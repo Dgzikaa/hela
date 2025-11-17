@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Calendar, ShoppingCart, Check } from 'lucide-react'
 import { Card } from '../components/Card'
 import { Button } from '../components/Button'
@@ -16,11 +17,12 @@ interface Boss {
 }
 
 export default function ComprarCarry() {
+  const router = useRouter()
+  
   // Redirecionar para home (página oculta - usar apenas bot Discord)
-  if (typeof window !== 'undefined') {
-    window.location.href = '/';
-    return null;
-  }
+  useEffect(() => {
+    router.push('/')
+  }, [router])
   
   const [bosses, setBosses] = useState<Boss[]>([])
   const [bosseselecionados, setBossesSelecionados] = useState<number[]>([])
