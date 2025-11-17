@@ -11,7 +11,7 @@ import { useToast } from '@/app/hooks/useToast'
 interface Jogador {
   id: number
   nick: string
-  categoria: string
+  categorias: string // String separada por vírgula: "HELA,CARRYS"
   discord: string | null
   discordId: string | null
   ativo: boolean
@@ -22,6 +22,16 @@ interface Jogador {
   totalGanho: number
 }
 
+// Helper para converter string em array
+const parseCategorias = (categorias: string): string[] => {
+  return categorias ? categorias.split(',') : []
+}
+
+// Helper para converter array em string
+const stringifyCategorias = (categorias: string[]): string => {
+  return categorias.join(',')
+}
+
 export default function JogadoresPage() {
   const toast = useToast()
   const [jogadores, setJogadores] = useState<Jogador[]>([])
@@ -30,7 +40,7 @@ export default function JogadoresPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     nick: '',
-    categoria: 'HELA',
+    categorias: ['HELA'] as string[], // Array de categorias
     discord: '',
     discordId: '',
     ativo: true,
@@ -60,7 +70,14 @@ export default function JogadoresPage() {
       const res = await fetch('/api/jogadores', {
         method: editingId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingId ? { id: editingId, ...formData } : formData)
+        body: JSON.stringify(editingId ? { 
+          id: editingId, 
+          ...formData,
+          categorias: formData.categorias // Já é array, API converte
+        } : {
+          ...formData,
+          categorias: formData.categorias
+        })
       })
 
       if (res.ok) {
@@ -69,7 +86,7 @@ export default function JogadoresPage() {
         setEditingId(null)
         setFormData({
           nick: '',
-          categoria: 'HELA',
+          categorias: ['HELA'],
           discord: '',
           discordId: '',
           ativo: true,
@@ -89,7 +106,7 @@ export default function JogadoresPage() {
     setEditingId(jogador.id)
     setFormData({
       nick: jogador.nick,
-      categoria: jogador.categoria,
+      categorias: parseCategorias(jogador.categorias),
       discord: jogador.discord || '',
       discordId: jogador.discordId || '',
       ativo: jogador.ativo,
@@ -131,6 +148,13 @@ export default function JogadoresPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
+  const renderCategoryBadges = (categoriasStr: string) => {
+    const cats = parseCategorias(categoriasStr)
+    return cats.map((cat, index) => (
+      <span key={index}>{getCategoryBadge(cat)}</span>
+    ))
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -159,19 +183,19 @@ export default function JogadoresPage() {
           <Card hover>
             <div className="text-green-600 text-sm font-semibold mb-1">Time HELA</div>
             <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.categoria === 'HELA' && j.ativo).length}
+              {jogadores.filter(j => j.categorias?.includes('HELA') && j.ativo).length}
             </div>
           </Card>
           <Card hover>
             <div className="text-blue-600 text-sm font-semibold mb-1">Carrys</div>
             <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.categoria === 'CARRYS' && j.ativo).length}
+              {jogadores.filter(j => j.categorias?.includes('CARRYS') && j.ativo).length}
             </div>
           </Card>
           <Card hover>
             <div className="text-yellow-600 text-sm font-semibold mb-1">Suplentes</div>
             <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.categoria === 'SUPLENTE' && j.ativo).length}
+              {jogadores.filter(j => j.categorias?.includes('SUPLENTE') && j.ativo).length}
             </div>
           </Card>
           <Card hover>
@@ -194,10 +218,10 @@ export default function JogadoresPage() {
                       <span className="text-xl" title="Jogador Essencial - Nunca sai da PT">⭐</span>
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    {getCategoryBadge(jogador.categoria)}
+                  <div className="flex gap-2 flex-wrap">
+                    {renderCategoryBadges(jogador.categorias)}
                     {jogador.essencial && (
-                      <Badge variant="warning">ESSENCIAL</Badge>
+                      <Badge variant="warning">⭐ ESSENCIAL</Badge>
                     )}
                   </div>
                 </div>
@@ -269,16 +293,29 @@ export default function JogadoresPage() {
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-2">Categoria</label>
-                  <select
-                    className="w-full bg-gray-700 text-white rounded px-4 py-2"
-                    value={formData.categoria}
-                    onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-                  >
-                    <option value="HELA">⭐ Time Principal (HELA)</option>
-                    <option value="CARRYS">🎯 Carrys (Boss 4-6)</option>
-                    <option value="SUPLENTE">🔄 Suplente</option>
-                  </select>
+                  <label className="block text-gray-300 mb-3">Categorias (selecione uma ou mais)</label>
+                  <div className="space-y-3">
+                    {['HELA', 'CARRYS', 'SUPLENTE'].map((cat) => (
+                      <label key={cat} className="flex items-center gap-3 cursor-pointer hover:bg-gray-700/50 p-2 rounded">
+                        <input
+                          type="checkbox"
+                          className="w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-800"
+                          checked={formData.categorias.includes(cat)}
+                          onChange={(e) => {
+                            const newCategorias = e.target.checked
+                              ? [...formData.categorias, cat]
+                              : formData.categorias.filter(c => c !== cat)
+                            setFormData({ ...formData, categorias: newCategorias })
+                          }}
+                        />
+                        <span className="text-white">
+                          {cat === 'HELA' && '⭐ Time Principal (HELA)'}
+                          {cat === 'CARRYS' && '🎯 Carrys (Boss 4-6)'}
+                          {cat === 'SUPLENTE' && '🔄 Suplente'}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
@@ -383,8 +420,8 @@ export default function JogadoresPage() {
                 <div className="bg-red-900/30 border border-red-500/50 p-4 rounded">
                   <div className="text-red-300 text-sm mb-1">⚠️ Esta ação não pode ser desfeita!</div>
                   <div className="text-white font-bold mt-3">{jogadorParaExcluir.nick}</div>
-                  <div className="text-gray-400 text-sm mt-2">
-                    {getCategoryBadge(jogadorParaExcluir.categoria).label}
+                  <div className="text-gray-400 text-sm mt-2 flex gap-2">
+                    {renderCategoryBadges(jogadorParaExcluir.categorias)}
                   </div>
                   <div className="text-gray-400 text-sm mt-1">
                     {jogadorParaExcluir.totalCarrys} carrys • {jogadorParaExcluir.totalGanho}KK ganho

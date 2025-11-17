@@ -48,12 +48,12 @@ enum CategoriaJogador {
 }
 
 model Jogador {
-  id        Int               @id @default(autoincrement())
-  nick      String            @unique
-  categoria CategoriaJogador
-  discord   String?           // Usuario do Discord (display name)
-  discordId String?           // ID do Discord para enviar mensagens
-  ativo     Boolean           @default(true)
+  id         Int      @id @default(autoincrement())
+  nick       String   @unique
+  categorias String   // Array de categorias separadas por vírgula: "HELA,CARRYS"
+  discord    String?  // Usuario do Discord (display name)
+  discordId  String?  // ID do Discord para enviar mensagens
+  ativo      Boolean  @default(true)
   
   // Sistema de rodízio
   essencial Boolean           @default(false) // Jogadores que NUNCA saem da PT

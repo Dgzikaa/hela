@@ -19,7 +19,7 @@ interface Boss {
 interface Jogador {
   id: number
   nick: string
-  categoria: string
+  categorias: string // String separada por vírgula: "HELA,CARRYS"
   discord: string | null
   ativo: boolean
   essencial: boolean
@@ -138,7 +138,7 @@ export default function PedidosPage() {
     const categoriaTime = temHela ? 'HELA' : 'CARRYS'
     
     const timeCategoria = jogadores.filter((j: Jogador) => 
-      j.categoria === categoriaTime && j.ativo
+      j.categorias?.includes(categoriaTime) && j.ativo
     )
     
     // 1. Pegar TODOS os essenciais (sempre vão)
@@ -264,7 +264,7 @@ export default function PedidosPage() {
         setShowCreateForm(false)
         
         // Resetar form mantendo o time HELA selecionado
-        const timeHela = jogadores.filter(j => j.categoria === 'HELA' && j.ativo)
+        const timeHela = jogadores.filter(j => j.categorias?.includes('HELA') && j.ativo)
         setFormData({
           nomeCliente: '',
           contatoCliente: '',
@@ -974,7 +974,7 @@ export default function PedidosPage() {
                   </p>
                   
                   {/* TIME PRINCIPAL (HELA) - Só mostra se tiver HELA selecionado */}
-                  {jogadores.filter((j: Jogador) => j.categoria === 'HELA').length > 0 && (
+                  {jogadores.filter((j: Jogador) => j.categorias?.includes('HELA')).length > 0 && (
                   <div className="mb-4">
                     <div className="text-sm font-semibold text-green-400 mb-2">
                       ⚔️ Time Principal (HELA)
@@ -985,7 +985,7 @@ export default function PedidosPage() {
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      {jogadores.filter((j: Jogador) => j.categoria === 'HELA').map((jogador: any) => {
+                      {jogadores.filter((j: Jogador) => j.categorias?.includes('HELA')).map((jogador: any) => {
                         const isEssencial = jogador.essencial
                         const isSelected = formData.jogadoresIds.includes(jogador.id)
                         
@@ -1017,7 +1017,7 @@ export default function PedidosPage() {
                   )}
 
                   {/* CARRYS (Boss 4-6) - Só mostra se não tiver HELA */}
-                  {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').length > 0 && (
+                  {jogadores.filter((j: Jogador) => j.categorias?.includes('CARRYS')).length > 0 && (
                     <div className="mb-4">
                       <div className="text-sm font-semibold text-blue-400 mb-2">
                         🎯 Time Carrys (Boss 4-6)
@@ -1028,7 +1028,7 @@ export default function PedidosPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').map((jogador: any) => {
+                        {jogadores.filter((j: Jogador) => j.categorias?.includes('CARRYS')).map((jogador: any) => {
                           const isSelected = formData.jogadoresIds.includes(jogador.id)
                           
                           return (
@@ -1053,7 +1053,7 @@ export default function PedidosPage() {
                   )}
 
                   {/* SUPLENTES (APENAS PARA SUBSTITUIÇÃO MANUAL) */}
-                  {jogadores.filter((j: Jogador) => j.categoria === 'SUPLENTE').length > 0 && (
+                  {jogadores.filter((j: Jogador) => j.categorias?.includes('SUPLENTE')).length > 0 && (
                     <div className="mb-2">
                       <div className="text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-2">
                         🔄 Suplentes (Use apenas se alguém faltar)
@@ -1062,7 +1062,7 @@ export default function PedidosPage() {
                         </span>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        {jogadores.filter((j: Jogador) => j.categoria === 'SUPLENTE').map((jogador: any) => {
+                        {jogadores.filter((j: Jogador) => j.categorias?.includes('SUPLENTE')).map((jogador: any) => {
                           const isSelected = formData.jogadoresIds.includes(jogador.id)
                           
                           return (
