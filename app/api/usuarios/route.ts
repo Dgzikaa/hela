@@ -11,6 +11,7 @@ export async function GET() {
         nome: true,
         email: true,
         role: true,
+        discordId: true,
         createdAt: true
       },
       orderBy: { createdAt: 'desc' }
@@ -29,7 +30,7 @@ export async function GET() {
 // POST - Criar novo usuário
 export async function POST(req: Request) {
   try {
-    const { nome, email, senha, role } = await req.json()
+    const { nome, email, senha, role, discordId } = await req.json()
 
     // Validações
     if (!nome || !email || !senha) {
@@ -60,13 +61,15 @@ export async function POST(req: Request) {
         nome,
         email,
         senha: senhaHash,
-        role: role || 'ADMIN'
+        role: role || 'ADMIN',
+        discordId: discordId || null
       },
       select: {
         id: true,
         nome: true,
         email: true,
         role: true,
+        discordId: true,
         createdAt: true
       }
     })
@@ -111,7 +114,7 @@ export async function DELETE(req: Request) {
 // PATCH - Atualizar usuário
 export async function PATCH(req: Request) {
   try {
-    const { id, nome, email, senha, role } = await req.json()
+    const { id, nome, email, senha, role, discordId } = await req.json()
 
     if (!id) {
       return NextResponse.json(
@@ -124,6 +127,7 @@ export async function PATCH(req: Request) {
     if (nome) data.nome = nome
     if (email) data.email = email
     if (role) data.role = role
+    if (discordId !== undefined) data.discordId = discordId || null
     if (senha) {
       data.senha = await bcrypt.hash(senha, 10)
     }
@@ -136,6 +140,7 @@ export async function PATCH(req: Request) {
         nome: true,
         email: true,
         role: true,
+        discordId: true,
         createdAt: true
       }
     })

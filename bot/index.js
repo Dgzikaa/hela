@@ -217,5 +217,42 @@ async function mostrarStatus(message) {
   }
 }
 
+// Função para enviar mensagem privada para um jogador
+async function enviarMensagemPrivada(discordId, mensagem) {
+  try {
+    const user = await client.users.fetch(discordId);
+    if (user) {
+      await user.send(mensagem);
+      console.log(`✅ Mensagem enviada para ${user.tag}`);
+      return true;
+    }
+  } catch (error) {
+    console.error(`❌ Erro ao enviar mensagem para ${discordId}:`, error.message);
+    return false;
+  }
+}
+
+// Função para enviar embed privado
+async function enviarEmbedPrivado(discordId, embed) {
+  try {
+    const user = await client.users.fetch(discordId);
+    if (user) {
+      await user.send({ embeds: [embed] });
+      console.log(`✅ Embed enviado para ${user.tag}`);
+      return true;
+    }
+  } catch (error) {
+    console.error(`❌ Erro ao enviar embed para ${discordId}:`, error.message);
+    return false;
+  }
+}
+
+// Exportar funções para serem usadas pela API
+module.exports = {
+  client,
+  enviarMensagemPrivada,
+  enviarEmbedPrivado
+};
+
 // Login
 client.login(process.env.DISCORD_BOT_TOKEN);

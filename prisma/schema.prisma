@@ -21,12 +21,14 @@ model Usuario {
   nome      String
   senha     String   // Hash bcrypt
   role      String   @default("ADMIN") // "ADMIN", "GERENTE"
+  discordId String?  // ID do Discord para enviar mensagens privadas
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relações
   pedidosAprovados Pedido[] @relation("UsuarioAprovador")
+  jogadores        Jogador[] // Jogadores associados a este usuário
 
   @@map("Usuario")
 }
@@ -45,8 +47,13 @@ model Jogador {
   id        Int               @id @default(autoincrement())
   nick      String            @unique
   categoria CategoriaJogador
-  discord   String?           // Usuario do Discord
+  discord   String?           // Usuario do Discord (display name)
+  discordId String?           // ID do Discord para enviar mensagens
   ativo     Boolean           @default(true)
+  
+  // Associação com usuário do sistema
+  usuarioId Int?
+  usuario   Usuario?          @relation(fields: [usuarioId], references: [id])
   
   // Estatísticas
   totalCarrys Int             @default(0)
@@ -56,7 +63,8 @@ model Jogador {
   updatedAt DateTime @updatedAt
 
   // Relações
-  missoesFora   Missao[]              @relation("JogadorFora") // Manter compatibilidade
+  missoesFora      Missao[]              @relation("JogadorFora") // Manter compatibilidade
+  participacoes    ParticipacaoCarry[]
 
   @@map("jogadores")
 }
@@ -216,6 +224,7 @@ model Pedido {
   // Relações
   itens         ItensPedido[]
   lead          Lead?        // Lead que originou (se veio do Discord)
+  participacoes ParticipacaoCarry[] // Jogadores participantes
 
   @@map("Pedido")
 }
@@ -237,22 +246,21 @@ model ItensPedido {
 }
 
 // Participação dos jogadores no carry
-// COMENTADO - Tabela não existe no banco ainda
-// model ParticipacaoCarry {
-//   id         Int   @id @default(autoincrement())
-//   pedidoId   Int
-//   jogadorId  Int
-//   
-//   pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-//   jogador    Jogador @relation(fields: [jogadorId], references: [id])
-//   
-//   // Valor recebido por esse jogador
-//   valorRecebido Int @default(0)
-//   
-//   createdAt DateTime @default(now())
-//
-//   @@map("participacoes_carry")
-// }
+model ParticipacaoCarry {
+  id         Int   @id @default(autoincrement())
+  pedidoId   Int
+  jogadorId  Int
+  
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  jogador    Jogador @relation(fields: [jogadorId], references: [id])
+  
+  // Valor recebido por esse jogador
+  valorRecebido Int @default(0)
+  
+  createdAt DateTime @default(now())
+
+  @@map("participacoes_carry")
+}
 
 // =======================
 // MIGRAÇÃO - MANTER COMPATIBILIDADE

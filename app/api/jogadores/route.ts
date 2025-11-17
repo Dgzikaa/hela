@@ -49,7 +49,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { nick, categoria } = body
+    const { nick, categoria, discord, discordId, ativo, usuarioId } = body
 
     if (!nick) {
       return NextResponse.json({ error: 'Nick é obrigatório' }, { status: 400 })
@@ -62,7 +62,11 @@ export async function POST(request: Request) {
     const jogador = await prisma.jogador.create({
       data: {
         nick,
-        categoria
+        categoria,
+        discord: discord || null,
+        discordId: discordId || null,
+        ativo: ativo !== undefined ? ativo : true,
+        usuarioId: usuarioId || null
       }
     })
 
@@ -70,6 +74,57 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Erro ao criar jogador:', error)
     return NextResponse.json({ error: 'Erro ao criar jogador' }, { status: 500 })
+  }
+}
+
+// PATCH - Atualizar jogador
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json()
+    const { id, nick, categoria, discord, discordId, ativo, usuarioId } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
+    }
+
+    const data: any = {}
+    if (nick) data.nick = nick
+    if (categoria) data.categoria = categoria
+    if (discord !== undefined) data.discord = discord || null
+    if (discordId !== undefined) data.discordId = discordId || null
+    if (ativo !== undefined) data.ativo = ativo
+    if (usuarioId !== undefined) data.usuarioId = usuarioId || null
+
+    const jogador = await prisma.jogador.update({
+      where: { id },
+      data
+    })
+
+    return NextResponse.json(jogador)
+  } catch (error) {
+    console.error('Erro ao atualizar jogador:', error)
+    return NextResponse.json({ error: 'Erro ao atualizar jogador' }, { status: 500 })
+  }
+}
+
+// DELETE - Excluir jogador
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
+    }
+
+    await prisma.jogador.delete({
+      where: { id: parseInt(id) }
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Erro ao excluir jogador:', error)
+    return NextResponse.json({ error: 'Erro ao excluir jogador' }, { status: 500 })
   }
 }
 

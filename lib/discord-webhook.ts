@@ -160,3 +160,148 @@ export async function enviarCalendarioSemanal(carrys: Array<{
   })
 }
 
+// Enviar mensagem privada via Discord API
+export async function enviarMensagemPrivada(discordId: string, conteudo: {
+  titulo: string
+  descricao: string
+  cor?: number
+  campos?: { nome: string; valor: string; inline?: boolean }[]
+  rodape?: string
+}) {
+  const botToken = process.env.DISCORD_BOT_TOKEN
+
+  if (!botToken) {
+    console.warn('⚠️ DISCORD_BOT_TOKEN não configurado - mensagem privada não enviada')
+    return
+  }
+
+  try {
+    // Criar canal DM com o usuário
+    const dmChannelResponse = await fetch(`https://discord.com/api/v10/users/@me/channels`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        recipient_id: discordId
+      })
+    })
+
+    if (!dmChannelResponse.ok) {
+      console.error('❌ Erro ao criar canal DM:', await dmChannelResponse.text())
+      return
+    }
+
+    const dmChannel = await dmChannelResponse.json()
+
+    // Enviar mensagem no canal DM
+    const embed = {
+      title: conteudo.titulo,
+      description: conteudo.descricao,
+      color: conteudo.cor || 0xFFD700,
+      fields: conteudo.campos || [],
+      footer: conteudo.rodape ? { text: conteudo.rodape } : undefined,
+      timestamp: new Date().toISOString()
+    }
+
+    const messageResponse = await fetch(`https://discord.com/api/v10/channels/${dmChannel.id}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        embeds: [embed]
+      })
+    })
+
+    if (!messageResponse.ok) {
+      console.error('❌ Erro ao enviar mensagem privada:', await messageResponse.text())
+    } else {
+      console.log(`✅ Mensagem privada enviada para ${discordId}`)
+    }
+  } catch (error) {
+    console.error('❌ Erro ao enviar mensagem privada:', error)
+  }
+}
+
+// Notificar jogadores sobre novo carry
+export async function notificarJogadoresNovoCarry(jogadores: Array<{
+  discordId: string | null
+  nick: string
+}>, pedido: {
+  id: number
+  nomeCliente: string
+  dataAgendada: string | null
+  bosses: string[]
+  valorTotal: number
+}) {
+  const dataFormatada = pedido.dataAgendada 
+    ? new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : 'A definir'
+
+  for (const jogador of jogadores) {
+    if (!jogador.discordId) {
+      console.log(`⚠️ Jogador ${jogador.nick} não tem Discord ID configurado`)
+      continue
+    }
+
+    await enviarMensagemPrivada(jogador.discordId, {
+      titulo: '🎮 Novo Carry Agendado!',
+      descricao: `Olá **${jogador.nick}**! Você foi selecionado para participar de um carry.`,
+      cor: 0x00FF00,
+      campos: [
+        { nome: '👤 Cliente', valor: pedido.nomeCliente, inline: true },
+        { nome: '💰 Valor Total', valor: `${pedido.valorTotal}KK`, inline: true },
+        { nome: '🎯 Bosses', valor: pedido.bosses.join(', '), inline: false },
+        { nome: '📅 Data', valor: dataFormatada, inline: false }
+      ],
+      rodape: `Pedido #${pedido.id} • Boa sorte!`
+    })
+
+    // Pequeno delay para não sobrecarregar a API do Discord
+    await new Promise(resolve => setTimeout(resolve, 500))
+  }
+}
+
+// Enviar lembrete diário para jogadores
+export async function enviarLembreteDiarioCarrys(jogadores: Array<{
+  discordId: string | null
+  nick: string
+  carrys: Array<{
+    id: number
+    nomeCliente: string
+    dataAgendada: string
+    bosses: string[]
+    horario: string
+  }>
+}>) {
+  for (const jogador of jogadores) {
+    if (!jogador.discordId || jogador.carrys.length === 0) continue
+
+    const listaCarrys = jogador.carrys.map(c => 
+      `**${c.horario}** - ${c.nomeCliente}\n🎯 ${c.bosses.join(', ')}`
+    ).join('\n\n')
+
+    await enviarMensagemPrivada(jogador.discordId, {
+      titulo: '☀️ Bom dia! Carries de Hoje',
+      descricao: `Olá **${jogador.nick}**! Você tem **${jogador.carrys.length} carry(s)** agendado(s) para hoje:`,
+      cor: 0xFFD700,
+      campos: [
+        { nome: '📋 Seus Carries de Hoje', valor: listaCarrys, inline: false }
+      ],
+      rodape: 'Boa sorte! 🎮'
+    })
+
+    await new Promise(resolve => setTimeout(resolve, 500))
+  }
+}
+

@@ -11,7 +11,8 @@ import {
   Crown,
   LogOut,
   Menu,
-  X
+  X,
+  Gamepad2
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -25,6 +26,7 @@ const menuItems: MenuItem[] = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
   { name: 'Calendário', href: '/admin/calendario', icon: Calendar },
+  { name: 'Jogadores', href: '/admin/jogadores', icon: Gamepad2 },
   { name: 'Leads', href: '/admin/leads', icon: MessageSquare },
   { name: 'Clientes VIP', href: '/admin/clientes', icon: Crown },
   { name: 'Usuários', href: '/admin/usuarios', icon: Users },

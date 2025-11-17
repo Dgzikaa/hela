@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido } from '@/lib/discord-webhook'
+import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido, notificarJogadoresNovoCarry } from '@/lib/discord-webhook'
 
 export async function GET() {
   try {
@@ -42,7 +42,8 @@ export async function POST(req: Request) {
       desconto,
       descontoTipo,
       origem,
-      observacoes 
+      observacoes,
+      jogadores // Array de IDs dos jogadores participantes
     } = body
 
     // Validações
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
       }
     })
 
-    // Criar pedido com itens
+    // Criar pedido com itens e participações
     const pedido = await prisma.pedido.create({
       data: {
         clienteId,
@@ -79,12 +80,23 @@ export async function POST(req: Request) {
             bossId: boss.id,
             preco: boss.preco
           }))
-        }
+        },
+        participacoes: jogadores && jogadores.length > 0 ? {
+          create: jogadores.map((jogadorId: number) => ({
+            jogadorId,
+            valorRecebido: 0 // Será calculado depois
+          }))
+        } : undefined
       },
       include: {
         itens: {
           include: {
             boss: true
+          }
+        },
+        participacoes: {
+          include: {
+            jogador: true
           }
         }
       }
@@ -127,7 +139,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Notificar no Discord
+    // Notificar no Discord (webhook público)
     try {
       const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
       await notificarNovoCarry({
@@ -139,6 +151,22 @@ export async function POST(req: Request) {
         pacoteCompleto: pedido.pacoteCompleto,
         conquistaSemMorrer: pedido.conquistaSemMorrer
       })
+
+      // Notificar jogadores participantes via DM
+      if (pedido.participacoes && pedido.participacoes.length > 0) {
+        const jogadoresParaNotificar = pedido.participacoes.map((p: any) => ({
+          discordId: p.jogador.discordId,
+          nick: p.jogador.nick
+        }))
+
+        await notificarJogadoresNovoCarry(jogadoresParaNotificar, {
+          id: pedido.id,
+          nomeCliente: pedido.nomeCliente,
+          dataAgendada: pedido.dataAgendada,
+          bosses: bossesNomes,
+          valorTotal: pedido.valorTotal
+        })
+      }
     } catch (error) {
       console.error('Erro ao notificar Discord (não crítico):', error)
     }

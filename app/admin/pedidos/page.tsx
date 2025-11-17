@@ -14,6 +14,14 @@ interface Boss {
   ordem: number
 }
 
+interface Jogador {
+  id: number
+  nick: string
+  categoria: string
+  discord: string | null
+  ativo: boolean
+}
+
 interface Pedido {
   id: number
   nomeCliente: string
@@ -47,10 +55,12 @@ export default function PedidosPage() {
   // Form state para criar novo pedido
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [bosses, setBosses] = useState<Boss[]>([])
+  const [jogadores, setJogadores] = useState<Jogador[]>([])
   const [formData, setFormData] = useState({
     nomeCliente: '',
     contatoCliente: '',
     bossesIds: [] as number[],
+    jogadoresIds: [] as number[],
     conquistaSemMorrer: false,
     pacoteCompleto: false,
     observacoes: ''
@@ -59,6 +69,7 @@ export default function PedidosPage() {
   useEffect(() => {
     fetchPedidos()
     fetchBosses()
+    fetchJogadores()
   }, [])
 
   const fetchPedidos = async () => {
@@ -84,6 +95,25 @@ export default function PedidosPage() {
       }
     } catch (error) {
       console.error('Erro ao buscar bosses:', error)
+    }
+  }
+
+  const fetchJogadores = async () => {
+    try {
+      const res = await fetch('/api/jogadores')
+      if (res.ok) {
+        const data = await res.json()
+        setJogadores(data.filter((j: Jogador) => j.ativo))
+        
+        // Selecionar time HELA por padrão
+        const timeHela = data.filter((j: Jogador) => j.categoria === 'HELA' && j.ativo)
+        setFormData(prev => ({
+          ...prev,
+          jogadoresIds: timeHela.map((j: Jogador) => j.id)
+        }))
+      }
+    } catch (error) {
+      console.error('Erro ao buscar jogadores:', error)
     }
   }
 
@@ -121,6 +151,7 @@ export default function PedidosPage() {
           nomeCliente: formData.nomeCliente,
           contatoCliente: formData.contatoCliente,
           bosses: formData.bossesIds,
+          jogadores: formData.jogadoresIds,
           conquistaSemMorrer: formData.conquistaSemMorrer,
           pacoteCompleto: formData.pacoteCompleto,
           valorTotal,
@@ -133,10 +164,14 @@ export default function PedidosPage() {
       if (res.ok) {
         alert('Pedido criado com sucesso!')
         setShowCreateForm(false)
+        
+        // Resetar form mantendo o time HELA selecionado
+        const timeHela = jogadores.filter(j => j.categoria === 'HELA' && j.ativo)
         setFormData({
           nomeCliente: '',
           contatoCliente: '',
           bossesIds: [],
+          jogadoresIds: timeHela.map(j => j.id),
           conquistaSemMorrer: false,
           pacoteCompleto: false,
           observacoes: ''
@@ -195,6 +230,15 @@ export default function PedidosPage() {
       bossesIds: prev.bossesIds.includes(bossId)
         ? prev.bossesIds.filter(id => id !== bossId)
         : [...prev.bossesIds, bossId]
+    }))
+  }
+
+  const toggleJogador = (jogadorId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      jogadoresIds: prev.jogadoresIds.includes(jogadorId)
+        ? prev.jogadoresIds.filter(id => id !== jogadorId)
+        : [...prev.jogadoresIds, jogadorId]
     }))
   }
 
@@ -461,6 +505,33 @@ export default function PedidosPage() {
                     />
                     <span>Pacote Completo 1-6 (Conquista Grátis)</span>
                   </label>
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-3 font-semibold">Jogadores Participantes</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {jogadores.map(jogador => (
+                      <button
+                        key={jogador.id}
+                        onClick={() => toggleJogador(jogador.id)}
+                        className={`p-3 rounded border-2 transition-colors text-left ${
+                          formData.jogadoresIds.includes(jogador.id)
+                            ? 'bg-green-600 border-green-500 text-white'
+                            : 'bg-gray-700 border-gray-600 text-gray-300'
+                        }`}
+                      >
+                        <div className="font-bold">{jogador.nick}</div>
+                        <div className="text-xs">
+                          {jogador.categoria === 'HELA' && '⭐ Time Principal'}
+                          {jogador.categoria === 'CARRYS' && '🎯 Carrys'}
+                          {jogador.categoria === 'SUPLENTE' && '🔄 Suplente'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-2 text-sm text-gray-400">
+                    {formData.jogadoresIds.length} jogador(es) selecionado(s)
+                  </div>
                 </div>
 
                 <div>
