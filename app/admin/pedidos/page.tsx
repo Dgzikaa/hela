@@ -359,9 +359,29 @@ export default function PedidosPage() {
 
         {/* Modal Criar Pedido */}
         {showCreateForm && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-              <h2 className="text-2xl font-bold text-white mb-6">Novo Pedido de Carry</h2>
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowCreateForm(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header com X */}
+              <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-700">
+                <h2 className="text-2xl font-bold text-white">Novo Pedido de Carry</h2>
+                <button
+                  onClick={() => setShowCreateForm(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Conteúdo com scroll */}
+              <div className="overflow-y-auto p-6 custom-scrollbar"  style={{ maxHeight: 'calc(90vh - 140px)' }}>
               
               <div className="space-y-4">
                 <div>
@@ -453,7 +473,12 @@ export default function PedidosPage() {
                   />
                 </div>
 
-                <div className="bg-gray-700 p-4 rounded">
+              </div>
+              </div>
+              
+              {/* Footer fixo com total e botões */}
+              <div className="border-t border-gray-700 p-6 pt-4 bg-gray-800">
+                <div className="bg-gray-700 p-4 rounded mb-4">
                   <div className="text-lg font-bold text-white">
                     Valor Total: {calcularValorTotal()}KK
                   </div>
