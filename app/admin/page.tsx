@@ -125,52 +125,16 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                Dashboard Admin
-              </h1>
-              <p className="text-slate-600">
-                Bem-vindo, <strong>{session.user.name}</strong>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => router.push('/admin/pedidos')}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-              >
-                🛒 Pedidos
-              </button>
-              <button
-                onClick={() => router.push('/admin/usuarios')}
-                className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 text-sm font-medium"
-              >
-                👥 Usuários
-              </button>
-              <button
-                onClick={() => router.push('/admin/calendario')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
-              >
-                📅 Calendário
-              </button>
-              <button
-                onClick={() => router.push('/admin/leads')}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
-              >
-                💬 Leads
-              </button>
-              <button
-                onClick={() => router.push('/admin/clientes')}
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm font-medium"
-              >
-                👑 Clientes VIP
-              </button>
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Dashboard
+          </h1>
+          <p className="text-gray-400">
+            Bem-vindo, <strong className="text-white">{session.user.name}</strong>
+          </p>
         </div>
 
         {/* Stats */}
