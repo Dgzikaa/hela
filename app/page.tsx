@@ -13,11 +13,11 @@ export default function Home() {
       <div className="max-w-4xl w-full">
         {/* Logo/Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl mb-6 shadow-2xl">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 rounded-3xl mb-6 shadow-2xl backdrop-blur-sm">
             <img 
-              src="https://api.ragnatales.com.br/database/mob/image?mob_id=28221" 
+              src="/images/bosses/hela.gif" 
               alt="Hela"
-              className="w-16 h-16 object-contain"
+              className="w-20 h-20 object-contain"
             />
           </div>
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-4">
@@ -31,47 +31,50 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Cards de Ação */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Comprar Carry */}
-          <Card 
-            className="p-8 hover:scale-105 transition-transform cursor-pointer bg-white"
-            onClick={() => router.push('/comprar')}
-          >
+        {/* O que Oferecemos */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          {/* Godly + Força Heróica */}
+          <Card className="p-6 bg-slate-800/50 border-slate-700">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-900 rounded-2xl mb-4">
-                <ShoppingCart className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-yellow-500/20 rounded-xl mb-3">
+                <Star className="w-6 h-6 text-yellow-500" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                Comprar Carry
-              </h2>
-              <p className="text-slate-600 mb-4">
-                Escolha os bosses e faça seu pedido
+              <h3 className="text-lg font-bold text-white mb-2">
+                Godly + Força Heróica
+              </h3>
+              <p className="text-sm text-slate-400">
+                Ingredientes para craftar os itens mais raros do jogo
               </p>
-              <Button fullWidth size="lg">
-                Começar Agora
-              </Button>
             </div>
           </Card>
 
-          {/* Admin */}
-          <Card 
-            className="p-8 hover:scale-105 transition-transform cursor-pointer bg-slate-900 border-slate-700"
-            onClick={() => router.push('/admin')}
-          >
+          {/* Conquistas */}
+          <Card className="p-6 bg-slate-800/50 border-slate-700">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4">
-                <Shield className="w-8 h-8 text-slate-900" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-xl mb-3">
+                <Shield className="w-6 h-6 text-blue-500" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Painel Admin
-              </h2>
-              <p className="text-slate-300 mb-4">
-                Gerenciar pedidos e jogadores
+              <h3 className="text-lg font-bold text-white mb-2">
+                Conquistas
+              </h3>
+              <p className="text-sm text-slate-400">
+                Sem Morrer e pacote completo 1-6 com benefícios especiais
               </p>
-              <Button fullWidth size="lg" variant="secondary">
-                Fazer Login
-              </Button>
+            </div>
+          </Card>
+
+          {/* Visual Exclusivo */}
+          <Card className="p-6 bg-slate-800/50 border-slate-700">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-xl mb-3">
+                <ShoppingCart className="w-6 h-6 text-purple-500" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">
+                Visual Exclusivo
+              </h3>
+              <p className="text-sm text-slate-400">
+                Pets e montarias únicas para se destacar no jogo
+              </p>
             </div>
           </Card>
         </div>
