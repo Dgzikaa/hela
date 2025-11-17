@@ -10,15 +10,15 @@ export function Input({ label, error, className, ...props }: InputProps) {
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-white text-sm font-medium mb-2">
+        <label className="block text-slate-700 text-sm font-medium mb-2">
           {label}
         </label>
       )}
       <input
         className={cn(
-          'w-full px-4 py-2.5 rounded-lg bg-white/20 text-white placeholder-purple-200',
-          'border border-white/30 backdrop-blur-sm',
-          'focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent',
+          'w-full px-4 py-2.5 rounded-lg bg-white text-slate-900 placeholder-slate-400',
+          'border border-slate-300',
+          'focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent',
           'transition-all duration-200',
           error && 'border-red-400 focus:ring-red-400',
           className
@@ -41,15 +41,15 @@ export function Textarea({ label, error, className, ...props }: TextareaProps) {
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-white text-sm font-medium mb-2">
+        <label className="block text-slate-700 text-sm font-medium mb-2">
           {label}
         </label>
       )}
       <textarea
         className={cn(
-          'w-full px-4 py-2.5 rounded-lg bg-white/20 text-white placeholder-purple-200',
-          'border border-white/30 backdrop-blur-sm',
-          'focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent',
+          'w-full px-4 py-2.5 rounded-lg bg-white text-slate-900 placeholder-slate-400',
+          'border border-slate-300',
+          'focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent',
           'transition-all duration-200',
           error && 'border-red-400 focus:ring-red-400',
           className
@@ -73,15 +73,15 @@ export function Select({ label, error, className, children, ...props }: SelectPr
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-white text-sm font-medium mb-2">
+        <label className="block text-slate-700 text-sm font-medium mb-2">
           {label}
         </label>
       )}
       <select
         className={cn(
-          'w-full px-4 py-2.5 rounded-lg bg-white/20 text-white',
-          'border border-white/30 backdrop-blur-sm',
-          'focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent',
+          'w-full px-4 py-2.5 rounded-lg bg-white text-slate-900',
+          'border border-slate-300',
+          'focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent',
           'transition-all duration-200',
           error && 'border-red-400 focus:ring-red-400',
           className

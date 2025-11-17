@@ -13,11 +13,11 @@ export function Card({ children, className, hover = false, gradient = false, sty
   return (
     <div
       className={cn(
-        'backdrop-blur-md rounded-xl p-6 transition-all duration-300',
+        'rounded-xl p-6 transition-all duration-300 border',
         gradient 
-          ? 'bg-gradient-to-br from-white/20 to-white/10 border border-white/20' 
-          : 'bg-white/10 border border-white/10',
-        hover && 'hover:bg-white/20 hover:scale-[1.02] hover:shadow-2xl cursor-pointer',
+          ? 'bg-white border-slate-200 shadow-sm' 
+          : 'bg-white border-slate-200',
+        hover && 'hover:shadow-lg hover:border-slate-300 cursor-pointer',
         className
       )}
       style={style}
@@ -32,10 +32,10 @@ export function CardHeader({ children, className }: { children: ReactNode; class
 }
 
 export function CardTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <h3 className={cn('text-2xl font-bold text-white', className)}>{children}</h3>
+  return <h3 className={cn('text-2xl font-bold text-slate-900', className)}>{children}</h3>
 }
 
 export function CardContent({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('text-purple-100', className)}>{children}</div>
+  return <div className={cn('text-slate-600', className)}>{children}</div>
 }
 

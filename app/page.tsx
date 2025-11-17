@@ -173,75 +173,75 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto mb-4"></div>
-          <div className="text-white text-xl font-semibold">Carregando...</div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-slate-900 mx-auto mb-4"></div>
+          <div className="text-slate-900 text-xl font-semibold">Carregando...</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-3 flex items-center justify-center gap-4 drop-shadow-2xl">
-            <div className="p-3 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-2xl">
-              <Calendar className="w-10 h-10" />
+          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-3 flex items-center justify-center gap-4">
+            <div className="p-3 bg-slate-900 rounded-2xl shadow-lg">
+              <Calendar className="w-10 h-10 text-white" />
             </div>
             Rodízio Ragnatales
           </h1>
-          <p className="text-purple-200 text-lg">Sistema de Gerenciamento de Missões</p>
+          <p className="text-slate-600 text-lg">Sistema de Gerenciamento de Missões</p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card gradient hover>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Users className="w-6 h-6 text-white" />
+              <div className="p-3 bg-slate-100 rounded-lg">
+                <Users className="w-6 h-6 text-slate-700" />
               </div>
               <div>
-                <p className="text-purple-200 text-sm">Jogadores</p>
-                <p className="text-white text-2xl font-bold">{jogadores.length}</p>
+                <p className="text-slate-600 text-sm">Jogadores</p>
+                <p className="text-slate-900 text-2xl font-bold">{jogadores.length}</p>
               </div>
             </div>
           </Card>
           
           <Card gradient hover>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <UserPlus className="w-6 h-6 text-white" />
+              <div className="p-3 bg-slate-100 rounded-lg">
+                <UserPlus className="w-6 h-6 text-slate-700" />
               </div>
               <div>
-                <p className="text-purple-200 text-sm">Suplentes</p>
-                <p className="text-white text-2xl font-bold">{suplentes.length}</p>
+                <p className="text-slate-600 text-sm">Suplentes</p>
+                <p className="text-slate-900 text-2xl font-bold">{suplentes.length}</p>
               </div>
             </div>
           </Card>
           
           <Card gradient hover>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Trophy className="w-6 h-6 text-white" />
+              <div className="p-3 bg-green-50 rounded-lg">
+                <Trophy className="w-6 h-6 text-green-700" />
               </div>
               <div>
-                <p className="text-purple-200 text-sm">Concluídas</p>
-                <p className="text-white text-2xl font-bold">{totalMissoesConcluidas}</p>
+                <p className="text-slate-600 text-sm">Concluídas</p>
+                <p className="text-slate-900 text-2xl font-bold">{totalMissoesConcluidas}</p>
               </div>
             </div>
           </Card>
           
           <Card gradient hover>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Clock className="w-6 h-6 text-white" />
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <Clock className="w-6 h-6 text-blue-700" />
               </div>
               <div>
-                <p className="text-purple-200 text-sm">Agendadas</p>
-                <p className="text-white text-2xl font-bold">{missoesAgendadas}</p>
+                <p className="text-slate-600 text-sm">Agendadas</p>
+                <p className="text-slate-900 text-2xl font-bold">{missoesAgendadas}</p>
               </div>
             </div>
           </Card>
@@ -249,15 +249,15 @@ export default function Home() {
 
         {/* Próximo Jogador */}
         {proximoJogador && (
-          <Card gradient className="mb-6 bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-2 border-purple-400/50">
+          <Card gradient className="mb-6 bg-slate-900 border-slate-800">
             <div className="flex items-center gap-4">
-              <div className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl shadow-xl">
+              <div className="p-4 bg-slate-800 rounded-xl">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <div className="flex-1">
                 <h2 className="text-white text-xl font-semibold mb-1">🎯 Próximo a Ficar de Fora</h2>
                 <p className="text-3xl font-bold text-white mb-1">{proximoJogador.nick}</p>
-                <p className="text-purple-100">
+                <p className="text-slate-300">
                   Ficou fora <strong>{proximoJogador.vezesFora}x</strong>
                   {proximoJogador.ultimaMissao 
                     ? ` • Última: ${formatDate(proximoJogador.ultimaMissao)}`
@@ -269,14 +269,14 @@ export default function Home() {
         )}
 
         {/* Tabs */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-2 mb-6 shadow-2xl border border-white/20">
+        <div className="bg-white rounded-2xl p-2 mb-6 shadow-lg border border-slate-200">
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('jogadores')}
               className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
                 activeTab === 'jogadores'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105'
-                  : 'text-white hover:bg-white/10'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
               <Users className="w-5 h-5" />
@@ -287,8 +287,8 @@ export default function Home() {
               onClick={() => setActiveTab('suplentes')}
               className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
                 activeTab === 'suplentes'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105'
-                  : 'text-white hover:bg-white/10'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
               <UserPlus className="w-5 h-5" />
@@ -299,8 +299,8 @@ export default function Home() {
               onClick={() => setActiveTab('missoes')}
               className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
                 activeTab === 'missoes'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105'
-                  : 'text-white hover:bg-white/10'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
               <ListTodo className="w-5 h-5" />
@@ -311,7 +311,7 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <Card className="shadow-2xl border border-white/20">
+        <Card className="shadow-lg border border-slate-200">
           {/* Jogadores Tab */}
           {activeTab === 'jogadores' && (
             <div>
@@ -354,7 +354,7 @@ export default function Home() {
                           {jogador.vezesFora === 0 ? '⭐' : '👤'}
                         </div>
                         <div>
-                          <h3 className="text-white font-bold text-xl mb-1">{jogador.nick}</h3>
+                          <h3 className="text-slate-900 font-bold text-xl mb-1">{jogador.nick}</h3>
                           <div className="flex gap-2 flex-wrap">
                             <Badge variant="default">
                               {jogador.vezesFora}x fora
@@ -377,9 +377,9 @@ export default function Home() {
                 ))}
                 {jogadores.length === 0 && (
                   <div className="text-center py-16">
-                    <Users className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
-                    <p className="text-purple-200 text-lg">Nenhum jogador cadastrado ainda</p>
-                    <p className="text-purple-300 text-sm mt-2">Adicione o primeiro jogador acima!</p>
+                    <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <p className="text-slate-600 text-lg">Nenhum jogador cadastrado ainda</p>
+                    <p className="text-slate-400 text-sm mt-2">Adicione o primeiro jogador acima!</p>
                   </div>
                 )}
               </div>
@@ -426,7 +426,7 @@ export default function Home() {
                       <div className="flex items-center gap-4">
                         <div className="text-5xl">🛡️</div>
                         <div>
-                          <h3 className="text-white font-bold text-xl mb-1">{suplente.nick}</h3>
+                          <h3 className="text-slate-900 font-bold text-xl mb-1">{suplente.nick}</h3>
                           <div className="flex gap-2 flex-wrap">
                             <Badge variant="default">
                               {suplente.vezesJogou}x jogou
@@ -449,9 +449,9 @@ export default function Home() {
                 ))}
                 {suplentes.length === 0 && (
                   <div className="text-center py-16">
-                    <UserPlus className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
-                    <p className="text-purple-200 text-lg">Nenhum suplente cadastrado ainda</p>
-                    <p className="text-purple-300 text-sm mt-2">Adicione o primeiro suplente acima!</p>
+                    <UserPlus className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <p className="text-slate-600 text-lg">Nenhum suplente cadastrado ainda</p>
+                    <p className="text-slate-400 text-sm mt-2">Adicione o primeiro suplente acima!</p>
                   </div>
                 )}
               </div>
@@ -577,8 +577,8 @@ export default function Home() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-purple-300" />
-                        <h3 className="text-white font-bold text-lg">
+                        <Calendar className="w-5 h-5 text-slate-400" />
+                        <h3 className="text-slate-900 font-bold text-lg">
                           {formatDate(missao.data)}
                         </h3>
                       </div>
@@ -596,7 +596,7 @@ export default function Home() {
                       </div>
                     </div>
                     
-                    <div className="space-y-2 text-purple-100">
+                    <div className="space-y-2 text-slate-600">
                       <p className="flex items-center gap-2">
                         <span className="text-xl">👤</span>
                         <strong>Ficou de fora:</strong> {missao.jogadorFora?.nick || 'N/A'}
@@ -624,7 +624,7 @@ export default function Home() {
                         </>
                       )}
                       {missao.observacoes && (
-                        <p className="flex items-center gap-2 italic text-purple-200">
+                        <p className="flex items-center gap-2 italic text-slate-500">
                           <span className="text-xl">📝</span>
                           {missao.observacoes}
                         </p>
@@ -634,16 +634,16 @@ export default function Home() {
                 ))}
                 {missoes.length === 0 && (
                   <div className="text-center py-16">
-                    <ListTodo className="w-16 h-16 text-purple-300 mx-auto mb-4 opacity-50" />
-                    <p className="text-purple-200 text-lg">Nenhuma missão cadastrada ainda</p>
-                    <p className="text-purple-300 text-sm mt-2">Crie a primeira missão acima!</p>
+                    <ListTodo className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <p className="text-slate-600 text-lg">Nenhuma missão cadastrada ainda</p>
+                    <p className="text-slate-400 text-sm mt-2">Crie a primeira missão acima!</p>
                   </div>
                 )}
               </div>
             </div>
           )}
         </Card>
-      </div>
+        </div>
     </div>
   )
 }
