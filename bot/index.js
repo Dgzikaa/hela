@@ -35,9 +35,13 @@ client.on('messageCreate', async (message) => {
   // Ignorar bots
   if (message.author.bot) return;
 
+  console.log(`📩 Mensagem recebida de ${message.author.username}: "${message.content}"`);
+
   const userId = message.author.id;
   const username = message.author.username;
   const content = message.content.toLowerCase().trim();
+
+  console.log(`🔍 Processando comando: "${content}"`);
 
   // Registrar lead (não bloquear o bot se falhar)
   registrarLead(userId, username, message.content).catch(err => {
