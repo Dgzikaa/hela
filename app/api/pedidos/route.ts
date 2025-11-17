@@ -43,7 +43,8 @@ export async function POST(req: Request) {
       descontoTipo,
       origem,
       observacoes,
-      jogadores // Array de IDs dos jogadores participantes
+      jogadores, // Array de IDs dos jogadores participantes
+      bossesPrecos // Mapa de ID do boss -> preço customizado (opcional)
     } = body
 
     // Validações
@@ -78,7 +79,10 @@ export async function POST(req: Request) {
         itens: {
           create: bossesData.map(boss => ({
             bossId: boss.id,
-            preco: boss.preco
+            // Usar preço customizado se fornecido, senão usar preço padrão
+            preco: bossesPrecos && bossesPrecos[boss.id] !== undefined 
+              ? bossesPrecos[boss.id] 
+              : boss.preco
           }))
         },
         participacoes: jogadores && jogadores.length > 0 ? {

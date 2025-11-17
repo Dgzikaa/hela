@@ -54,6 +54,12 @@ export default function PedidosPage() {
   const [showModal, setShowModal] = useState(false)
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null)
   
+  // Modal de agendamento
+  const [showAgendarModal, setShowAgendarModal] = useState(false)
+  const [pedidoParaAgendar, setPedidoParaAgendar] = useState<Pedido | null>(null)
+  const [dataAgendamento, setDataAgendamento] = useState('')
+  const [horaAgendamento, setHoraAgendamento] = useState('')
+  
   // Form state para criar novo pedido
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [bosses, setBosses] = useState<Boss[]>([])
@@ -65,7 +71,9 @@ export default function PedidosPage() {
     jogadoresIds: [] as number[],
     conquistaSemMorrer: false,
     pacoteCompleto: false,
-    observacoes: ''
+    observacoes: '',
+    precoCustomizado: false,
+    bossesPrecos: {} as Record<number, number> // ID do boss -> preço customizado
   })
 
   useEffect(() => {
@@ -149,10 +157,14 @@ export default function PedidosPage() {
   const calcularValorTotal = () => {
     let total = 0
     
-    // Somar bosses selecionados
+    // Somar bosses selecionados (com preços customizados se houver)
     formData.bossesIds.forEach(bossId => {
-      const boss = bosses.find(b => b.id === bossId)
-      if (boss) total += boss.preco
+      if (formData.precoCustomizado && formData.bossesPrecos[bossId] !== undefined) {
+        total += formData.bossesPrecos[bossId]
+      } else {
+        const boss = bosses.find(b => b.id === bossId)
+        if (boss) total += boss.preco
+      }
     })
     
     // Adicionar conquista sem morrer
@@ -167,6 +179,24 @@ export default function PedidosPage() {
     }
     
     return total
+  }
+  
+  const getBossPreco = (bossId: number) => {
+    if (formData.precoCustomizado && formData.bossesPrecos[bossId] !== undefined) {
+      return formData.bossesPrecos[bossId]
+    }
+    const boss = bosses.find(b => b.id === bossId)
+    return boss?.preco || 0
+  }
+  
+  const setBossPreco = (bossId: number, preco: number) => {
+    setFormData({
+      ...formData,
+      bossesPrecos: {
+        ...formData.bossesPrecos,
+        [bossId]: preco
+      }
+    })
   }
 
   const handleCreatePedido = async () => {
@@ -186,7 +216,8 @@ export default function PedidosPage() {
           valorTotal,
           desconto: 0,
           origem: 'WEB',
-          observacoes: formData.observacoes
+          observacoes: formData.observacoes,
+          bossesPrecos: formData.precoCustomizado ? formData.bossesPrecos : null
         })
       })
       
@@ -203,7 +234,9 @@ export default function PedidosPage() {
           jogadoresIds: timeHela.map(j => j.id),
           conquistaSemMorrer: false,
           pacoteCompleto: false,
-          observacoes: ''
+          observacoes: '',
+          precoCustomizado: false,
+          bossesPrecos: {}
         })
         fetchPedidos()
       } else {
@@ -254,12 +287,25 @@ export default function PedidosPage() {
   }
 
   const toggleBoss = (bossId: number) => {
-    setFormData(prev => ({
-      ...prev,
-      bossesIds: prev.bossesIds.includes(bossId)
-        ? prev.bossesIds.filter(id => id !== bossId)
-        : [...prev.bossesIds, bossId]
-    }))
+    const boss = bosses.find(b => b.id === bossId)
+    setFormData(prev => {
+      const isAdding = !prev.bossesIds.includes(bossId)
+      const newBossesIds = isAdding 
+        ? [...prev.bossesIds, bossId]
+        : prev.bossesIds.filter(id => id !== bossId)
+      
+      // Inicializar preço customizado com o preço padrão ao adicionar
+      const newBossesPrecos = { ...prev.bossesPrecos }
+      if (isAdding && boss && prev.precoCustomizado) {
+        newBossesPrecos[bossId] = boss.preco
+      }
+      
+      return {
+        ...prev,
+        bossesIds: newBossesIds,
+        bossesPrecos: newBossesPrecos
+      }
+    })
   }
 
   const toggleJogador = (jogadorId: number) => {
@@ -394,10 +440,13 @@ export default function PedidosPage() {
                     <Button
                       size="sm"
                       onClick={() => {
-                        const data = prompt('Data do carry (AAAA-MM-DD HH:MM):')
-                        if (data) {
-                          handleUpdateStatus(pedido.id, 'AGENDADO', data)
-                        }
+                        setPedidoParaAgendar(pedido)
+                        // Pré-preencher com data de hoje + 1 dia
+                        const amanha = new Date()
+                        amanha.setDate(amanha.getDate() + 1)
+                        setDataAgendamento(amanha.toISOString().split('T')[0])
+                        setHoraAgendamento('20:00')
+                        setShowAgendarModal(true)
                       }}
                     >
                       <Calendar className="w-4 h-4 mr-1" />
@@ -478,40 +527,95 @@ export default function PedidosPage() {
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-2">Selecione os Bosses</label>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-gray-300 font-semibold">Selecione os Bosses</label>
+                    <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer hover:text-gray-200">
+                      <input
+                        type="checkbox"
+                        checked={formData.precoCustomizado}
+                        onChange={(e) => {
+                          const checked = e.target.checked
+                          setFormData(prev => {
+                            // Inicializar preços customizados com valores padrão
+                            const newBossesPrecos: Record<number, number> = {}
+                            if (checked) {
+                              prev.bossesIds.forEach(bossId => {
+                                const boss = bosses.find(b => b.id === bossId)
+                                if (boss) newBossesPrecos[bossId] = boss.preco
+                              })
+                            }
+                            return {
+                              ...prev,
+                              precoCustomizado: checked,
+                              bossesPrecos: newBossesPrecos
+                            }
+                          })
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <span>💰 Preço Customizado (Amigos, Parcerias, etc)</span>
+                    </label>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     {/* Hela separada - destaque */}
                     {bosses.filter(b => b.ordem === 0).map(boss => (
-                      <button
-                        key={boss.id}
-                        onClick={() => toggleBoss(boss.id)}
-                        className={`col-span-2 p-4 rounded border-2 transition-colors ${
-                          formData.bossesIds.includes(boss.id)
-                            ? 'bg-purple-600 border-purple-500 text-white'
-                            : 'bg-gray-700 border-gray-600 text-gray-300'
-                        }`}
-                      >
-                        <div className="font-bold text-lg">{boss.nome}</div>
-                        <div className="text-sm">{boss.preco}KK</div>
-                      </button>
+                      <div key={boss.id} className="col-span-2">
+                        <button
+                          onClick={() => toggleBoss(boss.id)}
+                          className={`w-full p-4 rounded border-2 transition-colors ${
+                            formData.bossesIds.includes(boss.id)
+                              ? 'bg-purple-600 border-purple-500 text-white'
+                              : 'bg-gray-700 border-gray-600 text-gray-300'
+                          }`}
+                        >
+                          <div className="font-bold text-lg">{boss.nome}</div>
+                          <div className="text-sm">{boss.preco}KK (padrão)</div>
+                        </button>
+                        {formData.precoCustomizado && formData.bossesIds.includes(boss.id) && (
+                          <input
+                            type="number"
+                            value={getBossPreco(boss.id)}
+                            onChange={(e) => setBossPreco(boss.id, Number(e.target.value))}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full mt-2 bg-gray-700 text-white rounded px-4 py-2 border border-gray-600"
+                            placeholder="Preço customizado (KK)"
+                          />
+                        )}
+                      </div>
                     ))}
                     
                     {/* Bosses 1-6 */}
                     {bosses.filter(b => b.ordem > 0).map(boss => (
-                      <button
-                        key={boss.id}
-                        onClick={() => toggleBoss(boss.id)}
-                        className={`p-3 rounded border-2 transition-colors ${
-                          formData.bossesIds.includes(boss.id)
-                            ? 'bg-blue-600 border-blue-500 text-white'
-                            : 'bg-gray-700 border-gray-600 text-gray-300'
-                        }`}
-                      >
-                        <div className="font-bold">{boss.nome}</div>
-                        <div className="text-sm">{boss.preco}KK</div>
-                      </button>
+                      <div key={boss.id}>
+                        <button
+                          onClick={() => toggleBoss(boss.id)}
+                          className={`w-full p-3 rounded border-2 transition-colors ${
+                            formData.bossesIds.includes(boss.id)
+                              ? 'bg-blue-600 border-blue-500 text-white'
+                              : 'bg-gray-700 border-gray-600 text-gray-300'
+                          }`}
+                        >
+                          <div className="font-bold">{boss.nome}</div>
+                          <div className="text-sm">{boss.preco}KK</div>
+                        </button>
+                        {formData.precoCustomizado && formData.bossesIds.includes(boss.id) && (
+                          <input
+                            type="number"
+                            value={getBossPreco(boss.id)}
+                            onChange={(e) => setBossPreco(boss.id, Number(e.target.value))}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full mt-1 bg-gray-700 text-white rounded px-2 py-1 text-sm border border-gray-600"
+                            placeholder="KK"
+                          />
+                        )}
+                      </div>
                     ))}
                   </div>
+                  {formData.precoCustomizado && (
+                    <div className="mt-2 text-xs text-yellow-400 bg-yellow-900/20 p-2 rounded">
+                      💡 Modo customizado ativo - edite os valores acima para carry com desconto, amigos, parcerias, etc
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -612,6 +716,103 @@ export default function PedidosPage() {
                     Cancelar
                   </Button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Agendar Carry */}
+        {showAgendarModal && pedidoParaAgendar && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowAgendarModal(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Calendar className="w-6 h-6" />
+                  Agendar Carry
+                </h2>
+                <button
+                  onClick={() => setShowAgendarModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-gray-700 p-4 rounded">
+                  <div className="text-gray-300 text-sm mb-1">Cliente</div>
+                  <div className="text-white font-bold">{pedidoParaAgendar.nomeCliente}</div>
+                  <div className="text-gray-400 text-sm mt-2">
+                    {pedidoParaAgendar.itens.map(i => i.boss.nome).join(', ')}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2 font-semibold">📅 Data do Carry</label>
+                  <input
+                    type="date"
+                    value={dataAgendamento}
+                    onChange={(e) => setDataAgendamento(e.target.value)}
+                    className="w-full bg-gray-700 text-white rounded px-4 py-3 border border-gray-600 focus:border-blue-500 focus:outline-none text-lg"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2 font-semibold">⏰ Horário</label>
+                  <input
+                    type="time"
+                    value={horaAgendamento}
+                    onChange={(e) => setHoraAgendamento(e.target.value)}
+                    className="w-full bg-gray-700 text-white rounded px-4 py-3 border border-gray-600 focus:border-blue-500 focus:outline-none text-lg"
+                  />
+                </div>
+
+                {dataAgendamento && horaAgendamento && (
+                  <div className="bg-blue-900/30 border border-blue-500/50 p-3 rounded">
+                    <div className="text-blue-300 text-sm mb-1">Carry agendado para:</div>
+                    <div className="text-white font-bold">
+                      {new Date(`${dataAgendamento}T${horaAgendamento}`).toLocaleDateString('pt-BR', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                      })} às {horaAgendamento}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => {
+                    if (dataAgendamento && horaAgendamento) {
+                      const dataCompleta = `${dataAgendamento} ${horaAgendamento}`
+                      handleUpdateStatus(pedidoParaAgendar.id, 'AGENDADO', dataCompleta)
+                      setShowAgendarModal(false)
+                    } else {
+                      alert('Preencha data e horário!')
+                    }
+                  }}
+                  className="flex-1"
+                >
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  Confirmar Agendamento
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowAgendarModal(false)}
+                >
+                  Cancelar
+                </Button>
               </div>
             </div>
           </div>
