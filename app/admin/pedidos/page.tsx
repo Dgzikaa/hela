@@ -387,6 +387,23 @@ export default function PedidosPage() {
                 <div>
                   <label className="block text-gray-300 mb-2">Selecione os Bosses</label>
                   <div className="grid grid-cols-2 gap-2">
+                    {/* Hela separada - destaque */}
+                    {bosses.filter(b => b.ordem === 0).map(boss => (
+                      <button
+                        key={boss.id}
+                        onClick={() => toggleBoss(boss.id)}
+                        className={`col-span-2 p-4 rounded border-2 transition-colors ${
+                          formData.bossesIds.includes(boss.id)
+                            ? 'bg-purple-600 border-purple-500 text-white'
+                            : 'bg-gray-700 border-gray-600 text-gray-300'
+                        }`}
+                      >
+                        <div className="font-bold text-lg">{boss.nome}</div>
+                        <div className="text-sm">{boss.preco}KK</div>
+                      </button>
+                    ))}
+                    
+                    {/* Bosses 1-6 */}
                     {bosses.filter(b => b.ordem > 0).map(boss => (
                       <button
                         key={boss.id}
