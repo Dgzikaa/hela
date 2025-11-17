@@ -49,15 +49,20 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { nick } = body
+    const { nick, categoria } = body
 
     if (!nick) {
       return NextResponse.json({ error: 'Nick é obrigatório' }, { status: 400 })
     }
 
+    if (!categoria) {
+      return NextResponse.json({ error: 'Categoria é obrigatória' }, { status: 400 })
+    }
+
     const jogador = await prisma.jogador.create({
       data: {
-        nick
+        nick,
+        categoria
       }
     })
 
