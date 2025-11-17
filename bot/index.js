@@ -53,7 +53,7 @@ client.on('messageCreate', async (message) => {
         { 
           name: '💬 Como Comprar?', 
           value: 'Para consultar **preços** e fazer seu pedido, entre em contato com:\n\n' +
-                 '**@supaturk** ou **@godzera**\n\n' +
+                 '**@supaturk** ou **@godinho_**\n\n' +
                  '🔒 Preços exclusivos • Atendimento personalizado'
         }
       )
@@ -97,7 +97,7 @@ client.on('messageCreate', async (message) => {
         },
         { 
           name: '💬 Como Comprar?', 
-          value: 'Para consultar preços e fazer pedido, fale com:\n**@supaturk** ou **@godzera**' 
+          value: 'Para consultar preços e fazer pedido, fale com:\n**@supaturk** ou **@godinho_**' 
         },
         { 
           name: '⚡ Como começar?', 
@@ -145,7 +145,7 @@ async function mostrarHistorico(message) {
       const cliente = await response.json();
       
       if (!cliente || cliente.totalCompras === 0) {
-        await message.reply('📊 Você ainda não tem compras registradas. Entre em contato com **@supaturk** ou **@godzera** para fazer seu primeiro pedido!');
+        await message.reply('📊 Você ainda não tem compras registradas. Entre em contato com **@supaturk** ou **@godinho_** para fazer seu primeiro pedido!');
         return;
       }
 
@@ -162,7 +162,7 @@ async function mostrarHistorico(message) {
 
       await message.reply({ embeds: [embed] });
     } else {
-      await message.reply('📊 Você ainda não tem compras registradas. Entre em contato com **@supaturk** ou **@godzera** para fazer seu primeiro pedido!');
+      await message.reply('📊 Você ainda não tem compras registradas. Entre em contato com **@supaturk** ou **@godinho_** para fazer seu primeiro pedido!');
     }
   } catch (error) {
     console.error('Erro ao buscar histórico:', error);
@@ -187,12 +187,12 @@ async function mostrarStatus(message) {
         .addFields(
           { name: '👤 Seu Discord', value: lead.discordUsername, inline: true }
         )
-        .setFooter({ text: 'Para mais informações, fale com @supaturk ou @godzera' })
+        .setFooter({ text: 'Para mais informações, fale com @supaturk ou @godinho_' })
         .setTimestamp();
 
       await message.reply({ embeds: [embed] });
     } else {
-      await message.reply('📋 Nenhum pedido encontrado. Entre em contato com **@supaturk** ou **@godzera** para fazer um pedido!');
+      await message.reply('📋 Nenhum pedido encontrado. Entre em contato com **@supaturk** ou **@godinho_** para fazer um pedido!');
     }
   } catch (error) {
     console.error('Erro ao buscar status:', error);
