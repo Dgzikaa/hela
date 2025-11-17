@@ -39,8 +39,10 @@ client.on('messageCreate', async (message) => {
   const username = message.author.username;
   const content = message.content.toLowerCase().trim();
 
-  // Registrar lead
-  await registrarLead(userId, username, message.content);
+  // Registrar lead (não bloquear o bot se falhar)
+  registrarLead(userId, username, message.content).catch(err => {
+    console.error('Erro ao registrar lead (não crítico):', err.message);
+  });
 
   // Comando: !carry
   if (content === '!carry') {
