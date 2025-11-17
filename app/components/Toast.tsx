@@ -71,8 +71,15 @@ export function Toast({ id, type, message, duration = 4000, onClose }: ToastProp
   )
 }
 
+interface ToastData {
+  id: string
+  type: 'success' | 'error' | 'warning' | 'info'
+  message: string
+  duration?: number
+}
+
 export function ToastContainer({ toasts, onClose }: { 
-  toasts: ToastProps[]
+  toasts: ToastData[]
   onClose: (id: string) => void 
 }) {
   return (
