@@ -334,7 +334,7 @@ export default function PedidosPage() {
                   {pedido.status === 'AGENDADO' && (
                     <Button
                       size="sm"
-                      variant="info"
+                      variant="primary"
                       onClick={() => handleUpdateStatus(pedido.id, 'EM_ANDAMENTO')}
                     >
                       <Clock className="w-4 h-4 mr-1" />
