@@ -86,16 +86,29 @@ export default function Home() {
               Para consultar valores e fazer seu pedido, entre em contato via Discord:
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <div className="bg-slate-700/50 px-6 py-3 rounded-xl border border-slate-600">
+              <a 
+                href="https://discord.com/users/614167750457163796"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-700/50 px-6 py-3 rounded-xl border border-slate-600 hover:bg-slate-600/50 hover:border-blue-500 transition-all cursor-pointer"
+              >
                 <p className="text-white font-bold">@supaturk</p>
-              </div>
+              </a>
               <div className="text-slate-500 hidden sm:block">ou</div>
-              <div className="bg-slate-700/50 px-6 py-3 rounded-xl border border-slate-600">
-                <p className="text-white font-bold">@godzera</p>
-              </div>
+              <a 
+                href="https://discord.com/users/116981167101575171"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-700/50 px-6 py-3 rounded-xl border border-slate-600 hover:bg-slate-600/50 hover:border-blue-500 transition-all cursor-pointer"
+              >
+                <p className="text-white font-bold">@godinho_</p>
+              </a>
             </div>
             <p className="text-sm text-slate-400 mt-4">
               🔒 Preços exclusivos • Atendimento personalizado • Segurança garantida
+            </p>
+            <p className="text-xs text-slate-500">
+              💡 Clique nos nomes para abrir conversa no Discord
             </p>
           </div>
         </Card>
