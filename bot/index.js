@@ -27,8 +27,8 @@ const BOSSES = [
 ];
 
 client.on('ready', () => {
-  console.log(`🤖 Bot conectado como ${client.user.tag}`);
-  client.user.setActivity('!carry para comprar', { type: 'PLAYING' });
+  console.log(`🤖 Seu Raimundo conectado como ${client.user.tag}`);
+  client.user.setActivity('Vendendo carrys! Use !carry', { type: 'PLAYING' });
 });
 
 client.on('messageCreate', async (message) => {
@@ -123,8 +123,8 @@ async function iniciarCompra(message) {
 
   const embed = new EmbedBuilder()
     .setColor('#0099ff')
-    .setTitle('🎮 Comprar Carry - Ragnatales')
-    .setDescription('Selecione os bosses que deseja comprar:')
+    .setTitle('🎮 Seu Raimundo - Carrys de Ragnatales')
+    .setDescription('Olá! Sou o Seu Raimundo, seu vendedor de carrys! 😄\nSelecione os bosses que deseja comprar:')
     .addFields(
       { name: '1️⃣ Freylith', value: '70KK', inline: true },
       { name: '2️⃣ Tyrgrim', value: '100KK', inline: true },
@@ -134,7 +134,7 @@ async function iniciarCompra(message) {
       { name: '6️⃣ Glacius', value: '300KK', inline: true },
       { name: '📦 Pacote Completo (1-6)', value: '**500KK** + Conquista Sem Morrer GRÁTIS! 🎁', inline: false }
     )
-    .setFooter({ text: 'Selecione abaixo ⬇️' });
+    .setFooter({ text: '✨ Selecione abaixo e garanta seu carry! ⬇️' });
 
   const selectMenu = new StringSelectMenuBuilder()
     .setCustomId('select_bosses')
@@ -317,13 +317,13 @@ async function finalizarCompra(interaction, session) {
       const embed = new EmbedBuilder()
         .setColor('#00ff00')
         .setTitle('✅ Pedido Confirmado!')
-        .setDescription('Seu pedido foi registrado com sucesso!')
+        .setDescription('Seu pedido foi registrado com sucesso!\n\n**Muito obrigado pela preferência!** 😄')
         .addFields(
           { name: '🆔 Número do Pedido', value: `#${pedido.id}`, inline: true },
           { name: '💰 Valor', value: `${total}KK`, inline: true },
-          { name: '📞 Contato', value: 'Aguarde nosso contato para agendamento!', inline: false }
+          { name: '📞 Próximos Passos', value: 'Aguarde nosso contato para agendamento do carry!', inline: false }
         )
-        .setFooter({ text: 'Obrigado pela preferência! 🎮' });
+        .setFooter({ text: 'Seu Raimundo agradece! Volte sempre! 🎮' });
 
       await interaction.editReply({ embeds: [embed], components: [] });
     } else {
@@ -345,8 +345,12 @@ async function notificarAdmin(interaction, pedido) {
   try {
     // ID do canal ou usuário para notificar (configurar no .env)
     const NOTIFICATION_CHANNEL_ID = process.env.DISCORD_NOTIFICATION_CHANNEL;
+    const ADMIN_USER_ID = process.env.DISCORD_ADMIN_USER_ID;
     
-    if (!NOTIFICATION_CHANNEL_ID) return;
+    if (!NOTIFICATION_CHANNEL_ID) {
+      console.warn('⚠️ DISCORD_NOTIFICATION_CHANNEL não configurado no .env');
+      return;
+    }
 
     const channel = await client.channels.fetch(NOTIFICATION_CHANNEL_ID);
     
@@ -360,10 +364,13 @@ async function notificarAdmin(interaction, pedido) {
         { name: '📦 Bosses', value: `${pedido.itens.length}`, inline: true }
       )
       .setTimestamp()
-      .setFooter({ text: 'Verifique o painel admin' });
+      .setFooter({ text: 'Verifique o painel admin em https://hela-blond.vercel.app/admin' });
+
+    // Menção ao admin (se configurado)
+    const content = ADMIN_USER_ID ? `<@${ADMIN_USER_ID}>` : '@here';
 
     await channel.send({ 
-      content: '<@YOUR_USER_ID>', // Menção ao Dgzika (substituir)
+      content,
       embeds: [embed] 
     });
   } catch (error) {

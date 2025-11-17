@@ -13,64 +13,58 @@ export default function DivulgacaoCarry() {
             {/* LADO ESQUERDO - Hela Grande */}
             <div className="flex items-center justify-center p-8 bg-gradient-to-br from-purple-900/30 to-transparent">
               <img 
-                src="https://api.ragnatales.com.br/database/mob/image?mob_id=28221"
+                src="/images/bosses/hela.gif"
                 alt="Hela"
                 className="w-full max-w-xs h-auto object-contain drop-shadow-2xl"
                 onError={(e) => {
-                  // Se não carregar, mostrar placeholder
-                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23333" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%23666" font-size="20"%3EHELA%3C/text%3E%3C/svg%3E';
+                  e.currentTarget.src = 'https://api.ragnatales.com.br/database/mob/image?mob_id=28221';
                 }}
               />
             </div>
 
             {/* LADO DIREITO - Texto + Bosses */}
-            <div className="p-8 flex flex-col justify-between">
+            <div className="p-8 flex flex-col justify-center">
               
               {/* Texto Principal */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-8">
                 <h1 className="text-5xl font-black text-yellow-400 mb-3 leading-tight" style={{textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000'}}>
                   CARRY TORMENTA<br/>DEUSA HELA
                 </h1>
                 <p className="text-2xl font-black text-white mb-2" style={{textShadow: '2px 2px 0px #000'}}>
                   GODLY + FORÇA HERÓICA
                 </p>
-                <p className="text-xl font-black text-yellow-300" style={{textShadow: '2px 2px 0px #000'}}>
+                <p className="text-xl font-black text-yellow-300 mb-4" style={{textShadow: '2px 2px 0px #000'}}>
                   + VISUAL EXCLUSIVO!!
                 </p>
+                <div className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 rounded-xl border-2 border-blue-400">
+                  <p className="text-white font-black text-2xl">
+                    🛒 COMPRE CONOSCO
+                  </p>
+                </div>
               </div>
 
               {/* Grid de Bosses 3x2 */}
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { mobId: 21857, nome: 'Freylith' },
-                  { mobId: 20431, nome: 'Tyrgrim' },
-                  { mobId: 28292, nome: 'Skollgrim' },
-                  { mobId: 21856, nome: 'Baldira' },
-                  { mobId: 20433, nome: 'Thorvald' },
-                  { mobId: 21858, nome: 'Glacius' }
+                  { mobId: 21857, nome: 'Freylith', img: 'freylith.gif' },
+                  { mobId: 20431, nome: 'Tyrgrim', img: 'tyrgrim.gif' },
+                  { mobId: 28292, nome: 'Skollgrim', img: 'skollgrim.gif' },
+                  { mobId: 21856, nome: 'Baldira', img: 'baldira.gif' },
+                  { mobId: 20433, nome: 'Thorvald', img: 'thorvald.gif' },
+                  { mobId: 21858, nome: 'Glacius', img: 'glacius.gif' }
                 ].map((boss, idx) => (
                   <div key={idx} className="bg-gray-700/50 rounded-lg p-2 border-2 border-gray-600 hover:border-yellow-500 transition-colors">
                     <img 
-                      src={`https://api.ragnatales.com.br/database/mob/image?mob_id=${boss.mobId}`}
+                      src={`/images/bosses/${boss.img}`}
                       alt={boss.nome}
                       className="w-full h-16 object-contain"
                       onError={(e) => {
-                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect fill="%23444" width="64" height="64"/%3E%3C/svg%3E';
+                        e.currentTarget.src = `https://api.ragnatales.com.br/database/mob/image?mob_id=${boss.mobId}`;
                       }}
                     />
                     <p className="text-white text-xs text-center font-bold mt-1">{boss.nome}</p>
                   </div>
                 ))}
-              </div>
-
-              {/* CTA Bot */}
-              <div className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-4 text-center border-2 border-blue-400">
-                <p className="text-white font-black text-xl mb-1">
-                  🤖 COMPRE COM NOSSO BOT
-                </p>
-                <p className="text-yellow-300 font-bold">
-                  Digite: <span className="bg-black/30 px-2 py-1 rounded">!carry</span>
-                </p>
               </div>
             </div>
           </div>
