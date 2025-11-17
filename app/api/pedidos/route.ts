@@ -259,3 +259,29 @@ export async function PATCH(req: Request) {
   }
 }
 
+export async function DELETE(req: Request) {
+  try {
+    const body = await req.json()
+    const { id } = body
+
+    // Deletar itens e participações relacionadas primeiro
+    await prisma.itensPedido.deleteMany({
+      where: { pedidoId: id }
+    })
+
+    await prisma.participacaoCarry.deleteMany({
+      where: { pedidoId: id }
+    })
+
+    // Deletar o pedido
+    await prisma.pedido.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({ success: true, message: 'Pedido excluído com sucesso' })
+  } catch (error: any) {
+    console.error('Erro ao excluir pedido:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+

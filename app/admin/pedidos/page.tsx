@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Calendar, CheckCircle, XCircle, Clock, DollarSign, Edit2, Ban } from 'lucide-react'
+import { Plus, Calendar, CheckCircle, XCircle, Clock, DollarSign, Edit2, Ban, Trash2 } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
 import { Button } from '@/app/components/Button'
@@ -68,6 +68,10 @@ export default function PedidosPage() {
   const [pedidoParaCancelar, setPedidoParaCancelar] = useState<Pedido | null>(null)
   const [motivoCancelamento, setMotivoCancelamento] = useState('')
   
+  // Modal de exclusão
+  const [showExcluirModal, setShowExcluirModal] = useState(false)
+  const [pedidoParaExcluir, setPedidoParaExcluir] = useState<Pedido | null>(null)
+  
   // Modal de edição
   const [showEditModal, setShowEditModal] = useState(false)
   const [pedidoParaEditar, setPedidoParaEditar] = useState<Pedido | null>(null)
@@ -85,7 +89,8 @@ export default function PedidosPage() {
     pacoteCompleto: false,
     observacoes: '',
     precoCustomizado: false,
-    bossesPrecos: {} as Record<number, number> // ID do boss -> preço customizado
+    bossesPrecos: {} as Record<number, number>, // ID do boss -> preço customizado
+    numeroCompradores: 1 // Quantos compradores participarão (default 1)
   })
 
   useEffect(() => {
@@ -145,9 +150,10 @@ export default function PedidosPage() {
             return new Date(a.ultimoCarry).getTime() - new Date(b.ultimoCarry).getTime()
           })
         
-        // 3. Pegar 11 jogadores (considerando que 1 slot é pro comprador)
-        // Se temos 12 principais, tiramos 1 para o comprador
-        const totalSlots = 11
+        // 3. Pegar jogadores (considerando slots dos compradores)
+        // PT tem 12 slots, tiramos os slots dos compradores
+        const slotsCompradores = formData.numeroCompradores || 1
+        const totalSlots = 12 - slotsCompradores
         const slotsRestantes = totalSlots - essenciais.length
         const naoEssenciaisSelecionados = naoEssenciais.slice(0, Math.max(0, slotsRestantes))
         
@@ -248,7 +254,8 @@ export default function PedidosPage() {
           pacoteCompleto: false,
           observacoes: '',
           precoCustomizado: false,
-          bossesPrecos: {}
+          bossesPrecos: {},
+          numeroCompradores: 1
         })
         fetchPedidos()
       } else {
@@ -289,6 +296,26 @@ export default function PedidosPage() {
     } catch (error) {
       console.error('Erro:', error)
       toast.error('❌ Erro ao atualizar status')
+    }
+  }
+
+  const handleDeletePedido = async (pedidoId: number) => {
+    try {
+      const res = await fetch('/api/pedidos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: pedidoId })
+      })
+      
+      if (res.ok) {
+        toast.success('🗑️ Pedido excluído com sucesso!')
+        fetchPedidos()
+      } else {
+        toast.error('❌ Erro ao excluir pedido')
+      }
+    } catch (error) {
+      console.error('Erro:', error)
+      toast.error('❌ Erro ao excluir pedido')
     }
   }
 
@@ -437,6 +464,19 @@ export default function PedidosPage() {
                 </div>
 
                 <div className="flex gap-2 flex-wrap">
+                  {/* Botão Excluir - aparece em todos */}
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => {
+                      setPedidoParaExcluir(pedido)
+                      setShowExcluirModal(true)
+                    }}
+                    title="Excluir pedido"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+
                   {/* Botão Editar - aparece sempre exceto quando concluído ou cancelado */}
                   {!['CONCLUIDO', 'CANCELADO'].includes(pedido.status) && (
                     <Button
@@ -704,11 +744,31 @@ export default function PedidosPage() {
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-3 font-semibold">
-                    Jogadores Participantes ({formData.jogadoresIds.length}/11)
-                  </label>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-gray-300 font-semibold">
+                      Jogadores Participantes ({formData.jogadoresIds.length}/{12 - formData.numeroCompradores})
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-400">👥 Compradores:</label>
+                      <select
+                        value={formData.numeroCompradores}
+                        onChange={(e) => {
+                          const num = Number(e.target.value)
+                          setFormData({ ...formData, numeroCompradores: num })
+                          // Reajustar jogadores selecionados se necessário
+                          fetchJogadores()
+                        }}
+                        className="bg-gray-700 text-white rounded px-3 py-1 text-sm border border-gray-600"
+                      >
+                        <option value={1}>1 comprador</option>
+                        <option value={2}>2 compradores</option>
+                        <option value={3}>3 compradores</option>
+                        <option value={4}>4 compradores</option>
+                      </select>
+                    </div>
+                  </div>
                   <p className="text-xs text-gray-400 mb-3">
-                    ⭐ Essenciais são obrigatórios • 💫 Sugeridos por rodízio • 1 slot fica pro comprador
+                    ⭐ Essenciais são obrigatórios • 💫 Sugeridos por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     {jogadores.map((jogador: any) => {
@@ -742,7 +802,7 @@ export default function PedidosPage() {
                     })}
                   </div>
                   <div className="mt-2 text-sm text-gray-400">
-                    {formData.jogadoresIds.length} selecionado(s) • {11 - formData.jogadoresIds.length} slot(s) disponível(is)
+                    {formData.jogadoresIds.length} jogador(es) • {formData.numeroCompradores} comprador(es) • {12 - formData.jogadoresIds.length - formData.numeroCompradores} slot(s) vazios
                   </div>
                 </div>
 
@@ -873,6 +933,74 @@ export default function PedidosPage() {
                 <Button
                   variant="secondary"
                   onClick={() => setShowAgendarModal(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Excluir Pedido */}
+        {showExcluirModal && pedidoParaExcluir && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowExcluirModal(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Trash2 className="w-6 h-6 text-red-500" />
+                  Excluir Pedido
+                </h2>
+                <button
+                  onClick={() => setShowExcluirModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-red-900/30 border border-red-500/50 p-4 rounded">
+                  <div className="text-red-300 text-sm mb-1">⚠️ ATENÇÃO: Esta ação não pode ser desfeita!</div>
+                  <div className="text-white font-bold mt-3">#{pedidoParaExcluir.id} - {pedidoParaExcluir.nomeCliente}</div>
+                  <div className="text-gray-400 text-sm mt-2">
+                    {pedidoParaExcluir.itens.map(i => i.boss.nome).join(', ')} • {pedidoParaExcluir.valorTotal}KK
+                  </div>
+                  <div className="text-gray-400 text-sm mt-1">
+                    Status: {pedidoParaExcluir.status}
+                  </div>
+                </div>
+
+                <div className="bg-yellow-900/30 border border-yellow-500/50 p-3 rounded">
+                  <p className="text-yellow-300 text-sm">
+                    💡 <strong>Quando usar:</strong> Para remover pedidos de teste ou criados por engano. 
+                    Para cancelamentos normais, use o botão "Cancelar" que notifica o Discord.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    handleDeletePedido(pedidoParaExcluir.id)
+                    setShowExcluirModal(false)
+                  }}
+                  className="flex-1"
+                >
+                  <Trash2 className="w-5 h-5 mr-2" />
+                  Sim, Excluir Definitivamente
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowExcluirModal(false)}
                 >
                   Cancelar
                 </Button>
