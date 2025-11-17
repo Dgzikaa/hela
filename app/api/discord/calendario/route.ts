@@ -35,7 +35,7 @@ export async function GET() {
     const carrysFormatados = carrys.map(carry => ({
       id: carry.id,
       nomeCliente: carry.nomeCliente,
-      dataAgendada: carry.dataAgendada!,
+      dataAgendada: carry.dataAgendada!.toISOString(),
       bosses: carry.itens.map(i => i.boss.nome),
       valorTotal: carry.valorTotal
     }))
