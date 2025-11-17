@@ -125,6 +125,52 @@ export default function PedidosPage() {
     }
   }
 
+  const selecionarJogadoresAutomatico = () => {
+    // Determinar qual time usar baseado nos bosses selecionados
+    const helaId = bosses.find(b => b.nome === 'Hela')?.id
+    const temHela = formData.bossesIds.includes(helaId || 0)
+    
+    // Se selecionou HELA → time HELA
+    // Se não tem HELA → time CARRYS (boss 4-6)
+    const categoriaTime = temHela ? 'HELA' : 'CARRYS'
+    
+    const timeCategoria = jogadores.filter((j: Jogador) => 
+      j.categoria === categoriaTime && j.ativo
+    )
+    
+    // 1. Pegar TODOS os essenciais (sempre vão)
+    const essenciais = timeCategoria.filter((j: Jogador) => j.essencial)
+    
+    // 2. Pegar não-essenciais ordenados por último carry (rodízio)
+    const naoEssenciais = timeCategoria
+      .filter((j: Jogador) => !j.essencial)
+      .sort((a: any, b: any) => {
+        // Quem nunca participou vai primeiro
+        if (!a.ultimoCarry && !b.ultimoCarry) return 0
+        if (!a.ultimoCarry) return -1
+        if (!b.ultimoCarry) return 1
+        // Depois ordena por data (mais antigo primeiro)
+        return new Date(a.ultimoCarry).getTime() - new Date(b.ultimoCarry).getTime()
+      })
+    
+    // 3. Calcular slots disponíveis (12 - compradores)
+    const slotsCompradores = formData.numeroCompradores || 1
+    const totalSlots = 12 - slotsCompradores
+    const slotsRestantes = totalSlots - essenciais.length
+    const naoEssenciaisSelecionados = naoEssenciais.slice(0, Math.max(0, slotsRestantes))
+    
+    // SELECIONAR JOGADORES DO TIME (HELA ou CARRYS baseado nos bosses)
+    const jogadoresSelecionados = [
+      ...essenciais.map((j: Jogador) => j.id),
+      ...naoEssenciaisSelecionados.map((j: Jogador) => j.id)
+    ]
+    
+    setFormData(prev => ({
+      ...prev,
+      jogadoresIds: jogadoresSelecionados
+    }))
+  }
+
   const fetchJogadores = async () => {
     try {
       const res = await fetch('/api/jogadores')
@@ -135,40 +181,8 @@ export default function PedidosPage() {
         const jogadoresAtivos = data.filter((j: Jogador) => j.ativo)
         setJogadores(jogadoresAtivos)
         
-        // APENAS TIME PRINCIPAL (HELA) - NUNCA SUPLENTES AUTOMATICAMENTE!
-        const timeHela = jogadoresAtivos.filter((j: Jogador) => j.categoria === 'HELA')
-        
-        // 1. Pegar TODOS os essenciais do time HELA (sempre vão)
-        const essenciais = timeHela.filter((j: Jogador) => j.essencial)
-        
-        // 2. Pegar não-essenciais do time HELA ordenados por último carry (rodízio)
-        const naoEssenciais = timeHela
-          .filter((j: Jogador) => !j.essencial)
-          .sort((a: any, b: any) => {
-            // Quem nunca participou vai primeiro
-            if (!a.ultimoCarry && !b.ultimoCarry) return 0
-            if (!a.ultimoCarry) return -1
-            if (!b.ultimoCarry) return 1
-            // Depois ordena por data (mais antigo primeiro)
-            return new Date(a.ultimoCarry).getTime() - new Date(b.ultimoCarry).getTime()
-          })
-        
-        // 3. Calcular slots disponíveis (12 - compradores)
-        const slotsCompradores = formData.numeroCompradores || 1
-        const totalSlots = 12 - slotsCompradores
-        const slotsRestantes = totalSlots - essenciais.length
-        const naoEssenciaisSelecionados = naoEssenciais.slice(0, Math.max(0, slotsRestantes))
-        
-        // SELECIONAR APENAS TIME PRINCIPAL (HELA)
-        const jogadoresSelecionados = [
-          ...essenciais.map((j: Jogador) => j.id),
-          ...naoEssenciaisSelecionados.map((j: Jogador) => j.id)
-        ]
-        
-        setFormData(prev => ({
-          ...prev,
-          jogadoresIds: jogadoresSelecionados
-        }))
+        // Selecionar jogadores automaticamente
+        selecionarJogadoresAutomatico()
       }
     } catch (error) {
       console.error('Erro ao buscar jogadores:', error)
@@ -355,6 +369,9 @@ export default function PedidosPage() {
         bossesPrecos: newBossesPrecos
       }
     })
+    
+    // Reselecionar jogadores baseado nos bosses
+    setTimeout(() => selecionarJogadoresAutomatico(), 100)
   }
 
   const toggleJogador = (jogadorId: number) => {
@@ -771,12 +788,24 @@ export default function PedidosPage() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 mb-3">
-                    ⭐ Essenciais nunca saem • 💫 Principais por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
+                    ⭐ Essenciais nunca saem • 💫 Por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
+                    <br />
+                    {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) 
+                      ? '🔴 Selecionou HELA → Time HELA automático' 
+                      : '🔵 Sem HELA → Time CARRYS automático'}
                   </p>
                   
-                  {/* TIME PRINCIPAL (HELA) */}
+                  {/* TIME PRINCIPAL (HELA) - Só mostra se tiver HELA selecionado */}
+                  {jogadores.filter((j: Jogador) => j.categoria === 'HELA').length > 0 && (
                   <div className="mb-4">
-                    <div className="text-sm font-semibold text-green-400 mb-2">⚔️ Time Principal (HELA)</div>
+                    <div className="text-sm font-semibold text-green-400 mb-2">
+                      ⚔️ Time Principal (HELA)
+                      {!formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && (
+                        <span className="text-xs font-normal text-gray-400 ml-2">
+                          (selecione o boss HELA para usar este time)
+                        </span>
+                      )}
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       {jogadores.filter((j: Jogador) => j.categoria === 'HELA').map((jogador: any) => {
                         const isEssencial = jogador.essencial
@@ -807,6 +836,43 @@ export default function PedidosPage() {
                       })}
                     </div>
                   </div>
+                  )}
+
+                  {/* CARRYS (Boss 4-6) - Só mostra se não tiver HELA */}
+                  {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').length > 0 && (
+                    <div className="mb-4">
+                      <div className="text-sm font-semibold text-blue-400 mb-2">
+                        🎯 Time Carrys (Boss 4-6)
+                        {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && (
+                          <span className="text-xs font-normal text-gray-400 ml-2">
+                            (HELA selecionado, usando time HELA)
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').map((jogador: any) => {
+                          const isSelected = formData.jogadoresIds.includes(jogador.id)
+                          
+                          return (
+                            <button
+                              key={jogador.id}
+                              onClick={() => toggleJogador(jogador.id)}
+                              className={`p-3 rounded border-2 transition-colors text-left ${
+                                isSelected
+                                  ? 'bg-blue-600 border-blue-500 text-white'
+                                  : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-blue-500'
+                              }`}
+                            >
+                              <div className="flex items-center gap-1 font-bold">
+                                🎯 {jogador.nick}
+                              </div>
+                              <div className="text-xs">Carrys</div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* SUPLENTES (APENAS PARA SUBSTITUIÇÃO MANUAL) */}
                   {jogadores.filter((j: Jogador) => j.categoria === 'SUPLENTE').length > 0 && (
@@ -842,34 +908,6 @@ export default function PedidosPage() {
                     </div>
                   )}
 
-                  {/* CARRYS (se houver) */}
-                  {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').length > 0 && (
-                    <div className="mb-2">
-                      <div className="text-sm font-semibold text-blue-400 mb-2">🎯 Carrys (Boss 4-6)</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').map((jogador: any) => {
-                          const isSelected = formData.jogadoresIds.includes(jogador.id)
-                          
-                          return (
-                            <button
-                              key={jogador.id}
-                              onClick={() => toggleJogador(jogador.id)}
-                              className={`p-3 rounded border-2 transition-colors text-left ${
-                                isSelected
-                                  ? 'bg-blue-600 border-blue-500 text-white'
-                                  : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-blue-500'
-                              }`}
-                            >
-                              <div className="flex items-center gap-1 font-bold">
-                                🎯 {jogador.nick}
-                              </div>
-                              <div className="text-xs">Carrys</div>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
                   <div className="mt-2 text-sm text-gray-400">
                     {formData.jogadoresIds.length} jogador(es) • {formData.numeroCompradores} comprador(es) • {12 - formData.jogadoresIds.length - formData.numeroCompradores} slot(s) vazios
                   </div>
