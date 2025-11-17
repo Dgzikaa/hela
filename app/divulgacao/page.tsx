@@ -10,43 +10,16 @@ export default function DivulgacaoCarry() {
           {/* Layout em Grid */}
           <div className="grid grid-cols-2 gap-0">
             
-            {/* LADO ESQUERDO - Hela Grande + Itens Godly */}
-            <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-purple-900/30 to-transparent">
+            {/* LADO ESQUERDO - Hela Grande */}
+            <div className="flex items-center justify-center p-8 bg-gradient-to-br from-purple-900/30 to-transparent">
               <img 
                 src="/images/bosses/hela.gif"
                 alt="Hela"
-                className="w-full max-w-xs h-auto object-contain drop-shadow-2xl mb-4"
+                className="w-full max-w-xs h-auto object-contain drop-shadow-2xl"
                 onError={(e) => {
                   e.currentTarget.src = 'https://api.ragnatales.com.br/database/mob/image?mob_id=28221';
                 }}
               />
-              
-              {/* Itens Godly Pequenos */}
-              <div className="w-full">
-                <p className="text-yellow-400 font-bold text-xs text-center mb-2">💎 ITENS GODLY</p>
-                <div className="grid grid-cols-4 gap-1">
-                  {['asfrika', 'brisin', 'bryn', 'hervor'].map((item) => (
-                    <div key={item} className="bg-gray-800/50 rounded border border-yellow-600/30 p-1">
-                      <img 
-                        src={`/images/godly/${item}.png`}
-                        alt={`Godly ${item}`}
-                        className="w-full h-8 object-contain"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-3 gap-1 mt-1">
-                  {['megin', 'sleipnir', 'svalin'].map((item) => (
-                    <div key={item} className="bg-gray-800/50 rounded border border-yellow-600/30 p-1">
-                      <img 
-                        src={`/images/godly/${item}.png`}
-                        alt={`Godly ${item}`}
-                        className="w-full h-8 object-contain"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* LADO DIREITO - Texto + Bosses */}
