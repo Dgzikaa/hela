@@ -49,7 +49,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { nick, categoria, discord, discordId, ativo, usuarioId } = body
+    const { nick, categoria, discord, discordId, ativo } = body
 
     if (!nick) {
       return NextResponse.json({ error: 'Nick é obrigatório' }, { status: 400 })
@@ -65,8 +65,7 @@ export async function POST(request: Request) {
         categoria,
         discord: discord || null,
         discordId: discordId || null,
-        ativo: ativo !== undefined ? ativo : true,
-        usuarioId: usuarioId || null
+        ativo: ativo !== undefined ? ativo : true
       }
     })
 
@@ -81,7 +80,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json()
-    const { id, nick, categoria, discord, discordId, ativo, usuarioId } = body
+    const { id, nick, categoria, discord, discordId, ativo } = body
 
     if (!id) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
@@ -93,7 +92,6 @@ export async function PATCH(request: Request) {
     if (discord !== undefined) data.discord = discord || null
     if (discordId !== undefined) data.discordId = discordId || null
     if (ativo !== undefined) data.ativo = ativo
-    if (usuarioId !== undefined) data.usuarioId = usuarioId || null
 
     const jogador = await prisma.jogador.update({
       where: { id },

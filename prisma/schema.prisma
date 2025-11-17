@@ -23,12 +23,16 @@ model Usuario {
   role      String   @default("ADMIN") // "ADMIN", "GERENTE"
   discordId String?  // ID do Discord para enviar mensagens privadas
   ativo     Boolean  @default(true)
+  
+  // Cada usuário tem 1 jogador principal
+  jogadorId Int?     @unique
+  jogador   Jogador? @relation(fields: [jogadorId], references: [id])
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relações
   pedidosAprovados Pedido[] @relation("UsuarioAprovador")
-  jogadores        Jogador[] // Jogadores associados a este usuário
 
   @@map("Usuario")
 }
@@ -51,10 +55,6 @@ model Jogador {
   discordId String?           // ID do Discord para enviar mensagens
   ativo     Boolean           @default(true)
   
-  // Associação com usuário do sistema
-  usuarioId Int?
-  usuario   Usuario?          @relation(fields: [usuarioId], references: [id])
-  
   // Estatísticas
   totalCarrys Int             @default(0)
   totalGanho  Int             @default(0)
@@ -63,6 +63,7 @@ model Jogador {
   updatedAt DateTime @updatedAt
 
   // Relações
+  usuario          Usuario?              // Usuário dono deste jogador
   missoesFora      Missao[]              @relation("JogadorFora") // Manter compatibilidade
   participacoes    ParticipacaoCarry[]
 

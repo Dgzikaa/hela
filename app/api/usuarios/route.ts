@@ -12,6 +12,12 @@ export async function GET() {
         email: true,
         role: true,
         discordId: true,
+        jogadorId: true,
+        jogador: {
+          select: {
+            nick: true
+          }
+        },
         createdAt: true
       },
       orderBy: { createdAt: 'desc' }
@@ -30,7 +36,7 @@ export async function GET() {
 // POST - Criar novo usuário
 export async function POST(req: Request) {
   try {
-    const { nome, email, senha, role, discordId } = await req.json()
+    const { nome, email, senha, role, discordId, jogadorId } = await req.json()
 
     // Validações
     if (!nome || !email || !senha) {
@@ -62,7 +68,8 @@ export async function POST(req: Request) {
         email,
         senha: senhaHash,
         role: role || 'ADMIN',
-        discordId: discordId || null
+        discordId: discordId || null,
+        jogadorId: jogadorId || null
       },
       select: {
         id: true,
@@ -70,6 +77,7 @@ export async function POST(req: Request) {
         email: true,
         role: true,
         discordId: true,
+        jogadorId: true,
         createdAt: true
       }
     })
@@ -114,7 +122,7 @@ export async function DELETE(req: Request) {
 // PATCH - Atualizar usuário
 export async function PATCH(req: Request) {
   try {
-    const { id, nome, email, senha, role, discordId } = await req.json()
+    const { id, nome, email, senha, role, discordId, jogadorId } = await req.json()
 
     if (!id) {
       return NextResponse.json(
@@ -128,6 +136,7 @@ export async function PATCH(req: Request) {
     if (email) data.email = email
     if (role) data.role = role
     if (discordId !== undefined) data.discordId = discordId || null
+    if (jogadorId !== undefined) data.jogadorId = jogadorId || null
     if (senha) {
       data.senha = await bcrypt.hash(senha, 10)
     }
@@ -141,6 +150,7 @@ export async function PATCH(req: Request) {
         email: true,
         role: true,
         discordId: true,
+        jogadorId: true,
         createdAt: true
       }
     })

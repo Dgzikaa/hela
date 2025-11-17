@@ -162,7 +162,7 @@ export async function POST(req: Request) {
         await notificarJogadoresNovoCarry(jogadoresParaNotificar, {
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,
-          dataAgendada: pedido.dataAgendada,
+          dataAgendada: pedido.dataAgendada ? pedido.dataAgendada.toISOString() : null,
           bosses: bossesNomes,
           valorTotal: pedido.valorTotal
         })
