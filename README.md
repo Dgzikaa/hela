@@ -1,185 +1,155 @@
-# 🎮 Rodízio Ragnatales
+# 🎮 Hela Carrys - Sistema de Venda de Carrys Ragnatales
 
-Sistema de gerenciamento de rodízio para missões em Ragnatales. Controle quem deve ficar de fora, gerencie suplentes e organize missões com estilo!
+Sistema profissional completo para gestão e venda de carrys dos bosses de Ragnatales.
 
-![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
-![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-4-38bdf8?style=for-the-badge&logo=tailwind-css)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript)
-![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?style=for-the-badge&logo=prisma)
+## 🚀 Features
 
----
+### 📱 Página Pública (`/comprar`)
+- ✅ Seleção visual de bosses com imagens da API oficial
+- ✅ Cálculo automático de preços e descontos
+- ✅ Pacote completo 1-6 com brinde (Conquista Sem Morrer grátis!)
+- ✅ Formulário de pedido simples e intuitivo
+- ✅ Confirmação de pedido
 
-## ✨ Funcionalidades
+### 🔐 Painel Admin (`/admin`)
+- ✅ Autenticação com NextAuth
+- ✅ Dashboard com estatísticas
+- ✅ Listagem de pedidos em tempo real
+- ✅ Aprovação de pedidos
+- ✅ Gestão de status
+- ✅ Visualização de bosses por pedido
 
-- ✅ **Gerenciamento de Jogadores** - Cadastre o time principal
-- ✅ **Sistema de Suplentes** - Controle suplentes e suas participações
-- ✅ **Rodízio Inteligente** - Sugere automaticamente quem deve ficar de fora
-- ✅ **3 Tipos de Missões**:
-  - 🎯 **Normal** - Missão regular com rodízio
-  - 🛡️ **Suplente** - Missão com substituição
-  - ⚔️ **Carry** - Missão com jogador externo (pago)
-- ✅ **Dashboard com Estatísticas** - Visualize números em tempo real
-- ✅ **Interface Moderna** - Design glassmorphism com animações suaves
-- ✅ **Responsive** - Funciona perfeitamente em mobile e desktop
+### 💾 Banco de Dados
+- ✅ PostgreSQL (Supabase)
+- ✅ Prisma ORM
+- ✅ Schema completo com:
+  - Usuários (admin)
+  - Jogadores (com categorias: HELA, CARRYS, SUPLENTE)
+  - Bosses (com preços e imagens)
+  - Pedidos (com status e valores)
+  - Itens do Pedido
+  - Participações (divisão de valores)
 
----
+## 🏗️ Tecnologias
 
-## 🚀 Deploy Rápido
+- **Next.js 16** (App Router)
+- **TypeScript 5**
+- **Tailwind CSS 4**
+- **Prisma 6**
+- **NextAuth.js** (autenticação)
+- **PostgreSQL** (Supabase)
+- **Bcryptjs** (hash de senhas)
 
-### Opção 1: Deploy em Produção (Recomendado)
-
-Siga o guia completo em **[DEPLOY.md](./DEPLOY.md)** para:
-- Configurar Supabase (banco de dados grátis)
-- Deploy na Vercel (hospedagem grátis)
-- Configurar variáveis de ambiente
-- 100% gratuito! ✅
-
-### Opção 2: Desenvolvimento Local
+## 📦 Instalação
 
 ```bash
-# 1. Instalar dependências
+# Clone o repositório
+git clone https://github.com/Dgzikaa/hela.git
+cd hela
+
+# Instale as dependências
 npm install
 
-# 2. Configurar banco de dados local (SQLite)
-# Crie um arquivo .env na raiz:
-echo 'DATABASE_URL="file:./dev.db"' > .env
+# Configure o .env
+cp .env.example .env
+# Edite o .env com suas credenciais
 
-# 3. Gerar Prisma Client e criar banco
-npx prisma generate
-npx prisma db push
+# Execute as migrations
+npm run db:migrate
 
-# 4. Iniciar servidor de desenvolvimento
+# Popule o banco com bosses e usuário admin
+npm run db:seed
+
+# Inicie o servidor
 npm run dev
 ```
 
-Abra [http://localhost:3000](http://localhost:3000) no navegador.
+## 🔑 Credenciais Padrão
 
----
+Após executar o seed:
+- **Email:** `admin@hela.com`
+- **Senha:** `admin123`
 
-## 🛠️ Stack Tecnológica
+**⚠️ IMPORTANTE:** Altere essas credenciais em produção!
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Linguagem**: [TypeScript 5](https://www.typescriptlang.org/)
-- **Estilização**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Banco de Dados**: [PostgreSQL](https://www.postgresql.org/) (Supabase) / SQLite (dev)
-- **ORM**: [Prisma 6](https://www.prisma.io/)
-- **Ícones**: [Lucide React](https://lucide.dev/)
-- **Hospedagem**: [Vercel](https://vercel.com/)
+## 📊 Bosses e Preços
 
----
+| Boss | Preço |
+|------|-------|
+| Freylith (1) | 70KK |
+| Tyrgrim (2) | 100KK |
+| Skollgrim (3) | 130KK |
+| Baldira (4) | 150KK |
+| Thorvald (5) | 230KK |
+| Glacius (6) | 300KK |
+| **Pacote 1-6** | **500KK** |
+| Conquista Sem Morrer | 150KK (grátis no pacote) |
 
-## 📁 Estrutura do Projeto
+## 🗂️ Estrutura do Projeto
 
 ```
-rodizio-ragnatales/
+hela/
 ├── app/
-│   ├── api/              # API Routes
-│   │   ├── jogadores/    # CRUD de jogadores
-│   │   ├── suplentes/    # CRUD de suplentes
-│   │   └── missoes/      # CRUD de missões
-│   ├── components/       # Componentes reutilizáveis
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Input.tsx
-│   │   └── Badge.tsx
-│   ├── layout.tsx        # Layout principal
-│   ├── page.tsx          # Página inicial
-│   └── globals.css       # Estilos globais + animações
-├── lib/
-│   ├── prisma.ts         # Cliente Prisma
-│   └── utils.ts          # Funções utilitárias
+│   ├── admin/              # Área administrativa
+│   │   ├── login/          # Login do admin
+│   │   └── page.tsx        # Dashboard
+│   ├── comprar/            # Página pública de compra
+│   ├── api/
+│   │   ├── auth/           # NextAuth endpoints
+│   │   ├── bosses/         # API de bosses
+│   │   └── pedidos/        # API de pedidos
+│   └── components/         # Componentes reutilizáveis
 ├── prisma/
-│   └── schema.prisma     # Schema do banco de dados
-├── DEPLOY.md             # Guia completo de deploy
-└── README.md             # Este arquivo
+│   ├── schema.prisma       # Schema do banco
+│   └── seed.ts             # Seeds iniciais
+└── lib/
+    ├── prisma.ts           # Cliente Prisma
+    └── utils.ts            # Utilitários
 ```
 
----
+## 🚀 Deploy
 
-## 📊 Schema do Banco de Dados
+### Vercel + Supabase
 
-```prisma
-model Jogador {
-  id           Int      @id @default(autoincrement())
-  nick         String   @unique
-  ativo        Boolean  @default(true)
-  missoesFora  Missao[]
-}
+1. **Crie um projeto no Supabase**
+2. **Configure as variáveis de ambiente no Vercel:**
+   - `DATABASE_URL` (Session Pooler)
+   - `DIRECT_URL` (Direct Connection)
+   - `NEXTAUTH_SECRET`
+   - `NEXTAUTH_URL`
 
-model Suplente {
-  id      Int      @id @default(autoincrement())
-  nick    String   @unique
-  ativo   Boolean  @default(true)
-  missoes Missao[]
-}
-
-model Missao {
-  id            Int       @id @default(autoincrement())
-  data          DateTime
-  tipo          String    // "Normal", "Suplente", "Carry"
-  jogadorFora   Jogador   @relation(...)
-  suplente      Suplente? @relation(...)
-  carryNome     String?
-  carryValor    Float?
-  status        String    // "Agendado", "Concluído", "Cancelado"
-  observacoes   String?
-}
+3. **Faça o deploy:**
+```bash
+git push origin main
 ```
 
----
+O Vercel fará o deploy automático!
 
-## 🎯 Como Funciona o Rodízio?
+## 🔐 Segurança
 
-O sistema utiliza um algoritmo inteligente para sugerir quem deve ficar de fora:
+- Senhas com hash bcrypt
+- Autenticação JWT via NextAuth
+- Rotas admin protegidas
+- Validações no backend
+- SSL obrigatório no banco
 
-1. **Prioridade por menos vezes fora**: Quem ficou menos vezes tem prioridade
-2. **Critério de desempate**: Se houver empate, quem ficou de fora há mais tempo
-3. **Estatísticas em tempo real**: Dashboard mostra a situação de cada jogador
+## 🎯 Próximos Passos
 
----
-
-## 🎨 Screenshots
-
-### Dashboard Principal
-Interface moderna com estatísticas em tempo real e cards animados.
-
-### Gestão de Jogadores
-Adicione e visualize jogadores com suas estatísticas de participação.
-
-### Criação de Missões
-Formulário intuitivo com suporte a 3 tipos diferentes de missões.
-
----
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Sinta-se à vontade para:
-
-1. Fazer um fork do projeto
-2. Criar uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Abrir um Pull Request
-
----
+- [ ] Sistema de notificações (Discord webhook)
+- [ ] Gestão de times (montar equipe para cada carry)
+- [ ] Divisão automática de valores
+- [ ] Calendário de agendamentos
+- [ ] Relatórios financeiros
+- [ ] Dashboard de jogadores
 
 ## 📝 Licença
 
-Este projeto é de código aberto e está disponível sob a [Licença MIT](LICENSE).
+Projeto privado - Todos os direitos reservados
+
+## 👥 Autores
+
+- **Dgzikaa** - Desenvolvimento
 
 ---
 
-## 📞 Suporte
-
-Problemas ou dúvidas? 
-- 📖 Leia o [DEPLOY.md](./DEPLOY.md) para instruções detalhadas
-- 🐛 Abra uma [Issue](../../issues) no GitHub
-- 💬 Entre em contato com a equipe
-
----
-
-## 🎉 Agradecimentos
-
-Desenvolvido com ❤️ para a comunidade Ragnatales.
-
-**Boas missões!** ⚔️🛡️🎮
+**Ragnatales © 2024**
