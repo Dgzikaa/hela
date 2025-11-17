@@ -19,12 +19,24 @@ const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 
 client.on('ready', () => {
   console.log(`🤖 Seu Raimundo conectado como ${client.user.tag}`);
+  console.log(`📊 ID do Bot: ${client.user.id}`);
+  console.log(`🔧 Intents configurados: ${client.options.intents.bitfield}`);
+  console.log(`✅ Bot está pronto e aguardando mensagens...`);
   client.user.setActivity('Use !carry para informações', { type: 'PLAYING' });
 });
 
 client.on('messageCreate', async (message) => {
+  console.log(`\n🔔 EVENTO messageCreate DISPARADO!`);
+  console.log(`📝 Autor: ${message.author.tag} (ID: ${message.author.id})`);
+  console.log(`🤖 É bot?: ${message.author.bot}`);
+  console.log(`💬 Conteúdo: "${message.content}"`);
+  console.log(`📍 Canal: ${message.channel.type} (ID: ${message.channelId})`);
+  
   // Ignorar bots
-  if (message.author.bot) return;
+  if (message.author.bot) {
+    console.log(`❌ Ignorando bot`);
+    return;
+  }
 
   console.log(`📩 Mensagem recebida de ${message.author.username}: "${message.content}"`);
 
