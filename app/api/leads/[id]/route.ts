@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const lead = await prisma.lead.findFirst({
-      where: { discordUserId: params.id },
+      where: { discordUserId: id },
       include: {
         pedido: true
       }
@@ -26,14 +27,15 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
     const { status } = body
 
     const lead = await prisma.lead.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: { status }
     })
 
