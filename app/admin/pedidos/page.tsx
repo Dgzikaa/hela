@@ -965,15 +965,25 @@ export default function PedidosPage() {
                       Jogadores Participantes ({formData.jogadoresIds.length}/{12 - formData.numeroCompradores})
                     </label>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3">
-                    ⭐ Essenciais nunca saem • 💫 Por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
-                    <br />
-                    {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) 
-                      ? '🔴 Selecionou HELA → Time HELA automático' 
-                      : '🔵 Sem HELA → Time CARRYS automático'}
-                  </p>
                   
-                  {/* TIME PRINCIPAL (HELA) - Só mostra se tiver HELA selecionado */}
+                  {/* MOSTRAR JOGADORES APENAS SE TIVER BOSSES SELECIONADOS */}
+                  {formData.bossesIds.length === 0 ? (
+                    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-center">
+                      <p className="text-gray-400 text-sm">
+                        ⬆️ Selecione pelo menos 1 boss acima para ver os jogadores disponíveis
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-gray-400 mb-3">
+                        ⭐ Essenciais nunca saem • 💫 Por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
+                        <br />
+                        {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) 
+                          ? '🔴 Selecionou HELA → Time HELA automático' 
+                          : '🔵 Sem HELA → Time CARRYS automático'}
+                      </p>
+                      
+                      {/* TIME PRINCIPAL (HELA) - Só mostra se tiver HELA selecionado */}
                   {jogadores.filter((j: Jogador) => j.categorias?.includes('HELA')).length > 0 && (
                   <div className="mb-4">
                     <div className="text-sm font-semibold text-green-400 mb-2">
@@ -1052,11 +1062,12 @@ export default function PedidosPage() {
                     </div>
                   )}
 
-                  {/* SUPLENTES (APENAS PARA SUBSTITUIÇÃO MANUAL) */}
-                  {jogadores.filter((j: Jogador) => j.categorias?.includes('SUPLENTE')).length > 0 && (
+                  {/* SUPLENTES (APENAS PARA HELA E SUBSTITUIÇÃO MANUAL) */}
+                  {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && 
+                   jogadores.filter((j: Jogador) => j.categorias?.includes('SUPLENTE')).length > 0 && (
                     <div className="mb-2">
                       <div className="text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-2">
-                        🔄 Suplentes (Use apenas se alguém faltar)
+                        🔄 Suplentes (APENAS para HELA - Use se alguém faltar)
                         <span className="text-xs font-normal text-gray-400">
                           Clique para substituir manualmente
                         </span>
@@ -1086,9 +1097,11 @@ export default function PedidosPage() {
                     </div>
                   )}
 
-                  <div className="mt-2 text-sm text-gray-400">
-                    {formData.jogadoresIds.length} jogador(es) • {formData.numeroCompradores} comprador(es) • {12 - formData.jogadoresIds.length - formData.numeroCompradores} slot(s) vazios
-                  </div>
+                      <div className="mt-2 text-sm text-gray-400">
+                        {formData.jogadoresIds.length} jogador(es) • {formData.numeroCompradores} comprador(es) • {12 - formData.jogadoresIds.length - formData.numeroCompradores} slot(s) vazios
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div>
