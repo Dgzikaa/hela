@@ -217,7 +217,8 @@ model Pedido {
   conquistaSemMorrer Boolean  @default(false)
   pacoteCompleto     Boolean  @default(false) // 1-6
   
-  observacoes   String?
+  observacoes              String?
+  jogadoresNaoCadastrados  String? // Nomes separados por vírgula para jogadores não cadastrados
   
   // Aprovação
   aprovadoPor      Int?

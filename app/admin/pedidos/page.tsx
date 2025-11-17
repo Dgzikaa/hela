@@ -85,6 +85,7 @@ export default function PedidosPage() {
     contatoCliente: '',
     bossesIds: [] as number[],
     jogadoresIds: [] as number[],
+    jogadoresNaoCadastrados: '', // Nomes separados por vírgula
     conquistaSemMorrer: false,
     pacoteCompleto: false,
     observacoes: '',
@@ -249,6 +250,7 @@ export default function PedidosPage() {
           contatoCliente: formData.contatoCliente,
           bosses: formData.bossesIds,
           jogadores: formData.jogadoresIds,
+          jogadoresNaoCadastrados: formData.jogadoresNaoCadastrados,
           conquistaSemMorrer: formData.conquistaSemMorrer,
           pacoteCompleto: formData.pacoteCompleto,
           valorTotal,
@@ -270,6 +272,7 @@ export default function PedidosPage() {
           contatoCliente: '',
           bossesIds: [],
           jogadoresIds: timeHela.map(j => j.id),
+          jogadoresNaoCadastrados: '',
           conquistaSemMorrer: false,
           pacoteCompleto: false,
           observacoes: '',
@@ -1100,6 +1103,31 @@ export default function PedidosPage() {
                       <div className="mt-2 text-sm text-gray-400">
                         {formData.jogadoresIds.length} jogador(es) • {formData.numeroCompradores} comprador(es) • {12 - formData.jogadoresIds.length - formData.numeroCompradores} slot(s) vazios
                       </div>
+                      
+                      {/* JOGADORES NÃO CADASTRADOS (MANUAL) */}
+                      {!formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && (
+                        <div className="mt-4 bg-gray-800/50 border border-gray-700 rounded-lg p-4">
+                          <label className="block text-gray-300 mb-2">
+                            👤 Jogadores Não Cadastrados (opcional)
+                          </label>
+                          <p className="text-xs text-gray-400 mb-2">
+                            Para carrys de Boss 1-6, você pode adicionar jogadores que não estão no sistema. 
+                            Separe os nomes por vírgula (ex: Jogador1, Jogador2, Jogador3)
+                          </p>
+                          <input
+                            type="text"
+                            className="w-full bg-gray-700 text-white rounded px-4 py-2"
+                            placeholder="Nome1, Nome2, Nome3..."
+                            value={formData.jogadoresNaoCadastrados}
+                            onChange={(e) => setFormData({ ...formData, jogadoresNaoCadastrados: e.target.value })}
+                          />
+                          {formData.jogadoresNaoCadastrados && (
+                            <p className="text-xs text-yellow-400 mt-2">
+                              ⚠️ Jogadores não cadastrados serão considerados pagos automaticamente
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
