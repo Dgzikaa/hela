@@ -20,6 +20,8 @@ interface Jogador {
   categoria: string
   discord: string | null
   ativo: boolean
+  essencial: boolean
+  ultimoCarry: string | null
 }
 
 interface Pedido {
@@ -105,11 +107,38 @@ export default function PedidosPage() {
         const data = await res.json()
         setJogadores(data.filter((j: Jogador) => j.ativo))
         
-        // Selecionar time HELA por padrão
+        // Selecionar jogadores para o carry
         const timeHela = data.filter((j: Jogador) => j.categoria === 'HELA' && j.ativo)
+        
+        // 1. Pegar TODOS os essenciais (sempre vão)
+        const essenciais = timeHela.filter((j: Jogador) => j.essencial)
+        
+        // 2. Pegar não-essenciais ordenados por último carry (rodízio)
+        const naoEssenciais = timeHela
+          .filter((j: Jogador) => !j.essencial)
+          .sort((a: any, b: any) => {
+            // Quem nunca participou vai primeiro
+            if (!a.ultimoCarry && !b.ultimoCarry) return 0
+            if (!a.ultimoCarry) return -1
+            if (!b.ultimoCarry) return 1
+            // Depois ordena por data (mais antigo primeiro)
+            return new Date(a.ultimoCarry).getTime() - new Date(b.ultimoCarry).getTime()
+          })
+        
+        // 3. Pegar 11 jogadores (considerando que 1 slot é pro comprador)
+        // Se temos 12 principais, tiramos 1 para o comprador
+        const totalSlots = 11
+        const slotsRestantes = totalSlots - essenciais.length
+        const naoEssenciaisSelecionados = naoEssenciais.slice(0, Math.max(0, slotsRestantes))
+        
+        const jogadoresSelecionados = [
+          ...essenciais.map((j: Jogador) => j.id),
+          ...naoEssenciaisSelecionados.map((j: Jogador) => j.id)
+        ]
+        
         setFormData(prev => ({
           ...prev,
-          jogadoresIds: timeHela.map((j: Jogador) => j.id)
+          jogadoresIds: jogadoresSelecionados
         }))
       }
     } catch (error) {
@@ -508,29 +537,45 @@ export default function PedidosPage() {
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-3 font-semibold">Jogadores Participantes</label>
+                  <label className="block text-gray-300 mb-3 font-semibold">
+                    Jogadores Participantes ({formData.jogadoresIds.length}/11)
+                  </label>
+                  <p className="text-xs text-gray-400 mb-3">
+                    ⭐ Essenciais são obrigatórios • 💫 Sugeridos por rodízio • 1 slot fica pro comprador
+                  </p>
                   <div className="grid grid-cols-2 gap-2">
-                    {jogadores.map(jogador => (
-                      <button
-                        key={jogador.id}
-                        onClick={() => toggleJogador(jogador.id)}
-                        className={`p-3 rounded border-2 transition-colors text-left ${
-                          formData.jogadoresIds.includes(jogador.id)
-                            ? 'bg-green-600 border-green-500 text-white'
-                            : 'bg-gray-700 border-gray-600 text-gray-300'
-                        }`}
-                      >
-                        <div className="font-bold">{jogador.nick}</div>
-                        <div className="text-xs">
-                          {jogador.categoria === 'HELA' && '⭐ Time Principal'}
-                          {jogador.categoria === 'CARRYS' && '🎯 Carrys'}
-                          {jogador.categoria === 'SUPLENTE' && '🔄 Suplente'}
-                        </div>
-                      </button>
-                    ))}
+                    {jogadores.map((jogador: any) => {
+                      const isEssencial = jogador.essencial
+                      const isSelected = formData.jogadoresIds.includes(jogador.id)
+                      
+                      return (
+                        <button
+                          key={jogador.id}
+                          onClick={() => toggleJogador(jogador.id)}
+                          disabled={isEssencial}
+                          className={`p-3 rounded border-2 transition-colors text-left ${
+                            isSelected
+                              ? isEssencial
+                                ? 'bg-yellow-600 border-yellow-500 text-white cursor-not-allowed'
+                                : 'bg-green-600 border-green-500 text-white'
+                              : 'bg-gray-700 border-gray-600 text-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1 font-bold">
+                            {isEssencial && <span>⭐</span>}
+                            {jogador.nick}
+                          </div>
+                          <div className="text-xs">
+                            {jogador.categoria === 'HELA' && (isEssencial ? 'Essencial' : 'Time Principal')}
+                            {jogador.categoria === 'CARRYS' && '🎯 Carrys'}
+                            {jogador.categoria === 'SUPLENTE' && '🔄 Suplente'}
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                   <div className="mt-2 text-sm text-gray-400">
-                    {formData.jogadoresIds.length} jogador(es) selecionado(s)
+                    {formData.jogadoresIds.length} selecionado(s) • {11 - formData.jogadoresIds.length} slot(s) disponível(is)
                   </div>
                 </div>
 

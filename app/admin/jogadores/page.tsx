@@ -13,6 +13,9 @@ interface Jogador {
   discord: string | null
   discordId: string | null
   ativo: boolean
+  essencial: boolean
+  ordemRodizio: number | null
+  ultimoCarry: string | null
   totalCarrys: number
   totalGanho: number
 }
@@ -27,7 +30,8 @@ export default function JogadoresPage() {
     categoria: 'HELA',
     discord: '',
     discordId: '',
-    ativo: true
+    ativo: true,
+    essencial: false
   })
 
   useEffect(() => {
@@ -65,7 +69,8 @@ export default function JogadoresPage() {
           categoria: 'HELA',
           discord: '',
           discordId: '',
-          ativo: true
+          ativo: true,
+          essencial: false
         })
         fetchJogadores()
       } else {
@@ -84,7 +89,8 @@ export default function JogadoresPage() {
       categoria: jogador.categoria,
       discord: jogador.discord || '',
       discordId: jogador.discordId || '',
-      ativo: jogador.ativo
+      ativo: jogador.ativo,
+      essencial: jogador.essencial
     })
     setShowForm(true)
   }
@@ -176,8 +182,18 @@ export default function JogadoresPage() {
             <Card key={jogador.id} hover>
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{jogador.nick}</h3>
-                  {getCategoryBadge(jogador.categoria)}
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-xl font-bold text-gray-900">{jogador.nick}</h3>
+                    {jogador.essencial && (
+                      <span className="text-xl" title="Jogador Essencial - Nunca sai da PT">⭐</span>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {getCategoryBadge(jogador.categoria)}
+                    {jogador.essencial && (
+                      <Badge variant="warning">ESSENCIAL</Badge>
+                    )}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="secondary" onClick={() => handleEdit(jogador)}>
@@ -281,7 +297,7 @@ export default function JogadoresPage() {
                   </p>
                 </div>
 
-                <div>
+                <div className="space-y-2">
                   <label className="flex items-center gap-2 text-gray-300">
                     <input
                       type="checkbox"
@@ -291,6 +307,22 @@ export default function JogadoresPage() {
                     />
                     <span>Ativo</span>
                   </label>
+                  
+                  <label className="flex items-center gap-2 text-gray-300">
+                    <input
+                      type="checkbox"
+                      checked={formData.essencial}
+                      onChange={(e) => setFormData({ ...formData, essencial: e.target.checked })}
+                      className="w-5 h-5"
+                    />
+                    <span className="flex items-center gap-1">
+                      <span className="text-xl">⭐</span>
+                      <span>Essencial (Nunca sai da PT)</span>
+                    </span>
+                  </label>
+                  <p className="text-xs text-gray-400 ml-7">
+                    Jogadores essenciais são obrigatórios em todos os carries e não entram no rodízio
+                  </p>
                 </div>
               </div>
 

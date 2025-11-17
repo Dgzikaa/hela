@@ -55,6 +55,11 @@ model Jogador {
   discordId String?           // ID do Discord para enviar mensagens
   ativo     Boolean           @default(true)
   
+  // Sistema de rodízio
+  essencial Boolean           @default(false) // Jogadores que NUNCA saem da PT
+  ordemRodizio Int?           // Ordem no rodízio (para não-essenciais)
+  ultimoCarry DateTime?       // Data do último carry que participou
+  
   // Estatísticas
   totalCarrys Int             @default(0)
   totalGanho  Int             @default(0)

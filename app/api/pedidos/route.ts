@@ -102,6 +102,22 @@ export async function POST(req: Request) {
       }
     })
 
+    // Atualizar ultimoCarry dos jogadores participantes
+    if (jogadores && jogadores.length > 0) {
+      const agora = new Date()
+      await Promise.all(
+        jogadores.map((jogadorId: number) =>
+          prisma.jogador.update({
+            where: { id: jogadorId },
+            data: {
+              ultimoCarry: agora,
+              totalCarrys: { increment: 1 }
+            }
+          })
+        )
+      )
+    }
+
     // Atualizar estatísticas do cliente
     if (clienteId) {
       const cliente = await prisma.cliente.findUnique({
