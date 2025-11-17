@@ -37,7 +37,7 @@ type Missao = {
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'jogadores' | 'suplentes' | 'missoes'>('jogadores')
+  const [activeTab, setActiveTab] = useState<'jogadores' | 'suplentes' | 'carrys'>('jogadores')
   const [jogadores, setJogadores] = useState<Jogador[]>([])
   const [suplentes, setSuplentes] = useState<Suplente[]>([])
   const [missoes, setMissoes] = useState<Missao[]>([])
@@ -46,11 +46,10 @@ export default function Home() {
   // Form states
   const [novoJogador, setNovoJogador] = useState('')
   const [novoSuplente, setNovoSuplente] = useState('')
-  const [novaMissao, setNovaMissao] = useState({
+  const [novoCarry, setNovoCarry] = useState({
     data: new Date().toISOString().split('T')[0],
-    tipo: 'Normal',
+    torres: [] as string[], // ['Hela', '4', '5', '6']
     jogadorForaId: '',
-    suplenteId: '',
     carryNome: '',
     carryValor: '',
     status: 'Agendado',
@@ -123,23 +122,26 @@ export default function Home() {
     }
   }
 
-  const adicionarMissao = async (e: React.FormEvent) => {
+  const adicionarCarry = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!novaMissao.jogadorForaId) return
+    if (!novoCarry.jogadorForaId || novoCarry.torres.length === 0) return
 
     try {
       const res = await fetch('/api/missoes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(novaMissao)
+        body: JSON.stringify({
+          ...novoCarry,
+          tipo: novoCarry.torres.join(', '),  // "Hela, 4, 5"
+          suplenteId: null
+        })
       })
       
       if (res.ok) {
-        setNovaMissao({
+        setNovoCarry({
           data: new Date().toISOString().split('T')[0],
-          tipo: 'Normal',
+          torres: [],
           jogadorForaId: '',
-          suplenteId: '',
           carryNome: '',
           carryValor: '',
           status: 'Agendado',
@@ -148,8 +150,17 @@ export default function Home() {
         carregarDados()
       }
     } catch (error) {
-      console.error('Erro ao adicionar missão:', error)
+      console.error('Erro ao adicionar carry:', error)
     }
+  }
+  
+  const toggleTorre = (torre: string) => {
+    setNovoCarry(prev => ({
+      ...prev,
+      torres: prev.torres.includes(torre)
+        ? prev.torres.filter(t => t !== torre)
+        : [...prev.torres, torre]
+    }))
   }
 
   const getProximoJogadorFora = () => {
@@ -186,62 +197,62 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-3 flex items-center justify-center gap-4">
-            <div className="p-3 bg-slate-900 rounded-2xl shadow-lg">
-              <Calendar className="w-10 h-10 text-white" />
+        <div className="text-center mb-4 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-1 flex items-center justify-center gap-3">
+            <div className="p-2 bg-slate-900 rounded-xl shadow-lg">
+              <Calendar className="w-6 h-6 text-white" />
             </div>
             Rodízio Ragnatales
           </h1>
-          <p className="text-slate-600 text-lg">Sistema de Gerenciamento de Missões</p>
+          <p className="text-slate-600 text-sm">Sistema de Gerenciamento de Carrys</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card gradient hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-slate-100 rounded-lg">
-                <Users className="w-6 h-6 text-slate-700" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+          <Card gradient hover className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-slate-100 rounded-lg">
+                <Users className="w-5 h-5 text-slate-700" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm">Jogadores</p>
-                <p className="text-slate-900 text-2xl font-bold">{jogadores.length}</p>
+                <p className="text-slate-600 text-xs">Jogadores</p>
+                <p className="text-slate-900 text-xl font-bold">{jogadores.length}</p>
               </div>
             </div>
           </Card>
           
-          <Card gradient hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-slate-100 rounded-lg">
-                <UserPlus className="w-6 h-6 text-slate-700" />
+          <Card gradient hover className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-slate-100 rounded-lg">
+                <UserPlus className="w-5 h-5 text-slate-700" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm">Suplentes</p>
-                <p className="text-slate-900 text-2xl font-bold">{suplentes.length}</p>
+                <p className="text-slate-600 text-xs">Suplentes</p>
+                <p className="text-slate-900 text-xl font-bold">{suplentes.length}</p>
               </div>
             </div>
           </Card>
           
-          <Card gradient hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-50 rounded-lg">
-                <Trophy className="w-6 h-6 text-green-700" />
+          <Card gradient hover className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <Trophy className="w-5 h-5 text-green-700" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm">Concluídas</p>
-                <p className="text-slate-900 text-2xl font-bold">{totalMissoesConcluidas}</p>
+                <p className="text-slate-600 text-xs">Concluídas</p>
+                <p className="text-slate-900 text-xl font-bold">{totalMissoesConcluidas}</p>
               </div>
             </div>
           </Card>
           
-          <Card gradient hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <Clock className="w-6 h-6 text-blue-700" />
+          <Card gradient hover className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Clock className="w-5 h-5 text-blue-700" />
               </div>
               <div>
-                <p className="text-slate-600 text-sm">Agendadas</p>
-                <p className="text-slate-900 text-2xl font-bold">{missoesAgendadas}</p>
+                <p className="text-slate-600 text-xs">Agendadas</p>
+                <p className="text-slate-900 text-xl font-bold">{missoesAgendadas}</p>
               </div>
             </div>
           </Card>
@@ -249,19 +260,19 @@ export default function Home() {
 
         {/* Próximo Jogador */}
         {proximoJogador && (
-          <Card gradient className="mb-6 bg-slate-900 border-slate-800">
-            <div className="flex items-center gap-4">
-              <div className="p-4 bg-slate-800 rounded-xl">
-                <TrendingUp className="w-8 h-8 text-white" />
+          <Card gradient className="mb-4 bg-slate-900 border-slate-800 p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-slate-800 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-white text-xl font-semibold mb-1">🎯 Próximo a Ficar de Fora</h2>
-                <p className="text-3xl font-bold text-white mb-1">{proximoJogador.nick}</p>
-                <p className="text-slate-300">
-                  Ficou fora <strong>{proximoJogador.vezesFora}x</strong>
+                <h2 className="text-white text-sm font-semibold">🎯 Próximo a Ficar de Fora</h2>
+                <p className="text-xl font-bold text-white">{proximoJogador.nick}</p>
+                <p className="text-slate-300 text-xs">
+                  {proximoJogador.vezesFora}x fora
                   {proximoJogador.ultimaMissao 
-                    ? ` • Última: ${formatDate(proximoJogador.ultimaMissao)}`
-                    : ' • Nunca ficou de fora'}
+                    ? ` • ${formatDate(proximoJogador.ultimaMissao)}`
+                    : ' • Nunca ficou'}
                 </p>
               </div>
             </div>
@@ -273,38 +284,38 @@ export default function Home() {
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('jogadores')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
+              className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                 activeTab === 'jogadores'
                   ? 'bg-slate-900 text-white shadow-md'
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <Users className="w-5 h-5" />
-              <span>Jogadores</span>
+              <Users className="w-4 h-4" />
+              <span className="text-sm">Jogadores</span>
               <Badge variant="info">{jogadores.length}</Badge>
             </button>
             <button
               onClick={() => setActiveTab('suplentes')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
+              className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                 activeTab === 'suplentes'
                   ? 'bg-slate-900 text-white shadow-md'
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <UserPlus className="w-5 h-5" />
-              <span>Suplentes</span>
+              <UserPlus className="w-4 h-4" />
+              <span className="text-sm">Suplentes</span>
               <Badge variant="info">{suplentes.length}</Badge>
             </button>
             <button
-              onClick={() => setActiveTab('missoes')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-3 ${
-                activeTab === 'missoes'
+              onClick={() => setActiveTab('carrys')}
+              className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                activeTab === 'carrys'
                   ? 'bg-slate-900 text-white shadow-md'
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <ListTodo className="w-5 h-5" />
-              <span>Missões</span>
+              <ListTodo className="w-4 h-4" />
+              <span className="text-sm">Carrys</span>
               <Badge variant="info">{missoes.length}</Badge>
             </button>
           </div>
@@ -315,46 +326,46 @@ export default function Home() {
           {/* Jogadores Tab */}
           {activeTab === 'jogadores' && (
             <div>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <Users className="w-7 h-7" />
+              <CardHeader className="mb-3">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Users className="w-5 h-5" />
                   Jogadores Principais
                 </CardTitle>
               </CardHeader>
               
               {/* Form */}
-              <form onSubmit={adicionarJogador} className="mb-6">
-                <div className="flex gap-3">
+              <form onSubmit={adicionarJogador} className="mb-4">
+                <div className="flex gap-2">
                   <Input
                     type="text"
                     value={novoJogador}
                     onChange={(e) => setNovoJogador(e.target.value)}
-                    placeholder="Digite o nick do jogador..."
-                    className="flex-1"
+                    placeholder="Nick do jogador..."
+                    className="flex-1 text-sm"
                   />
-                  <Button type="submit" size="lg">
-                    <UserPlus className="w-5 h-5" />
+                  <Button type="submit">
+                    <UserPlus className="w-4 h-4" />
                     Adicionar
                   </Button>
                 </div>
               </form>
 
               {/* Lista */}
-              <div className="grid gap-4">
+              <div className="grid gap-3">
                 {jogadores.map((jogador, index) => (
                   <Card 
                     key={jogador.id} 
                     hover 
-                    className="animate-slide-up"
+                    className="animate-slide-up p-4"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="text-5xl">
+                      <div className="flex items-center gap-3">
+                        <div className="text-3xl">
                           {jogador.vezesFora === 0 ? '⭐' : '👤'}
                         </div>
                         <div>
-                          <h3 className="text-slate-900 font-bold text-xl mb-1">{jogador.nick}</h3>
+                          <h3 className="text-slate-900 font-bold text-lg mb-1">{jogador.nick}</h3>
                           <div className="flex gap-2 flex-wrap">
                             <Badge variant="default">
                               {jogador.vezesFora}x fora
@@ -389,44 +400,44 @@ export default function Home() {
           {/* Suplentes Tab */}
           {activeTab === 'suplentes' && (
             <div>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <UserPlus className="w-7 h-7" />
+              <CardHeader className="mb-3">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <UserPlus className="w-5 h-5" />
                   Suplentes
                 </CardTitle>
               </CardHeader>
               
               {/* Form */}
-              <form onSubmit={adicionarSuplente} className="mb-6">
-                <div className="flex gap-3">
+              <form onSubmit={adicionarSuplente} className="mb-4">
+                <div className="flex gap-2">
                   <Input
                     type="text"
                     value={novoSuplente}
                     onChange={(e) => setNovoSuplente(e.target.value)}
-                    placeholder="Digite o nick do suplente..."
-                    className="flex-1"
+                    placeholder="Nick do suplente..."
+                    className="flex-1 text-sm"
                   />
-                  <Button type="submit" size="lg">
-                    <UserPlus className="w-5 h-5" />
+                  <Button type="submit">
+                    <UserPlus className="w-4 h-4" />
                     Adicionar
                   </Button>
                 </div>
               </form>
 
               {/* Lista */}
-              <div className="grid gap-4">
+              <div className="grid gap-3">
                 {suplentes.map((suplente, index) => (
                   <Card 
                     key={suplente.id} 
                     hover
-                    className="animate-slide-up"
+                    className="animate-slide-up p-4"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="text-5xl">🛡️</div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-3xl">🛡️</div>
                         <div>
-                          <h3 className="text-slate-900 font-bold text-xl mb-1">{suplente.nick}</h3>
+                          <h3 className="text-slate-900 font-bold text-lg mb-1">{suplente.nick}</h3>
                           <div className="flex gap-2 flex-wrap">
                             <Badge variant="default">
                               {suplente.vezesJogou}x jogou
@@ -458,42 +469,51 @@ export default function Home() {
             </div>
           )}
 
-          {/* Missões Tab */}
-          {activeTab === 'missoes' && (
+          {/* Carrys Tab */}
+          {activeTab === 'carrys' && (
             <div>
               <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <ListTodo className="w-7 h-7" />
-                  Missões / Rodízio
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <ListTodo className="w-5 h-5" />
+                  Carrys
                 </CardTitle>
               </CardHeader>
               
               {/* Form */}
-              <Card gradient className="mb-6">
-                <form onSubmit={adicionarMissao} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
+              <Card gradient className="mb-4 p-4">
+                <form onSubmit={adicionarCarry} className="space-y-3">
+                  <div className="grid md:grid-cols-2 gap-3">
                     <Input
                       type="date"
-                      label="Data da Missão"
-                      value={novaMissao.data}
-                      onChange={(e) => setNovaMissao({ ...novaMissao, data: e.target.value })}
+                      label="Data"
+                      value={novoCarry.data}
+                      onChange={(e) => setNovoCarry({ ...novoCarry, data: e.target.value })}
+                      className="text-sm"
                     />
                     
-                    <Select
-                      label="Tipo de Missão"
-                      value={novaMissao.tipo}
-                      onChange={(e) => setNovaMissao({ ...novaMissao, tipo: e.target.value })}
-                    >
-                      <option value="Normal">Normal</option>
-                      <option value="Suplente">Suplente</option>
-                      <option value="Carry">Carry</option>
-                    </Select>
+                    <div>
+                      <label className="block text-slate-700 text-sm font-medium mb-2">Torres *</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Hela', '4', '5', '6'].map((torre) => (
+                          <label key={torre} className="flex items-center gap-2 p-2 bg-white border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50">
+                            <input
+                              type="checkbox"
+                              checked={novoCarry.torres.includes(torre)}
+                              onChange={() => toggleTorre(torre)}
+                              className="w-4 h-4"
+                            />
+                            <span className="text-sm font-medium">Torre {torre}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
 
                     <Select
                       label="Jogador de Fora *"
-                      value={novaMissao.jogadorForaId}
-                      onChange={(e) => setNovaMissao({ ...novaMissao, jogadorForaId: e.target.value })}
+                      value={novoCarry.jogadorForaId}
+                      onChange={(e) => setNovoCarry({ ...novoCarry, jogadorForaId: e.target.value })}
                       required
+                      className="text-sm"
                     >
                       <option value="">Selecione...</option>
                       {jogadores.map((j) => (
@@ -503,45 +523,30 @@ export default function Home() {
                       ))}
                     </Select>
 
-                    {novaMissao.tipo === 'Suplente' && (
-                      <Select
-                        label="Suplente"
-                        value={novaMissao.suplenteId}
-                        onChange={(e) => setNovaMissao({ ...novaMissao, suplenteId: e.target.value })}
-                      >
-                        <option value="">Selecione...</option>
-                        {suplentes.map((s) => (
-                          <option key={s.id} value={s.id}>
-                            {s.nick} ({s.vezesJogou}x jogou)
-                          </option>
-                        ))}
-                      </Select>
-                    )}
-
-                    {novaMissao.tipo === 'Carry' && (
-                      <>
-                        <Input
-                          type="text"
-                          label="Nome do Carry"
-                          value={novaMissao.carryNome}
-                          onChange={(e) => setNovaMissao({ ...novaMissao, carryNome: e.target.value })}
-                          placeholder="Nome do carry"
-                        />
-                        <Input
-                          type="number"
-                          step="0.01"
-                          label="Valor (R$)"
-                          value={novaMissao.carryValor}
-                          onChange={(e) => setNovaMissao({ ...novaMissao, carryValor: e.target.value })}
-                          placeholder="0.00"
-                        />
-                      </>
-                    )}
+                    <Input
+                      type="text"
+                      label="Cliente"
+                      value={novoCarry.carryNome}
+                      onChange={(e) => setNovoCarry({ ...novoCarry, carryNome: e.target.value })}
+                      placeholder="Nome do cliente"
+                      className="text-sm"
+                    />
+                    
+                    <Input
+                      type="number"
+                      step="0.01"
+                      label="Valor (R$)"
+                      value={novoCarry.carryValor}
+                      onChange={(e) => setNovoCarry({ ...novoCarry, carryValor: e.target.value })}
+                      placeholder="0.00"
+                      className="text-sm"
+                    />
 
                     <Select
                       label="Status"
-                      value={novaMissao.status}
-                      onChange={(e) => setNovaMissao({ ...novaMissao, status: e.target.value })}
+                      value={novoCarry.status}
+                      onChange={(e) => setNovoCarry({ ...novoCarry, status: e.target.value })}
+                      className="text-sm"
                     >
                       <option value="Agendado">Agendado</option>
                       <option value="Concluído">Concluído</option>
@@ -551,39 +556,40 @@ export default function Home() {
                     <div className="md:col-span-2">
                       <Textarea
                         label="Observações"
-                        value={novaMissao.observacoes}
-                        onChange={(e) => setNovaMissao({ ...novaMissao, observacoes: e.target.value })}
+                        value={novoCarry.observacoes}
+                        onChange={(e) => setNovoCarry({ ...novoCarry, observacoes: e.target.value })}
                         placeholder="Observações opcionais..."
                         rows={2}
+                        className="text-sm"
                       />
                     </div>
                   </div>
 
-                  <Button type="submit" fullWidth size="lg">
-                    <Calendar className="w-5 h-5" />
-                    Criar Missão
+                  <Button type="submit" fullWidth>
+                    <Calendar className="w-4 h-4" />
+                    Registrar Carry
                   </Button>
                 </form>
               </Card>
 
               {/* Lista */}
-              <div className="grid gap-4">
+              <div className="grid gap-3">
                 {missoes.map((missao, index) => (
                   <Card 
                     key={missao.id} 
                     hover
-                    className="animate-slide-up"
+                    className="animate-slide-up p-4"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-slate-400" />
-                        <h3 className="text-slate-900 font-bold text-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-slate-400" />
+                        <h3 className="text-slate-900 font-bold text-base">
                           {formatDate(missao.data)}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={missao.tipo === 'Normal' ? 'default' : missao.tipo === 'Carry' ? 'warning' : 'info'}>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <Badge variant="default">
                           {missao.tipo}
                         </Badge>
                         <Badge variant={
@@ -596,36 +602,26 @@ export default function Home() {
                       </div>
                     </div>
                     
-                    <div className="space-y-2 text-slate-600">
+                    <div className="space-y-1 text-slate-600 text-sm">
                       <p className="flex items-center gap-2">
-                        <span className="text-xl">👤</span>
-                        <strong>Ficou de fora:</strong> {missao.jogadorFora?.nick || 'N/A'}
+                        <span>👤</span>
+                        <strong>Jogador:</strong> {missao.jogadorFora?.nick || 'N/A'}
                       </p>
-                      {missao.tipo === 'Suplente' && missao.suplente && (
+                      {missao.carryNome && (
                         <p className="flex items-center gap-2">
-                          <span className="text-xl">🛡️</span>
-                          <strong>Suplente:</strong> {missao.suplente.nick}
+                          <span>👨‍💼</span>
+                          <strong>Cliente:</strong> {missao.carryNome}
                         </p>
                       )}
-                      {missao.tipo === 'Carry' && (
-                        <>
-                          {missao.carryNome && (
-                            <p className="flex items-center gap-2">
-                              <span className="text-xl">⚔️</span>
-                              <strong>Carry:</strong> {missao.carryNome}
-                            </p>
-                          )}
-                          {missao.carryValor && (
-                            <p className="flex items-center gap-2">
-                              <span className="text-xl">💰</span>
-                              <strong>Valor:</strong> {formatCurrency(missao.carryValor)}
-                            </p>
-                          )}
-                        </>
+                      {missao.carryValor && missao.carryValor > 0 && (
+                        <p className="flex items-center gap-2">
+                          <span>💰</span>
+                          <strong>Valor:</strong> {formatCurrency(missao.carryValor)}
+                        </p>
                       )}
                       {missao.observacoes && (
-                        <p className="flex items-center gap-2 italic text-slate-500">
-                          <span className="text-xl">📝</span>
+                        <p className="flex items-center gap-2 italic text-slate-500 text-xs">
+                          <span>📝</span>
                           {missao.observacoes}
                         </p>
                       )}
@@ -633,10 +629,10 @@ export default function Home() {
                   </Card>
                 ))}
                 {missoes.length === 0 && (
-                  <div className="text-center py-16">
-                    <ListTodo className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <p className="text-slate-600 text-lg">Nenhuma missão cadastrada ainda</p>
-                    <p className="text-slate-400 text-sm mt-2">Crie a primeira missão acima!</p>
+                  <div className="text-center py-12">
+                    <ListTodo className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                    <p className="text-slate-600">Nenhum carry cadastrado ainda</p>
+                    <p className="text-slate-400 text-sm mt-1">Registre o primeiro carry acima!</p>
                   </div>
                 )}
               </div>
