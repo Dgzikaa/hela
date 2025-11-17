@@ -126,8 +126,14 @@
         const messageDiv = document.getElementById('message');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Verificar status ao carregar
-        fetch('/api/setup/first-user')
+        // Primeiro, garantir que as tabelas existem
+        fetch('/api/setup/migrate', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Migration result:', data);
+                // Verificar status ao carregar
+                return fetch('/api/setup/first-user');
+            })
             .then(res => res.json())
             .then(data => {
                 if (data.usuariosExistentes > 0) {
@@ -135,6 +141,9 @@
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'Usuário já existe';
                 }
+            })
+            .catch(err => {
+                console.error('Erro ao verificar:', err);
             });
 
         form.addEventListener('submit', async (e) => {
