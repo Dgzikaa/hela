@@ -829,17 +829,30 @@ export default function PedidosPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            toggleBoss(boss.id)
-                            // Adicionar automaticamente ao comprador único
                             const novosCompradores = [...formData.compradores]
                             const bossesAtuais = novosCompradores[0].bossesIds
+                            const incluiBoss = bossesAtuais.includes(boss.id)
+                            
+                            // Toggle boss no comprador
                             novosCompradores[0] = {
                               ...novosCompradores[0],
-                              bossesIds: bossesAtuais.includes(boss.id)
+                              bossesIds: incluiBoss
                                 ? bossesAtuais.filter(id => id !== boss.id)
                                 : [...bossesAtuais, boss.id]
                             }
-                            setFormData({ ...formData, compradores: novosCompradores })
+                            
+                            // Atualizar bosses do pedido
+                            const novosBossesIds = incluiBoss
+                              ? formData.bossesIds.filter(id => id !== boss.id)
+                              : [...formData.bossesIds, boss.id]
+                            
+                            setFormData({ 
+                              ...formData, 
+                              bossesIds: novosBossesIds,
+                              compradores: novosCompradores 
+                            })
+                            
+                            setTimeout(() => selecionarJogadoresAutomatico(), 100)
                           }}
                           className={`w-full p-4 rounded border-2 transition-colors ${
                             formData.bossesIds.includes(boss.id)
@@ -869,17 +882,30 @@ export default function PedidosPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            toggleBoss(boss.id)
-                            // Adicionar automaticamente ao comprador único
                             const novosCompradores = [...formData.compradores]
                             const bossesAtuais = novosCompradores[0].bossesIds
+                            const incluiBoss = bossesAtuais.includes(boss.id)
+                            
+                            // Toggle boss no comprador
                             novosCompradores[0] = {
                               ...novosCompradores[0],
-                              bossesIds: bossesAtuais.includes(boss.id)
+                              bossesIds: incluiBoss
                                 ? bossesAtuais.filter(id => id !== boss.id)
                                 : [...bossesAtuais, boss.id]
                             }
-                            setFormData({ ...formData, compradores: novosCompradores })
+                            
+                            // Atualizar bosses do pedido
+                            const novosBossesIds = incluiBoss
+                              ? formData.bossesIds.filter(id => id !== boss.id)
+                              : [...formData.bossesIds, boss.id]
+                            
+                            setFormData({ 
+                              ...formData, 
+                              bossesIds: novosBossesIds,
+                              compradores: novosCompradores 
+                            })
+                            
+                            setTimeout(() => selecionarJogadoresAutomatico(), 100)
                           }}
                           className={`w-full p-3 rounded border-2 transition-colors ${
                             formData.bossesIds.includes(boss.id)
