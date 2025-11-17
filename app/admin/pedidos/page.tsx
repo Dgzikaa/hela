@@ -130,15 +130,18 @@ export default function PedidosPage() {
       const res = await fetch('/api/jogadores')
       if (res.ok) {
         const data = await res.json()
-        setJogadores(data.filter((j: Jogador) => j.ativo))
         
-        // Selecionar jogadores para o carry
-        const timeHela = data.filter((j: Jogador) => j.categoria === 'HELA' && j.ativo)
+        // Separar jogadores ativos por categoria
+        const jogadoresAtivos = data.filter((j: Jogador) => j.ativo)
+        setJogadores(jogadoresAtivos)
         
-        // 1. Pegar TODOS os essenciais (sempre vão)
+        // APENAS TIME PRINCIPAL (HELA) - NUNCA SUPLENTES AUTOMATICAMENTE!
+        const timeHela = jogadoresAtivos.filter((j: Jogador) => j.categoria === 'HELA')
+        
+        // 1. Pegar TODOS os essenciais do time HELA (sempre vão)
         const essenciais = timeHela.filter((j: Jogador) => j.essencial)
         
-        // 2. Pegar não-essenciais ordenados por último carry (rodízio)
+        // 2. Pegar não-essenciais do time HELA ordenados por último carry (rodízio)
         const naoEssenciais = timeHela
           .filter((j: Jogador) => !j.essencial)
           .sort((a: any, b: any) => {
@@ -150,13 +153,13 @@ export default function PedidosPage() {
             return new Date(a.ultimoCarry).getTime() - new Date(b.ultimoCarry).getTime()
           })
         
-        // 3. Pegar jogadores (considerando slots dos compradores)
-        // PT tem 12 slots, tiramos os slots dos compradores
+        // 3. Calcular slots disponíveis (12 - compradores)
         const slotsCompradores = formData.numeroCompradores || 1
         const totalSlots = 12 - slotsCompradores
         const slotsRestantes = totalSlots - essenciais.length
         const naoEssenciaisSelecionados = naoEssenciais.slice(0, Math.max(0, slotsRestantes))
         
+        // SELECIONAR APENAS TIME PRINCIPAL (HELA)
         const jogadoresSelecionados = [
           ...essenciais.map((j: Jogador) => j.id),
           ...naoEssenciaisSelecionados.map((j: Jogador) => j.id)
@@ -768,39 +771,105 @@ export default function PedidosPage() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 mb-3">
-                    ⭐ Essenciais são obrigatórios • 💫 Sugeridos por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
+                    ⭐ Essenciais nunca saem • 💫 Principais por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {jogadores.map((jogador: any) => {
-                      const isEssencial = jogador.essencial
-                      const isSelected = formData.jogadoresIds.includes(jogador.id)
-                      
-                      return (
-                        <button
-                          key={jogador.id}
-                          onClick={() => toggleJogador(jogador.id)}
-                          disabled={isEssencial}
-                          className={`p-3 rounded border-2 transition-colors text-left ${
-                            isSelected
-                              ? isEssencial
-                                ? 'bg-yellow-600 border-yellow-500 text-white cursor-not-allowed'
-                                : 'bg-green-600 border-green-500 text-white'
-                              : 'bg-gray-700 border-gray-600 text-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-1 font-bold">
-                            {isEssencial && <span>⭐</span>}
-                            {jogador.nick}
-                          </div>
-                          <div className="text-xs">
-                            {jogador.categoria === 'HELA' && (isEssencial ? 'Essencial' : 'Time Principal')}
-                            {jogador.categoria === 'CARRYS' && '🎯 Carrys'}
-                            {jogador.categoria === 'SUPLENTE' && '🔄 Suplente'}
-                          </div>
-                        </button>
-                      )
-                    })}
+                  
+                  {/* TIME PRINCIPAL (HELA) */}
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-green-400 mb-2">⚔️ Time Principal (HELA)</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {jogadores.filter((j: Jogador) => j.categoria === 'HELA').map((jogador: any) => {
+                        const isEssencial = jogador.essencial
+                        const isSelected = formData.jogadoresIds.includes(jogador.id)
+                        
+                        return (
+                          <button
+                            key={jogador.id}
+                            onClick={() => toggleJogador(jogador.id)}
+                            disabled={isEssencial}
+                            className={`p-3 rounded border-2 transition-colors text-left ${
+                              isSelected
+                                ? isEssencial
+                                  ? 'bg-yellow-600 border-yellow-500 text-white cursor-not-allowed'
+                                  : 'bg-green-600 border-green-500 text-white'
+                                : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500'
+                            }`}
+                          >
+                            <div className="flex items-center gap-1 font-bold">
+                              {isEssencial && <span>⭐</span>}
+                              {jogador.nick}
+                            </div>
+                            <div className="text-xs">
+                              {isEssencial ? 'Essencial (fixo)' : 'Principal'}
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
+
+                  {/* SUPLENTES (APENAS PARA SUBSTITUIÇÃO MANUAL) */}
+                  {jogadores.filter((j: Jogador) => j.categoria === 'SUPLENTE').length > 0 && (
+                    <div className="mb-2">
+                      <div className="text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-2">
+                        🔄 Suplentes (Use apenas se alguém faltar)
+                        <span className="text-xs font-normal text-gray-400">
+                          Clique para substituir manualmente
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {jogadores.filter((j: Jogador) => j.categoria === 'SUPLENTE').map((jogador: any) => {
+                          const isSelected = formData.jogadoresIds.includes(jogador.id)
+                          
+                          return (
+                            <button
+                              key={jogador.id}
+                              onClick={() => toggleJogador(jogador.id)}
+                              className={`p-3 rounded border-2 transition-colors text-left ${
+                                isSelected
+                                  ? 'bg-yellow-600 border-yellow-500 text-white'
+                                  : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-yellow-500'
+                              }`}
+                            >
+                              <div className="flex items-center gap-1 font-bold">
+                                🔄 {jogador.nick}
+                              </div>
+                              <div className="text-xs">Suplente</div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CARRYS (se houver) */}
+                  {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').length > 0 && (
+                    <div className="mb-2">
+                      <div className="text-sm font-semibold text-blue-400 mb-2">🎯 Carrys (Boss 4-6)</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {jogadores.filter((j: Jogador) => j.categoria === 'CARRYS').map((jogador: any) => {
+                          const isSelected = formData.jogadoresIds.includes(jogador.id)
+                          
+                          return (
+                            <button
+                              key={jogador.id}
+                              onClick={() => toggleJogador(jogador.id)}
+                              className={`p-3 rounded border-2 transition-colors text-left ${
+                                isSelected
+                                  ? 'bg-blue-600 border-blue-500 text-white'
+                                  : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-blue-500'
+                              }`}
+                            >
+                              <div className="flex items-center gap-1 font-bold">
+                                🎯 {jogador.nick}
+                              </div>
+                              <div className="text-xs">Carrys</div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
                   <div className="mt-2 text-sm text-gray-400">
                     {formData.jogadoresIds.length} jogador(es) • {formData.numeroCompradores} comprador(es) • {12 - formData.jogadoresIds.length - formData.numeroCompradores} slot(s) vazios
                   </div>
