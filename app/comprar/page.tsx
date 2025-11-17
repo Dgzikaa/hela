@@ -17,6 +17,12 @@ interface Boss {
 }
 
 export default function ComprarCarry() {
+  // Redirecionar para home (página oculta - usar apenas bot Discord)
+  if (typeof window !== 'undefined') {
+    window.location.href = '/';
+    return null;
+  }
+  
   const [bosses, setBosses] = useState<Boss[]>([])
   const [bosseselecionados, setBossesSelecionados] = useState<number[]>([])
   const [conquistaSemMorrer, setConquistaSemMorrer] = useState(false)

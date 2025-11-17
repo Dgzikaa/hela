@@ -41,12 +41,16 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { 
+      clienteId,
       nomeCliente, 
       contatoCliente, 
       bosses, 
       conquistaSemMorrer, 
       pacoteCompleto, 
       valorTotal,
+      desconto,
+      descontoTipo,
+      origem,
       observacoes 
     } = body
 
@@ -68,12 +72,16 @@ export async function POST(req: Request) {
     // Criar pedido com itens
     const pedido = await prisma.pedido.create({
       data: {
+        clienteId,
         nomeCliente,
         contatoCliente,
         status: 'PENDENTE',
         valorTotal,
+        desconto: desconto || 0,
+        descontoTipo,
         conquistaSemMorrer,
         pacoteCompleto,
+        origem: origem || 'WEB',
         observacoes,
         itens: {
           create: bossesData.map(boss => ({
@@ -90,6 +98,43 @@ export async function POST(req: Request) {
         }
       }
     })
+
+    // Atualizar estatísticas do cliente
+    if (clienteId) {
+      const cliente = await prisma.cliente.findUnique({
+        where: { id: clienteId },
+        include: {
+          pedidos: {
+            where: {
+              status: { not: 'CANCELADO' }
+            }
+          }
+        }
+      })
+
+      if (cliente) {
+        const totalCompras = cliente.pedidos.length
+        const totalGasto = cliente.pedidos.reduce((acc, p) => acc + p.valorTotal, 0)
+
+        // Determinar tier
+        let tier = 'BRONZE'
+        if (totalCompras >= 21) tier = 'DIAMANTE'
+        else if (totalCompras >= 11) tier = 'PLATINA'
+        else if (totalCompras >= 6) tier = 'OURO'
+        else if (totalCompras >= 3) tier = 'PRATA'
+
+        await prisma.cliente.update({
+          where: { id: clienteId },
+          data: {
+            totalCompras,
+            totalGasto,
+            tier: tier as any,
+            ultimaCompra: new Date(),
+            primeiraCompra: cliente.primeiraCompra || new Date()
+          }
+        })
+      }
+    }
 
     // TODO: Enviar notificação (webhook Discord, email, etc)
     

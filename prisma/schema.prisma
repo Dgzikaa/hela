@@ -85,6 +85,87 @@ model Boss {
 }
 
 // =======================
+// CLIENTES (DISCORD)
+// =======================
+
+enum TierCliente {
+  BRONZE   // 0-2 compras
+  PRATA    // 3-5 compras
+  OURO     // 6-10 compras
+  PLATINA  // 11-20 compras
+  DIAMANTE // 21+ compras
+}
+
+model Cliente {
+  id              Int          @id @default(autoincrement())
+  discordUserId   String       @unique
+  discordUsername String
+  
+  // Estatísticas
+  totalCompras    Int          @default(0)
+  totalGasto      Float        @default(0)
+  tier            TierCliente  @default(BRONZE)
+  
+  // Datas importantes
+  primeiraCompra  DateTime?
+  ultimaCompra    DateTime?
+  
+  // Preferências
+  bossPreferido   String?      // Boss que mais compra
+  diaPreferido    String?      // Dia da semana preferido
+  
+  // Marketing
+  aceitaOfertas   Boolean      @default(true)
+  ultimaOferta    DateTime?
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relações
+  pedidos         Pedido[]
+  leads           Lead[]
+
+  @@map("clientes")
+}
+
+// =======================
+// LEADS DO DISCORD
+// =======================
+
+enum StatusLead {
+  INICIADO          // Começou conversa
+  EM_NEGOCIACAO     // Discutindo detalhes
+  AGUARDANDO_CONFIRMACAO // Esperando confirmar
+  CONVERTIDO        // Virou pedido
+  PERDIDO           // Não finalizou
+}
+
+model Lead {
+  id              Int        @id @default(autoincrement())
+  
+  // Cliente
+  clienteId       Int?
+  cliente         Cliente?   @relation(fields: [clienteId], references: [id])
+  
+  discordUserId   String     // ID do usuário no Discord (backup)
+  discordUsername String     // Username no Discord (backup)
+  status          StatusLead @default(INICIADO)
+  
+  // Histórico da conversa (JSON)
+  conversaHistorico String?  @db.Text
+  
+  // Pedido gerado (se converteu)
+  pedidoId        Int?       @unique
+  pedido          Pedido?    @relation(fields: [pedidoId], references: [id])
+  
+  ultimaInteracao DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@map("leads")
+}
+
+// =======================
 // PEDIDOS DE CARRY
 // =======================
 
@@ -101,8 +182,14 @@ model Pedido {
   id            Int          @id @default(autoincrement())
   
   // Cliente
+  clienteId     Int?
+  cliente       Cliente?     @relation(fields: [clienteId], references: [id])
+  
   nomeCliente   String
   contatoCliente String      // Discord, WhatsApp, etc
+  
+  // Origem
+  origem        String       @default("WEB") // "WEB", "DISCORD"
   
   // Detalhes
   status        StatusPedido @default(PENDENTE)
@@ -113,6 +200,7 @@ model Pedido {
   valorTotal    Float        @default(0)
   valorPago     Float        @default(0)
   desconto      Float        @default(0)
+  descontoTipo  String?      // "FIDELIDADE", "PROMOCAO", "PRIMEIRA_COMPRA"
   
   // Opções extras
   conquistaSemMorrer Boolean  @default(false)
@@ -130,6 +218,7 @@ model Pedido {
   // Relações
   itens         ItensPedido[]
   participacoes ParticipacaoCarry[]
+  lead          Lead?        // Lead que originou (se veio do Discord)
 
   @@map("pedidos")
 }

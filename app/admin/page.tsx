@@ -129,12 +129,36 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Dashboard Admin
-          </h1>
-          <p className="text-slate-600">
-            Bem-vindo, <strong>{session.user.name}</strong>
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                Dashboard Admin
+              </h1>
+              <p className="text-slate-600">
+                Bem-vindo, <strong>{session.user.name}</strong>
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push('/admin/calendario')}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+              >
+                📅 Calendário
+              </button>
+              <button
+                onClick={() => router.push('/admin/leads')}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+              >
+                💬 Leads
+              </button>
+              <button
+                onClick={() => router.push('/admin/clientes')}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm font-medium"
+              >
+                👑 Clientes VIP
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Stats */}
