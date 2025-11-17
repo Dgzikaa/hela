@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Primeiro Usuário - Hela Carrys</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        p {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            color: #334155;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0f172a;
+        }
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Setup Inicial</h1>
+        <p>Criar primeiro usuário administrador</p>
+        
+        <div id="message" class="message"></div>
+        
+        <form id="setupForm">
+            <div>
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" value="Rodrigo" required>
+            </div>
+            
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" value="rodrigo@grupomenosemais.com.br" required>
+            </div>
+            
+            <div>
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" value="Geladeira@001" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">Criar Usuário</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('setupForm');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Verificar status ao carregar
+        fetch('/api/setup/first-user')
+            .then(res => res.json())
+            .then(data => {
+                if (data.usuariosExistentes > 0) {
+                    showMessage('info', data.message + ' Use /admin/login para entrar.');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Usuário já existe';
+                }
+            });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Criando...';
+            
+            try {
+                const response = await fetch('/api/setup/first-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('success', '✅ ' + data.message);
+                    setTimeout(() => {
+                        window.location.href = '/admin/login';
+                    }, 2000);
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Criar Usuário';
+                }
+            } catch (error) {
+                showMessage('error', '❌ Erro ao criar usuário: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Criar Usuário';
+            }
+        });
+
+        function showMessage(type, text) {
+            messageDiv.className = 'message ' + type;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
