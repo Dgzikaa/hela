@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido } from '@/lib/discord-webhook'
 
 export async function GET() {
   try {
