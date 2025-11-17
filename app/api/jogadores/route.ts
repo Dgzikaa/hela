@@ -49,20 +49,23 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { nick, categoria, discord, discordId, ativo, essencial } = body
+    const { nick, categorias, discord, discordId, ativo, essencial } = body
 
     if (!nick) {
       return NextResponse.json({ error: 'Nick é obrigatório' }, { status: 400 })
     }
 
-    if (!categoria) {
+    if (!categorias || (Array.isArray(categorias) && categorias.length === 0)) {
       return NextResponse.json({ error: 'Categoria é obrigatória' }, { status: 400 })
     }
+
+    // Garantir que categorias seja string (array separado por vírgula)
+    const categoriasStr = Array.isArray(categorias) ? categorias.join(',') : categorias
 
     const jogador = await prisma.jogador.create({
       data: {
         nick,
-        categoria,
+        categorias: categoriasStr,
         discord: discord || null,
         discordId: discordId || null,
         ativo: ativo !== undefined ? ativo : true,
@@ -81,7 +84,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json()
-    const { id, nick, categoria, discord, discordId, ativo, essencial } = body
+    const { id, nick, categorias, discord, discordId, ativo, essencial } = body
 
     if (!id) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
@@ -89,7 +92,10 @@ export async function PATCH(request: Request) {
 
     const data: any = {}
     if (nick) data.nick = nick
-    if (categoria) data.categoria = categoria
+    if (categorias) {
+      // Garantir que categorias seja string (array separado por vírgula)
+      data.categorias = Array.isArray(categorias) ? categorias.join(',') : categorias
+    }
     if (discord !== undefined) data.discord = discord || null
     if (discordId !== undefined) data.discordId = discordId || null
     if (ativo !== undefined) data.ativo = ativo
