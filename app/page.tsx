@@ -118,7 +118,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="text-center mt-8 text-slate-400 text-sm">
-          <p>Ragnatales © 2024 - Sistema de Carrys Profissional</p>
+          <p>Hela Carrys © 2025 - Sistema de Carrys Profissional</p>
         </div>
       </div>
     </div>
