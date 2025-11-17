@@ -7,9 +7,10 @@ interface CardProps {
   hover?: boolean
   gradient?: boolean
   style?: CSSProperties
+  onClick?: () => void
 }
 
-export function Card({ children, className, hover = false, gradient = false, style }: CardProps) {
+export function Card({ children, className, hover = false, gradient = false, style, onClick }: CardProps) {
   return (
     <div
       className={cn(
@@ -21,6 +22,7 @@ export function Card({ children, className, hover = false, gradient = false, sty
         className
       )}
       style={style}
+      onClick={onClick}
     >
       {children}
     </div>
