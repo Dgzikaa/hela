@@ -14,11 +14,11 @@ export function Card({ children, className, hover = false, gradient = false, sty
   return (
     <div
       className={cn(
-        'rounded-xl p-6 transition-all duration-300 border',
+        'rounded-2xl p-6 transition-all duration-300 border backdrop-blur-sm',
         gradient 
-          ? 'bg-white border-slate-200 shadow-sm' 
-          : 'bg-white border-slate-200',
-        hover && 'hover:shadow-lg hover:border-slate-300 cursor-pointer',
+          ? 'bg-white/80 border-gray-200 shadow-sm' 
+          : 'bg-white border-gray-200 shadow-sm',
+        hover && 'hover:shadow-xl hover:shadow-purple-100 hover:border-purple-200 hover:-translate-y-0.5 cursor-pointer',
         className
       )}
       style={style}

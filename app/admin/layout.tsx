@@ -10,7 +10,7 @@ export default function AdminLayout({
 }) {
   return (
     <SessionProvider>
-      <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="flex min-h-screen bg-gray-50">
         <AdminSidebar />
         <main className="flex-1 lg:ml-64 mt-14 lg:mt-0">
           {children}

@@ -212,38 +212,38 @@ export default function PedidosPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Pedidos de Carry</h1>
-            <p className="text-gray-400">Gerencie todos os pedidos de carry</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Pedidos de Carry</h1>
+            <p className="text-gray-600">Gerencie todos os pedidos de carry</p>
           </div>
           <Button onClick={() => setShowCreateForm(true)}>
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-5 h-5" />
             Novo Pedido
           </Button>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <div className="text-yellow-400 text-sm mb-1">Pendentes</div>
-            <div className="text-3xl font-bold text-white">
+          <Card hover>
+            <div className="text-yellow-600 text-sm font-semibold mb-1">Pendentes</div>
+            <div className="text-3xl font-bold text-gray-900">
               {pedidos.filter(p => p.status === 'PENDENTE').length}
             </div>
           </Card>
-          <Card>
-            <div className="text-blue-400 text-sm mb-1">Agendados</div>
-            <div className="text-3xl font-bold text-white">
+          <Card hover>
+            <div className="text-blue-600 text-sm font-semibold mb-1">Agendados</div>
+            <div className="text-3xl font-bold text-gray-900">
               {pedidos.filter(p => p.status === 'AGENDADO').length}
             </div>
           </Card>
-          <Card>
-            <div className="text-green-400 text-sm mb-1">Concluídos</div>
-            <div className="text-3xl font-bold text-white">
+          <Card hover>
+            <div className="text-green-600 text-sm font-semibold mb-1">Concluídos</div>
+            <div className="text-3xl font-bold text-gray-900">
               {pedidos.filter(p => p.status === 'CONCLUIDO').length}
             </div>
           </Card>
-          <Card>
-            <div className="text-gray-400 text-sm mb-1">Valor Total</div>
-            <div className="text-3xl font-bold text-white">
+          <Card hover>
+            <div className="text-purple-600 text-sm font-semibold mb-1">Valor Total</div>
+            <div className="text-3xl font-bold text-gray-900">
               {pedidos.reduce((acc, p) => acc + p.valorFinal, 0)}KK
             </div>
           </Card>
@@ -252,21 +252,21 @@ export default function PedidosPage() {
         {/* Lista de Pedidos */}
         <div className="space-y-4">
           {pedidos.map(pedido => (
-            <Card key={pedido.id}>
+            <Card key={pedido.id} hover>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold text-white">{pedido.nomeCliente}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">{pedido.nomeCliente}</h3>
                     {getStatusBadge(pedido.status)}
                     <Badge variant="default">{pedido.origem}</Badge>
                   </div>
                   
-                  <div className="text-gray-400 mb-3">
+                  <div className="text-gray-600 mb-3">
                     <div className="flex items-center gap-2 mb-1">
                       <DollarSign className="w-4 h-4" />
                       <span>Valor: {pedido.valorTotal}KK | Final: {pedido.valorFinal}KK</span>
                       {pedido.desconto > 0 && (
-                        <span className="text-green-400">(Desconto: -{pedido.desconto}KK)</span>
+                        <span className="text-green-600 font-semibold">(Desconto: -{pedido.desconto}KK)</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function PedidosPage() {
                     )}
                   </div>
 
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 font-medium">
                     Contato: {pedido.contatoCliente} • Criado em {new Date(pedido.createdAt).toLocaleDateString('pt-BR')}
                   </div>
                 </div>
