@@ -5,6 +5,8 @@ export async function enviarWebhookDiscord(conteudo: {
   cor?: number
   campos?: { nome: string; valor: string; inline?: boolean }[]
   rodape?: string
+  imagemUrl?: string // URL da imagem (thumbnail pequeno)
+  imagemGrande?: string // URL da imagem grande
 }) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL
 
@@ -14,13 +16,23 @@ export async function enviarWebhookDiscord(conteudo: {
   }
 
   try {
-    const embed = {
+    const embed: any = {
       title: conteudo.titulo,
       description: conteudo.descricao,
       color: conteudo.cor || 0xFFD700, // Dourado
       fields: conteudo.campos || [],
       footer: conteudo.rodape ? { text: conteudo.rodape } : undefined,
       timestamp: new Date().toISOString()
+    }
+
+    // Adicionar imagem thumbnail (pequena no canto)
+    if (conteudo.imagemUrl) {
+      embed.thumbnail = { url: conteudo.imagemUrl }
+    }
+
+    // Adicionar imagem grande
+    if (conteudo.imagemGrande) {
+      embed.image = { url: conteudo.imagemGrande }
     }
 
     const response = await fetch(webhookUrl, {
@@ -41,6 +53,17 @@ export async function enviarWebhookDiscord(conteudo: {
   }
 }
 
+// Mapeamento de bosses para imagens
+const BOSS_IMAGES: Record<string, string> = {
+  'Hela': '/images/bosses/hela.gif',
+  'Freylith': '/images/bosses/freylith.gif',
+  'Tyrgrim': '/images/bosses/tyrgrim.gif',
+  'Skollgrim': '/images/bosses/skollgrim.gif',
+  'Baldira': '/images/bosses/baldira.gif',
+  'Thorvald': '/images/bosses/thorvald.gif',
+  'Glacius': '/images/bosses/glacius.gif'
+}
+
 // Notificar novo carry
 export async function notificarNovoCarry(pedido: {
   id: number
@@ -48,13 +71,28 @@ export async function notificarNovoCarry(pedido: {
   contatoCliente: string
   valorTotal: number
   bosses: string[]
+  bossesCompletos?: Array<{ nome: string; imagemUrl: string }>
   pacoteCompleto: boolean
   conquistaSemMorrer: boolean
 }) {
-  const bossesTexto = pedido.bosses.join(', ')
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  
+  // Usar emojis para os bosses
+  const bossesComEmoji = pedido.bosses.map(boss => {
+    if (boss === 'Hela') return '⚔️ ' + boss
+    if (['Freylith', 'Tyrgrim', 'Skollgrim'].includes(boss)) return '🛡️ ' + boss
+    if (['Baldira', 'Thorvald', 'Glacius'].includes(boss)) return '⚔️ ' + boss
+    return boss
+  })
+  
+  const bossesTexto = bossesComEmoji.join('\n')
   const extras = []
-  if (pedido.pacoteCompleto) extras.push('🎁 Pacote Completo')
-  if (pedido.conquistaSemMorrer) extras.push('⭐ Sem Morrer')
+  if (pedido.pacoteCompleto) extras.push('🎁 Pacote Completo 1-6')
+  if (pedido.conquistaSemMorrer) extras.push('⭐ Conquista Sem Morrer')
+
+  // Pegar imagem do primeiro boss (ou Hela se tiver)
+  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
+  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
 
   await enviarWebhookDiscord({
     titulo: '🛒 Novo Carry Registrado!',
@@ -62,10 +100,12 @@ export async function notificarNovoCarry(pedido: {
     cor: 0x00FF00, // Verde
     campos: [
       { nome: '💰 Valor Total', valor: `${pedido.valorTotal}KK`, inline: true },
+      { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true },
       { nome: '🎯 Bosses', valor: bossesTexto, inline: false },
       ...(extras.length > 0 ? [{ nome: '🎁 Extras', valor: extras.join('\n'), inline: false }] : [])
     ],
-    rodape: `Pedido #${pedido.id} • Acesse o painel para aprovar`
+    rodape: 'Acesse o painel para aprovar',
+    imagemUrl: imagemBoss // Thumbnail do boss no canto
   })
 }
 
@@ -77,22 +117,37 @@ export async function notificarCarryAgendado(pedido: {
   bosses: string[]
   valorTotal: number
 }) {
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  
   const dataFormatada = new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: '2-digit',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })
+
+  const bossesComEmoji = pedido.bosses.map(boss => {
+    if (boss === 'Hela') return '⚔️ ' + boss
+    return boss
+  }).join(', ')
+
+  // Pegar imagem do primeiro boss
+  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
+  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
 
   await enviarWebhookDiscord({
     titulo: '📅 Carry Agendado!',
-    descricao: `**${pedido.nomeCliente}** - ${pedido.bosses.join(', ')}`,
+    descricao: `**Cliente:** ${pedido.nomeCliente}\n**Bosses:** ${bossesComEmoji}`,
     cor: 0x0099FF, // Azul
     campos: [
-      { nome: '📆 Data', valor: dataFormatada, inline: true },
-      { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true }
+      { nome: '📆 Data/Hora', valor: dataFormatada, inline: false },
+      { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
+      { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
     ],
-    rodape: `Pedido #${pedido.id}`
+    rodape: 'Preparar o time!',
+    imagemUrl: imagemBoss
   })
 }
 
@@ -103,14 +158,27 @@ export async function notificarCarryConcluido(pedido: {
   valorTotal: number
   bosses: string[]
 }) {
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  
+  const bossesTexto = pedido.bosses.map(boss => {
+    if (boss === 'Hela') return '⚔️ ' + boss
+    return boss
+  }).join(', ')
+
+  // Pegar imagem do primeiro boss (ou Hela se tiver)
+  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
+  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
+
   await enviarWebhookDiscord({
     titulo: '✅ Carry Concluído!',
-    descricao: `**${pedido.nomeCliente}** completou os bosses: ${pedido.bosses.join(', ')}`,
-    cor: 0x00FF00, // Verde
+    descricao: `**${pedido.nomeCliente}** completou:\n${bossesTexto}`,
+    cor: 0xFFD700, // Dourado
     campos: [
-      { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true }
+      { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
+      { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
     ],
-    rodape: `Pedido #${pedido.id} • Parabéns ao time! 🎉`
+    rodape: 'Parabéns ao time! 🎉',
+    imagemUrl: imagemBoss
   })
 }
 
@@ -167,6 +235,7 @@ export async function enviarMensagemPrivada(discordId: string, conteudo: {
   cor?: number
   campos?: { nome: string; valor: string; inline?: boolean }[]
   rodape?: string
+  imagemUrl?: string
 }) {
   const botToken = process.env.DISCORD_BOT_TOKEN
 
@@ -196,13 +265,17 @@ export async function enviarMensagemPrivada(discordId: string, conteudo: {
     const dmChannel = await dmChannelResponse.json()
 
     // Enviar mensagem no canal DM
-    const embed = {
+    const embed: any = {
       title: conteudo.titulo,
       description: conteudo.descricao,
       color: conteudo.cor || 0xFFD700,
       fields: conteudo.campos || [],
       footer: conteudo.rodape ? { text: conteudo.rodape } : undefined,
       timestamp: new Date().toISOString()
+    }
+
+    if (conteudo.imagemUrl) {
+      embed.thumbnail = { url: conteudo.imagemUrl }
     }
 
     const messageResponse = await fetch(`https://discord.com/api/v10/channels/${dmChannel.id}/messages`, {
@@ -237,6 +310,8 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
   bosses: string[]
   valorTotal: number
 }) {
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  
   const dataFormatada = pedido.dataAgendada 
     ? new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
         weekday: 'long',
@@ -247,6 +322,17 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
         minute: '2-digit'
       })
     : 'A definir'
+
+  const bossesComEmoji = pedido.bosses.map(boss => {
+    if (boss === 'Hela') return '⚔️ ' + boss
+    if (['Freylith', 'Tyrgrim', 'Skollgrim'].includes(boss)) return '🛡️ ' + boss
+    if (['Baldira', 'Thorvald', 'Glacius'].includes(boss)) return '⚔️ ' + boss
+    return boss
+  }).join('\n')
+
+  // Pegar imagem do primeiro boss (ou Hela se tiver)
+  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
+  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
 
   for (const jogador of jogadores) {
     if (!jogador.discordId) {
@@ -261,10 +347,11 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
       campos: [
         { nome: '👤 Cliente', valor: pedido.nomeCliente, inline: true },
         { nome: '💰 Valor Total', valor: `${pedido.valorTotal}KK`, inline: true },
-        { nome: '🎯 Bosses', valor: pedido.bosses.join(', '), inline: false },
+        { nome: '🎯 Bosses', valor: bossesComEmoji, inline: false },
         { nome: '📅 Data', valor: dataFormatada, inline: false }
       ],
-      rodape: `Pedido #${pedido.id} • Boa sorte!`
+      rodape: `Pedido #${pedido.id} • Boa sorte!`,
+      imagemUrl: imagemBoss
     })
 
     // Pequeno delay para não sobrecarregar a API do Discord
