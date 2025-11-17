@@ -137,7 +137,21 @@ export async function POST(req: Request) {
       }
     }
 
-    // TODO: Enviar notificação (webhook Discord, email, etc)
+    // Notificar no Discord
+    try {
+      const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
+      await notificarNovoCarry({
+        id: pedido.id,
+        nomeCliente: pedido.nomeCliente,
+        contatoCliente: pedido.contatoCliente,
+        valorTotal: pedido.valorTotal,
+        bosses: bossesNomes,
+        pacoteCompleto: pedido.pacoteCompleto,
+        conquistaSemMorrer: pedido.conquistaSemMorrer
+      })
+    } catch (error) {
+      console.error('Erro ao notificar Discord (não crítico):', error)
+    }
     
     return NextResponse.json(pedido, { status: 201 })
   } catch (error: any) {
@@ -166,6 +180,30 @@ export async function PATCH(req: Request) {
         }
       }
     })
+
+    // Notificar no Discord baseado no status
+    try {
+      const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
+
+      if (status === 'AGENDADO' && dataAgendada) {
+        await notificarCarryAgendado({
+          id: pedido.id,
+          nomeCliente: pedido.nomeCliente,
+          dataAgendada: dataAgendada,
+          bosses: bossesNomes,
+          valorTotal: pedido.valorTotal
+        })
+      } else if (status === 'CONCLUIDO') {
+        await notificarCarryConcluido({
+          id: pedido.id,
+          nomeCliente: pedido.nomeCliente,
+          valorTotal: pedido.valorTotal,
+          bosses: bossesNomes
+        })
+      }
+    } catch (error) {
+      console.error('Erro ao notificar Discord (não crítico):', error)
+    }
 
     return NextResponse.json(pedido)
   } catch (error: any) {
