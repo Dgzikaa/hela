@@ -67,6 +67,10 @@ export default function PedidosPage() {
   const [showCancelarModal, setShowCancelarModal] = useState(false)
   const [pedidoParaCancelar, setPedidoParaCancelar] = useState<Pedido | null>(null)
   const [motivoCancelamento, setMotivoCancelamento] = useState('')
+
+  // Modal de conclusão/pagamento
+  const [showConcluirModal, setShowConcluirModal] = useState(false)
+  const [pedidoParaConcluir, setPedidoParaConcluir] = useState<Pedido | null>(null)
   
   // Modal de exclusão
   const [showExcluirModal, setShowExcluirModal] = useState(false)
@@ -291,7 +295,7 @@ export default function PedidosPage() {
     }
   }
 
-  const handleUpdateStatus = async (pedidoId: number, novoStatus: string, dataAgendada?: string, motivo?: string) => {
+  const handleUpdateStatus = async (pedidoId: number, novoStatus: string, dataAgendada?: string, motivo?: string, marcarPago?: boolean) => {
     try {
       const res = await fetch('/api/pedidos', {
         method: 'PATCH',
@@ -300,7 +304,8 @@ export default function PedidosPage() {
           id: pedidoId,
           status: novoStatus,
           dataAgendada: dataAgendada || null,
-          motivo: motivo || null
+          motivo: motivo || null,
+          marcarPago: marcarPago || false
         })
       })
       
@@ -309,6 +314,8 @@ export default function PedidosPage() {
           toast.warning('⚠️ Carry cancelado e notificação enviada ao Discord')
         } else if (novoStatus === 'AGENDADO') {
           toast.success('📅 Carry agendado com sucesso!')
+        } else if (novoStatus === 'CONCLUIDO' && marcarPago) {
+          toast.success('💰 Carry concluído e jogadores pagos!')
         } else {
           toast.success('✅ Status atualizado!')
         }
@@ -597,7 +604,10 @@ export default function PedidosPage() {
                     <Button
                       size="sm"
                       variant="success"
-                      onClick={() => handleUpdateStatus(pedido.id, 'CONCLUIDO')}
+                      onClick={() => {
+                        setPedidoParaConcluir(pedido)
+                        setShowConcluirModal(true)
+                      }}
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
                       Concluir
@@ -1406,6 +1416,80 @@ export default function PedidosPage() {
                     setShowCancelarModal(false)
                     setMotivoCancelamento('')
                   }}
+                >
+                  Voltar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Concluir / Pagamento */}
+        {showConcluirModal && pedidoParaConcluir && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowConcluirModal(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-lg w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <CheckCircle className="w-6 h-6 text-green-500" />
+                  Concluir Carry #{pedidoParaConcluir.id}
+                </h2>
+                <button
+                  onClick={() => setShowConcluirModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-green-900/30 border border-green-500/50 p-4 rounded">
+                  <div className="text-green-300 text-sm mb-1">✅ Carry a ser concluído:</div>
+                  <div className="text-white font-bold">{pedidoParaConcluir.nomeCliente}</div>
+                  <div className="text-gray-400 text-sm mt-2">
+                    {pedidoParaConcluir.itens.map(i => i.boss.nome).join(', ')}
+                  </div>
+                  <div className="text-yellow-400 font-semibold mt-3">
+                    💰 {pedidoParaConcluir.valorTotal}KK
+                  </div>
+                </div>
+
+                <div className="bg-gray-700/50 p-4 rounded">
+                  <p className="text-white font-semibold mb-2">💵 Divisão do Pagamento</p>
+                  <p className="text-gray-300 text-sm">
+                    Valor será dividido igualmente entre todos os jogadores participantes.
+                  </p>
+                  <p className="text-gray-400 text-xs mt-2">
+                    ⚠️ Jogadores não cadastrados serão marcados como pagos automaticamente.
+                  </p>
+                  <p className="text-gray-400 text-xs mt-1">
+                    ✉️ Jogadores cadastrados com Discord receberão uma mensagem privada sobre o pagamento.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="success"
+                  onClick={() => {
+                    handleUpdateStatus(pedidoParaConcluir.id, 'CONCLUIDO', undefined, undefined, true)
+                    setShowConcluirModal(false)
+                  }}
+                  className="flex-1"
+                >
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  💰 Concluir e Pagar Jogadores
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowConcluirModal(false)}
                 >
                   Voltar
                 </Button>

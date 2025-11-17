@@ -182,6 +182,49 @@ export async function notificarCarryConcluido(pedido: {
   })
 }
 
+// Notificar jogadores que foram pagos
+export async function notificarJogadoresPagos(jogadores: Array<{
+  nick: string
+  discordId: string | null
+  valorRecebido: number
+  valorTotalCarrys: number
+}>, pedido: {
+  id: number
+  bosses: string[]
+}) {
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  
+  const bossesTexto = pedido.bosses.map(boss => {
+    if (boss === 'Hela') return '⚔️ ' + boss
+    return '🛡️ ' + boss
+  }).join('\n')
+
+  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
+  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
+
+  // Enviar mensagem para cada jogador cadastrado (com discordId)
+  for (const jogador of jogadores) {
+    if (!jogador.discordId) continue // Pular jogadores sem Discord
+
+    try {
+      await enviarMensagemPrivada(jogador.discordId, {
+        titulo: '💰 Pagamento Recebido!',
+        descricao: `Você foi pago pelo carry **#${pedido.id}**`,
+        cor: 0xFFD700, // Dourado
+        campos: [
+          { nome: '🛡️ Bosses', valor: bossesTexto, inline: false },
+          { nome: '💵 Valor Recebido', valor: `${jogador.valorRecebido}KK`, inline: true },
+          { nome: '📊 Total Acumulado', valor: `${jogador.valorTotalCarrys}KK`, inline: true }
+        ],
+        rodape: 'Continue com o bom trabalho! 🎉',
+        imagemUrl: imagemBoss
+      })
+    } catch (error) {
+      console.error(`Erro ao enviar notificação de pagamento para ${jogador.nick}:`, error)
+    }
+  }
+}
+
 // Notificar carry cancelado
 export async function notificarCarryCancelado(pedido: {
   id: number

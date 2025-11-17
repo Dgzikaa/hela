@@ -201,7 +201,7 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const body = await req.json()
-    const { id, status, dataAgendada, aprovadoPor } = body
+    const { id, status, dataAgendada, aprovadoPor, marcarPago } = body
 
     const pedido = await prisma.pedido.update({
       where: { id },
@@ -215,9 +215,62 @@ export async function PATCH(req: Request) {
           include: {
             boss: true
           }
+        },
+        participacoes: {
+          include: {
+            jogador: true
+          }
         }
       }
     })
+
+    // Se concluir e marcar como pago, processar pagamentos
+    if (status === 'CONCLUIDO' && marcarPago && pedido.participacoes.length > 0) {
+      // Calcular valor por jogador (dividir igualmente entre participantes)
+      const valorPorJogador = Math.floor(pedido.valorTotal / pedido.participacoes.length)
+
+      // Atualizar participações e jogadores
+      for (const participacao of pedido.participacoes) {
+        // Marcar participação como paga e definir valor recebido
+        await prisma.participacaoCarry.update({
+          where: { id: participacao.id },
+          data: {
+            pago: true,
+            valorRecebido: valorPorJogador
+          }
+        })
+
+        // Atualizar totalGanho do jogador
+        await prisma.jogador.update({
+          where: { id: participacao.jogadorId },
+          data: {
+            totalGanho: {
+              increment: valorPorJogador
+            }
+          }
+        })
+      }
+
+      // Enviar notificações de pagamento aos jogadores cadastrados
+      try {
+        const { notificarJogadoresPagos } = await import('@/lib/discord-webhook')
+        const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
+        
+        const jogadoresParaNotificar = pedido.participacoes.map(p => ({
+          nick: p.jogador.nick,
+          discordId: p.jogador.discordId,
+          valorRecebido: valorPorJogador,
+          valorTotalCarrys: p.jogador.totalGanho + valorPorJogador
+        }))
+
+        await notificarJogadoresPagos(jogadoresParaNotificar, {
+          id: pedido.id,
+          bosses: bossesNomes
+        })
+      } catch (error) {
+        console.error('Erro ao notificar jogadores sobre pagamento:', error)
+      }
+    }
 
     // Notificar no Discord baseado no status
     try {
@@ -231,7 +284,8 @@ export async function PATCH(req: Request) {
           bosses: bossesNomes,
           valorTotal: pedido.valorTotal
         })
-      } else if (status === 'CONCLUIDO') {
+      } else if (status === 'CONCLUIDO' && !marcarPago) {
+        // Só notifica conclusão se NÃO marcou como pago (para evitar duplicata)
         await notificarCarryConcluido({
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,

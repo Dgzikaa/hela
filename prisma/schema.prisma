@@ -263,6 +263,7 @@ model ParticipacaoCarry {
   
   // Valor recebido por esse jogador
   valorRecebido Int @default(0)
+  pago          Boolean @default(false) // Se o jogador já foi pago
   
   createdAt DateTime @default(now())
 
