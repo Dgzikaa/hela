@@ -4,8 +4,8 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
-import Card from '@/app/components/Card'
-import Badge from '@/app/components/Badge'
+import { Card } from '@/app/components/Card'
+import { Badge } from '@/app/components/Badge'
 
 interface Pedido {
   id: number

@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { ShoppingCart, Shield, Star } from 'lucide-react'
-import Card from './components/Card'
-import Button from './components/Button'
+import { Card } from './components/Card'
+import { Button } from './components/Button'
 
 export default function Home() {
   const router = useRouter()

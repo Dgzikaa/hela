@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Calendar, ShoppingCart, Check } from 'lucide-react'
-import Card from '../components/Card'
-import Button from '../components/Button'
-import Input from '../components/Input'
-import { Textarea } from '../components/Input'
+import { Card } from '../components/Card'
+import { Button } from '../components/Button'
+import { Input, Textarea } from '../components/Input'
 
 interface Boss {
   id: number

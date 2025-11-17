@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Lock } from 'lucide-react'
-import Card from '@/app/components/Card'
-import Input from '@/app/components/Input'
-import Button from '@/app/components/Button'
+import { Card } from '@/app/components/Card'
+import { Input } from '@/app/components/Input'
+import { Button } from '@/app/components/Button'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
