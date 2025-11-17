@@ -90,7 +90,10 @@ export default function PedidosPage() {
     observacoes: '',
     precoCustomizado: false,
     bossesPrecos: {} as Record<number, number>, // ID do boss -> preço customizado
-    numeroCompradores: 1 // Quantos compradores participarão (default 1)
+    numeroCompradores: 1, // Quantos compradores participarão (default 1)
+    compradores: [
+      { nome: '', contato: '', bossesIds: [] as number[] }
+    ] // Dados de cada comprador individual
   })
 
   useEffect(() => {
@@ -272,7 +275,8 @@ export default function PedidosPage() {
           observacoes: '',
           precoCustomizado: false,
           bossesPrecos: {},
-          numeroCompradores: 1
+          numeroCompradores: 1,
+          compradores: [{ nome: '', contato: '', bossesIds: [] }]
         })
         fetchPedidos()
       } else {
@@ -629,26 +633,165 @@ export default function PedidosPage() {
               <div className="overflow-y-auto p-6 custom-scrollbar"  style={{ maxHeight: 'calc(90vh - 140px)' }}>
               
               <div className="space-y-4">
+                {/* Número de compradores */}
                 <div>
-                  <label className="block text-gray-300 mb-2">Nome do Cliente</label>
-                  <input
-                    type="text"
-                    className="w-full bg-gray-700 text-white rounded px-4 py-2"
-                    value={formData.nomeCliente}
-                    onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })}
-                  />
+                  <label className="block text-gray-300 mb-2 font-semibold">👥 Quantos compradores?</label>
+                  <select
+                    value={formData.numeroCompradores}
+                    onChange={(e) => {
+                      const num = Number(e.target.value)
+                      const novosCompradores = Array.from({ length: num }, (_, i) => 
+                        formData.compradores[i] || { nome: '', contato: '', bossesIds: [] }
+                      )
+                      setFormData({ 
+                        ...formData, 
+                        numeroCompradores: num,
+                        compradores: novosCompradores
+                      })
+                      setTimeout(() => selecionarJogadoresAutomatico(), 100)
+                    }}
+                    className="w-full bg-gray-700 text-white rounded px-4 py-2 border border-gray-600"
+                  >
+                    <option value={1}>1 comprador (carry solo)</option>
+                    <option value={2}>2 compradores (carry duplo)</option>
+                    <option value={3}>3 compradores (carry trio)</option>
+                    <option value={4}>4 compradores (carry grupo)</option>
+                  </select>
                 </div>
 
-                <div>
-                  <label className="block text-gray-300 mb-2">Contato (Discord/WhatsApp)</label>
-                  <input
-                    type="text"
-                    className="w-full bg-gray-700 text-white rounded px-4 py-2"
-                    value={formData.contatoCliente}
-                    onChange={(e) => setFormData({ ...formData, contatoCliente: e.target.value })}
-                  />
-                </div>
+                {/* Dados de cada comprador */}
+                {formData.numeroCompradores === 1 ? (
+                  // Comprador único (modo simples)
+                  <>
+                    <div>
+                      <label className="block text-gray-300 mb-2">Nome do Cliente</label>
+                      <input
+                        type="text"
+                        className="w-full bg-gray-700 text-white rounded px-4 py-2"
+                        value={formData.compradores[0].nome}
+                        onChange={(e) => {
+                          const novosCompradores = [...formData.compradores]
+                          novosCompradores[0] = { ...novosCompradores[0], nome: e.target.value }
+                          setFormData({ ...formData, compradores: novosCompradores })
+                        }}
+                      />
+                    </div>
 
+                    <div>
+                      <label className="block text-gray-300 mb-2">Contato (Discord/WhatsApp)</label>
+                      <input
+                        type="text"
+                        className="w-full bg-gray-700 text-white rounded px-4 py-2"
+                        value={formData.compradores[0].contato}
+                        onChange={(e) => {
+                          const novosCompradores = [...formData.compradores]
+                          novosCompradores[0] = { ...novosCompradores[0], contato: e.target.value }
+                          setFormData({ ...formData, compradores: novosCompradores })
+                        }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  // Múltiplos compradores (modo detalhado)
+                  <div className="space-y-4">
+                    <div className="bg-blue-900/20 border border-blue-500/50 p-3 rounded">
+                      <p className="text-blue-300 text-sm">
+                        💡 <strong>Carry com múltiplos compradores:</strong> Preencha os dados de cada pessoa abaixo. 
+                        Cada um pode escolher bosses diferentes!
+                      </p>
+                    </div>
+                    
+                    {formData.compradores.map((comprador, index) => (
+                      <div key={index} className="bg-gray-700/50 p-4 rounded border border-gray-600">
+                        <div className="font-semibold text-white mb-3">
+                          👤 Comprador {index + 1}
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-gray-300 text-sm mb-1">Nome</label>
+                            <input
+                              type="text"
+                              className="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm border border-gray-600"
+                              placeholder={`Nome do comprador ${index + 1}`}
+                              value={comprador.nome}
+                              onChange={(e) => {
+                                const novosCompradores = [...formData.compradores]
+                                novosCompradores[index] = { ...novosCompradores[index], nome: e.target.value }
+                                setFormData({ ...formData, compradores: novosCompradores })
+                              }}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-gray-300 text-sm mb-1">Contato</label>
+                            <input
+                              type="text"
+                              className="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm border border-gray-600"
+                              placeholder="Discord ou WhatsApp"
+                              value={comprador.contato}
+                              onChange={(e) => {
+                                const novosCompradores = [...formData.compradores]
+                                novosCompradores[index] = { ...novosCompradores[index], contato: e.target.value }
+                                setFormData({ ...formData, compradores: novosCompradores })
+                              }}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-gray-300 text-sm mb-2">
+                              🎯 Bosses que {comprador.nome || `Comprador ${index + 1}`} quer fazer:
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {bosses.map(boss => (
+                                <button
+                                  key={boss.id}
+                                  type="button"
+                                  onClick={() => {
+                                    const novosCompradores = [...formData.compradores]
+                                    const bossesAtuais = novosCompradores[index].bossesIds
+                                    novosCompradores[index] = {
+                                      ...novosCompradores[index],
+                                      bossesIds: bossesAtuais.includes(boss.id)
+                                        ? bossesAtuais.filter(id => id !== boss.id)
+                                        : [...bossesAtuais, boss.id]
+                                    }
+                                    
+                                    // Atualizar bosses totais do pedido
+                                    const todosBosses = Array.from(new Set(
+                                      novosCompradores.flatMap(c => c.bossesIds)
+                                    ))
+                                    
+                                    setFormData({ 
+                                      ...formData, 
+                                      compradores: novosCompradores,
+                                      bossesIds: todosBosses
+                                    })
+                                    
+                                    setTimeout(() => selecionarJogadoresAutomatico(), 100)
+                                  }}
+                                  className={`p-2 rounded text-sm border-2 transition-colors ${
+                                    comprador.bossesIds.includes(boss.id)
+                                      ? boss.ordem === 0
+                                        ? 'bg-purple-600 border-purple-500 text-white'
+                                        : 'bg-blue-600 border-blue-500 text-white'
+                                      : 'bg-gray-700 border-gray-600 text-gray-300'
+                                  }`}
+                                >
+                                  <div className="font-bold">{boss.nome}</div>
+                                  <div className="text-xs">{boss.preco}KK</div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Só mostra seleção de bosses se for comprador único */}
+                {formData.numeroCompradores === 1 && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <label className="block text-gray-300 font-semibold">Selecione os Bosses</label>
@@ -684,7 +827,20 @@ export default function PedidosPage() {
                     {bosses.filter(b => b.ordem === 0).map(boss => (
                       <div key={boss.id} className="col-span-2">
                         <button
-                          onClick={() => toggleBoss(boss.id)}
+                          type="button"
+                          onClick={() => {
+                            toggleBoss(boss.id)
+                            // Adicionar automaticamente ao comprador único
+                            const novosCompradores = [...formData.compradores]
+                            const bossesAtuais = novosCompradores[0].bossesIds
+                            novosCompradores[0] = {
+                              ...novosCompradores[0],
+                              bossesIds: bossesAtuais.includes(boss.id)
+                                ? bossesAtuais.filter(id => id !== boss.id)
+                                : [...bossesAtuais, boss.id]
+                            }
+                            setFormData({ ...formData, compradores: novosCompradores })
+                          }}
                           className={`w-full p-4 rounded border-2 transition-colors ${
                             formData.bossesIds.includes(boss.id)
                               ? 'bg-purple-600 border-purple-500 text-white'
@@ -711,7 +867,20 @@ export default function PedidosPage() {
                     {bosses.filter(b => b.ordem > 0).map(boss => (
                       <div key={boss.id}>
                         <button
-                          onClick={() => toggleBoss(boss.id)}
+                          type="button"
+                          onClick={() => {
+                            toggleBoss(boss.id)
+                            // Adicionar automaticamente ao comprador único
+                            const novosCompradores = [...formData.compradores]
+                            const bossesAtuais = novosCompradores[0].bossesIds
+                            novosCompradores[0] = {
+                              ...novosCompradores[0],
+                              bossesIds: bossesAtuais.includes(boss.id)
+                                ? bossesAtuais.filter(id => id !== boss.id)
+                                : [...bossesAtuais, boss.id]
+                            }
+                            setFormData({ ...formData, compradores: novosCompradores })
+                          }}
                           className={`w-full p-3 rounded border-2 transition-colors ${
                             formData.bossesIds.includes(boss.id)
                               ? 'bg-blue-600 border-blue-500 text-white'
@@ -740,6 +909,7 @@ export default function PedidosPage() {
                     </div>
                   )}
                 </div>
+                )}
 
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-gray-300">
@@ -764,28 +934,10 @@ export default function PedidosPage() {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="mb-3">
                     <label className="block text-gray-300 font-semibold">
                       Jogadores Participantes ({formData.jogadoresIds.length}/{12 - formData.numeroCompradores})
                     </label>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-400">👥 Compradores:</label>
-                      <select
-                        value={formData.numeroCompradores}
-                        onChange={(e) => {
-                          const num = Number(e.target.value)
-                          setFormData({ ...formData, numeroCompradores: num })
-                          // Reajustar jogadores selecionados se necessário
-                          fetchJogadores()
-                        }}
-                        className="bg-gray-700 text-white rounded px-3 py-1 text-sm border border-gray-600"
-                      >
-                        <option value={1}>1 comprador</option>
-                        <option value={2}>2 compradores</option>
-                        <option value={3}>3 compradores</option>
-                        <option value={4}>4 compradores</option>
-                      </select>
-                    </div>
                   </div>
                   <p className="text-xs text-gray-400 mb-3">
                     ⭐ Essenciais nunca saem • 💫 Por rodízio • {formData.numeroCompradores} slot(s) para comprador(es)
