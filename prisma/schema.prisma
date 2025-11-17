@@ -50,13 +50,12 @@ model Jogador {
   
   // Estatísticas
   totalCarrys Int             @default(0)
-  totalGanho  Float           @default(0)
+  totalGanho  Int             @default(0)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relações
-  participacoes ParticipacaoCarry[]
   missoesFora   Missao[]              @relation("JogadorFora") // Manter compatibilidade
 
   @@map("jogadores")
@@ -238,21 +237,22 @@ model ItensPedido {
 }
 
 // Participação dos jogadores no carry
-model ParticipacaoCarry {
-  id         Int   @id @default(autoincrement())
-  pedidoId   Int
-  jogadorId  Int
-  
-  pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-  jogador    Jogador @relation(fields: [jogadorId], references: [id])
-  
-  // Valor recebido por esse jogador
-  valorRecebido Int @default(0)
-  
-  createdAt DateTime @default(now())
-
-  @@map("participacoes_carry")
-}
+// COMENTADO - Tabela não existe no banco ainda
+// model ParticipacaoCarry {
+//   id         Int   @id @default(autoincrement())
+//   pedidoId   Int
+//   jogadorId  Int
+//   
+//   pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+//   jogador    Jogador @relation(fields: [jogadorId], references: [id])
+//   
+//   // Valor recebido por esse jogador
+//   valorRecebido Int @default(0)
+//   
+//   createdAt DateTime @default(now())
+//
+//   @@map("participacoes_carry")
+// }
 
 // =======================
 // MIGRAÇÃO - MANTER COMPATIBILIDADE
