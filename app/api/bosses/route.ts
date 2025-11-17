@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma'
 export async function GET() {
   try {
     const bosses = await prisma.boss.findMany({
-      where: { ativo: true },
       orderBy: { ordem: 'asc' }
     })
     
