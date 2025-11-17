@@ -25,29 +25,23 @@ export default function DivulgacaoCarry() {
               <div className="w-full">
                 <p className="text-yellow-400 font-bold text-xs text-center mb-2">💎 ITENS GODLY</p>
                 <div className="grid grid-cols-4 gap-1">
-                  {[17200, 17201, 17202, 17203].map((itemId) => (
-                    <div key={itemId} className="bg-gray-800/50 rounded border border-yellow-600/30 p-1">
+                  {['asfrika', 'brisin', 'bryn', 'hervor'].map((item) => (
+                    <div key={item} className="bg-gray-800/50 rounded border border-yellow-600/30 p-1">
                       <img 
-                        src={`https://api.ragnatales.com.br/database/item/collection?nameid=${itemId}`}
-                        alt={`Godly ${itemId}`}
+                        src={`/images/godly/${item}.png`}
+                        alt={`Godly ${item}`}
                         className="w-full h-8 object-contain"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
                       />
                     </div>
                   ))}
                 </div>
                 <div className="grid grid-cols-3 gap-1 mt-1">
-                  {[17204, 17206, 17208].map((itemId) => (
-                    <div key={itemId} className="bg-gray-800/50 rounded border border-yellow-600/30 p-1">
+                  {['megin', 'sleipnir', 'svalin'].map((item) => (
+                    <div key={item} className="bg-gray-800/50 rounded border border-yellow-600/30 p-1">
                       <img 
-                        src={`https://api.ragnatales.com.br/database/item/collection?nameid=${itemId}`}
-                        alt={`Godly ${itemId}`}
+                        src={`/images/godly/${item}.png`}
+                        alt={`Godly ${item}`}
                         className="w-full h-8 object-contain"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
                       />
                     </div>
                   ))}
