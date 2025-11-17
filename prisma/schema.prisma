@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Jogadores principais (time fixo)
+model Jogador {
+  id        Int      @id @default(autoincrement())
+  nick      String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  missoesFora Missao[] @relation("JogadorFora")
+
+  @@map("jogadores")
+}
+
+// Suplentes
+model Suplente {
+  id        Int      @id @default(autoincrement())
+  nick      String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  missoes Missao[] @relation("SuplenteNaMissao")
+
+  @@map("suplentes")
+}
+
+// Missões/Rodízio
+model Missao {
+  id         Int      @id @default(autoincrement())
+  data       DateTime
+  tipo       String   // "Normal", "Suplente", "Carry"
+  
+  // Jogador que ficou de fora
+  jogadorForaId Int
+  jogadorFora   Jogador @relation("JogadorFora", fields: [jogadorForaId], references: [id])
+  
+  // Suplente (se tipo = "Suplente")
+  suplenteId    Int?
+  suplente      Suplente? @relation("SuplenteNaMissao", fields: [suplenteId], references: [id])
+  
+  // Carry (se tipo = "Carry")
+  carryNome  String?
+  carryValor Float?   @default(0)
+  
+  status      String   // "Agendado", "Concluído", "Cancelado"
+  observacoes String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("missoes")
+}
