@@ -182,6 +182,61 @@ export async function notificarCarryConcluido(pedido: {
   })
 }
 
+// Notificar carry cancelado
+export async function notificarCarryCancelado(pedido: {
+  id: number
+  nomeCliente: string
+  dataAgendada?: string | null
+  bosses: string[]
+  valorTotal: number
+  motivo?: string
+}) {
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  
+  const bossesTexto = pedido.bosses.map(boss => {
+    if (boss === 'Hela') return '⚔️ ' + boss
+    return boss
+  }).join(', ')
+
+  const dataFormatada = pedido.dataAgendada
+    ? new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : 'Não agendado'
+
+  // Pegar imagem do primeiro boss (ou Hela se tiver)
+  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
+  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
+
+  const campos = [
+    { nome: '👤 Cliente', valor: pedido.nomeCliente, inline: true },
+    { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
+    { nome: '🎯 Bosses', valor: bossesTexto, inline: false }
+  ]
+
+  if (pedido.dataAgendada) {
+    campos.push({ nome: '📅 Estava agendado para', valor: dataFormatada, inline: false })
+  }
+
+  if (pedido.motivo) {
+    campos.push({ nome: '📝 Motivo', valor: pedido.motivo, inline: false })
+  }
+
+  await enviarWebhookDiscord({
+    titulo: '❌ Carry Cancelado',
+    descricao: `O carry #${pedido.id} foi **CANCELADO**`,
+    cor: 0xFF0000, // Vermelho
+    campos,
+    rodape: 'Sistema de Gestão Hela',
+    imagemUrl: imagemBoss
+  })
+}
+
 // Enviar calendário semanal
 export async function enviarCalendarioSemanal(carrys: Array<{
   id: number

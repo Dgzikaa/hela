@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido, notificarJogadoresNovoCarry } from '@/lib/discord-webhook'
+import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido, notificarJogadoresNovoCarry, notificarCarryCancelado } from '@/lib/discord-webhook'
 
 export async function GET() {
   try {
@@ -237,6 +237,15 @@ export async function PATCH(req: Request) {
           nomeCliente: pedido.nomeCliente,
           valorTotal: pedido.valorTotal,
           bosses: bossesNomes
+        })
+      } else if (status === 'CANCELADO') {
+        await notificarCarryCancelado({
+          id: pedido.id,
+          nomeCliente: pedido.nomeCliente,
+          dataAgendada: pedido.dataAgendada?.toISOString() || null,
+          bosses: bossesNomes,
+          valorTotal: pedido.valorTotal,
+          motivo: body.motivo
         })
       }
     } catch (error) {

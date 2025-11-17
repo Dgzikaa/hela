@@ -48,6 +48,26 @@ body {
   }
 }
 
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(30, 41, 59, 0.3);
@@ -63,6 +83,14 @@ body {
 
 .animate-slide-up {
   animation: slide-up 0.5s ease-out both;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-progress {
+  animation: progress linear forwards;
 }
 
 .animate-pulse-glow {

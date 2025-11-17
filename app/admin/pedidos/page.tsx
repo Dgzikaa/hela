@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Calendar, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react'
+import { Plus, Calendar, CheckCircle, XCircle, Clock, DollarSign, Edit2, Ban } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
 import { Button } from '@/app/components/Button'
+import { ToastContainer } from '@/app/components/Toast'
+import { useToast } from '@/app/hooks/useToast'
 
 interface Boss {
   id: number
@@ -49,6 +51,7 @@ interface Pedido {
 
 export default function PedidosPage() {
   const router = useRouter()
+  const toast = useToast()
   const [pedidos, setPedidos] = useState<Pedido[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -59,6 +62,15 @@ export default function PedidosPage() {
   const [pedidoParaAgendar, setPedidoParaAgendar] = useState<Pedido | null>(null)
   const [dataAgendamento, setDataAgendamento] = useState('')
   const [horaAgendamento, setHoraAgendamento] = useState('')
+  
+  // Modal de cancelamento
+  const [showCancelarModal, setShowCancelarModal] = useState(false)
+  const [pedidoParaCancelar, setPedidoParaCancelar] = useState<Pedido | null>(null)
+  const [motivoCancelamento, setMotivoCancelamento] = useState('')
+  
+  // Modal de edição
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [pedidoParaEditar, setPedidoParaEditar] = useState<Pedido | null>(null)
   
   // Form state para criar novo pedido
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -222,7 +234,7 @@ export default function PedidosPage() {
       })
       
       if (res.ok) {
-        alert('Pedido criado com sucesso!')
+        toast.success('🎉 Pedido criado com sucesso!')
         setShowCreateForm(false)
         
         // Resetar form mantendo o time HELA selecionado
@@ -240,15 +252,15 @@ export default function PedidosPage() {
         })
         fetchPedidos()
       } else {
-        alert('Erro ao criar pedido')
+        toast.error('❌ Erro ao criar pedido')
       }
     } catch (error) {
       console.error('Erro:', error)
-      alert('Erro ao criar pedido')
+      toast.error('❌ Erro ao criar pedido')
     }
   }
 
-  const handleUpdateStatus = async (pedidoId: number, novoStatus: string, dataAgendada?: string) => {
+  const handleUpdateStatus = async (pedidoId: number, novoStatus: string, dataAgendada?: string, motivo?: string) => {
     try {
       const res = await fetch('/api/pedidos', {
         method: 'PATCH',
@@ -256,20 +268,27 @@ export default function PedidosPage() {
         body: JSON.stringify({
           id: pedidoId,
           status: novoStatus,
-          dataAgendada: dataAgendada || null
+          dataAgendada: dataAgendada || null,
+          motivo: motivo || null
         })
       })
       
       if (res.ok) {
-        alert('Status atualizado!')
+        if (novoStatus === 'CANCELADO') {
+          toast.warning('⚠️ Carry cancelado e notificação enviada ao Discord')
+        } else if (novoStatus === 'AGENDADO') {
+          toast.success('📅 Carry agendado com sucesso!')
+        } else {
+          toast.success('✅ Status atualizado!')
+        }
         fetchPedidos()
         setSelectedPedido(null)
       } else {
-        alert('Erro ao atualizar status')
+        toast.error('❌ Erro ao atualizar status')
       }
     } catch (error) {
       console.error('Erro:', error)
-      alert('Erro ao atualizar status')
+      toast.error('❌ Erro ao atualizar status')
     }
   }
 
@@ -417,7 +436,22 @@ export default function PedidosPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
+                  {/* Botão Editar - aparece sempre exceto quando concluído ou cancelado */}
+                  {!['CONCLUIDO', 'CANCELADO'].includes(pedido.status) && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        setPedidoParaEditar(pedido)
+                        setShowEditModal(true)
+                      }}
+                      title="Editar pedido"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  )}
+
                   {pedido.status === 'PENDENTE' && (
                     <>
                       <Button
@@ -430,38 +464,67 @@ export default function PedidosPage() {
                       <Button
                         size="sm"
                         variant="danger"
-                        onClick={() => handleUpdateStatus(pedido.id, 'CANCELADO')}
+                        onClick={() => {
+                          setPedidoParaCancelar(pedido)
+                          setShowCancelarModal(true)
+                        }}
                       >
                         <XCircle className="w-4 h-4" />
                       </Button>
                     </>
                   )}
                   {pedido.status === 'APROVADO' && (
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setPedidoParaAgendar(pedido)
-                        // Pré-preencher com data de hoje + 1 dia
-                        const amanha = new Date()
-                        amanha.setDate(amanha.getDate() + 1)
-                        setDataAgendamento(amanha.toISOString().split('T')[0])
-                        setHoraAgendamento('20:00')
-                        setShowAgendarModal(true)
-                      }}
-                    >
-                      <Calendar className="w-4 h-4 mr-1" />
-                      Agendar
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setPedidoParaAgendar(pedido)
+                          // Pré-preencher com data de hoje + 1 dia
+                          const amanha = new Date()
+                          amanha.setDate(amanha.getDate() + 1)
+                          setDataAgendamento(amanha.toISOString().split('T')[0])
+                          setHoraAgendamento('20:00')
+                          setShowAgendarModal(true)
+                        }}
+                      >
+                        <Calendar className="w-4 h-4 mr-1" />
+                        Agendar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => {
+                          setPedidoParaCancelar(pedido)
+                          setShowCancelarModal(true)
+                        }}
+                      >
+                        <Ban className="w-4 h-4 mr-1" />
+                        Cancelar
+                      </Button>
+                    </>
                   )}
                   {pedido.status === 'AGENDADO' && (
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={() => handleUpdateStatus(pedido.id, 'EM_ANDAMENTO')}
-                    >
-                      <Clock className="w-4 h-4 mr-1" />
-                      Iniciar
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() => handleUpdateStatus(pedido.id, 'EM_ANDAMENTO')}
+                      >
+                        <Clock className="w-4 h-4 mr-1" />
+                        Iniciar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => {
+                          setPedidoParaCancelar(pedido)
+                          setShowCancelarModal(true)
+                        }}
+                      >
+                        <Ban className="w-4 h-4 mr-1" />
+                        Cancelar
+                      </Button>
+                    </>
                   )}
                   {pedido.status === 'EM_ANDAMENTO' && (
                     <Button
@@ -799,7 +862,7 @@ export default function PedidosPage() {
                       handleUpdateStatus(pedidoParaAgendar.id, 'AGENDADO', dataCompleta)
                       setShowAgendarModal(false)
                     } else {
-                      alert('Preencha data e horário!')
+                      toast.warning('⚠️ Preencha data e horário!')
                     }
                   }}
                   className="flex-1"
@@ -817,6 +880,145 @@ export default function PedidosPage() {
             </div>
           </div>
         )}
+
+        {/* Modal Cancelar Carry */}
+        {showCancelarModal && pedidoParaCancelar && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowCancelarModal(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Ban className="w-6 h-6 text-red-500" />
+                  Cancelar Carry
+                </h2>
+                <button
+                  onClick={() => setShowCancelarModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-red-900/30 border border-red-500/50 p-4 rounded">
+                  <div className="text-red-300 text-sm mb-1">⚠️ Você está prestes a cancelar:</div>
+                  <div className="text-white font-bold">{pedidoParaCancelar.nomeCliente}</div>
+                  <div className="text-gray-400 text-sm mt-2">
+                    {pedidoParaCancelar.itens.map(i => i.boss.nome).join(', ')}
+                  </div>
+                  {pedidoParaCancelar.dataAgendada && (
+                    <div className="text-gray-400 text-sm mt-2">
+                      📅 Agendado para: {new Date(pedidoParaCancelar.dataAgendada).toLocaleString('pt-BR')}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2 font-semibold">💬 Motivo do Cancelamento</label>
+                  <textarea
+                    value={motivoCancelamento}
+                    onChange={(e) => setMotivoCancelamento(e.target.value)}
+                    className="w-full bg-gray-700 text-white rounded px-4 py-3 border border-gray-600 focus:border-red-500 focus:outline-none"
+                    rows={3}
+                    placeholder="Explique o motivo do cancelamento..."
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Este motivo será enviado na notificação do Discord</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    handleUpdateStatus(pedidoParaCancelar.id, 'CANCELADO', undefined, motivoCancelamento || 'Sem motivo especificado')
+                    setShowCancelarModal(false)
+                    setMotivoCancelamento('')
+                  }}
+                  className="flex-1"
+                >
+                  <Ban className="w-5 h-5 mr-2" />
+                  Confirmar Cancelamento
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setShowCancelarModal(false)
+                    setMotivoCancelamento('')
+                  }}
+                >
+                  Voltar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Editar - Temporário: avisa que está em desenvolvimento */}
+        {showEditModal && pedidoParaEditar && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowEditModal(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Edit2 className="w-6 h-6 text-blue-500" />
+                  Editar Pedido #{pedidoParaEditar.id}
+                </h2>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-blue-900/30 border border-blue-500/50 p-4 rounded">
+                  <div className="text-blue-300 text-sm mb-2">📝 Dados do pedido:</div>
+                  <div className="text-white font-bold mb-2">{pedidoParaEditar.nomeCliente}</div>
+                  <div className="text-gray-300 text-sm">
+                    <div>Contato: {pedidoParaEditar.contatoCliente}</div>
+                    <div>Valor: {pedidoParaEditar.valorTotal}KK</div>
+                    <div>Bosses: {pedidoParaEditar.itens.map(i => i.boss.nome).join(', ')}</div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-900/30 border border-yellow-500/50 p-4 rounded">
+                  <div className="text-yellow-300 text-sm">
+                    🚧 <strong>Funcionalidade em desenvolvimento!</strong>
+                  </div>
+                  <p className="text-gray-300 text-sm mt-2">
+                    A edição de pedidos estará disponível em breve. Por enquanto, você pode cancelar o pedido e criar um novo.
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                variant="secondary"
+                onClick={() => setShowEditModal(false)}
+                className="w-full"
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Toast Container */}
+        <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       </div>
     </div>
   )
