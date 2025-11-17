@@ -5,6 +5,8 @@ import { Plus, Edit, Trash } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
 import { Button } from '@/app/components/Button'
+import { ToastContainer } from '@/app/components/Toast'
+import { useToast } from '@/app/hooks/useToast'
 
 interface Jogador {
   id: number
@@ -21,6 +23,7 @@ interface Jogador {
 }
 
 export default function JogadoresPage() {
+  const toast = useToast()
   const [jogadores, setJogadores] = useState<Jogador[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -61,7 +64,7 @@ export default function JogadoresPage() {
       })
 
       if (res.ok) {
-        alert(editingId ? 'Jogador atualizado!' : 'Jogador criado!')
+        toast.success(editingId ? '✅ Jogador atualizado!' : '🎉 Jogador criado!')
         setShowForm(false)
         setEditingId(null)
         setFormData({
@@ -74,11 +77,11 @@ export default function JogadoresPage() {
         })
         fetchJogadores()
       } else {
-        alert('Erro ao salvar jogador')
+        toast.error('❌ Erro ao salvar jogador')
       }
     } catch (error) {
       console.error('Erro:', error)
-      alert('Erro ao salvar jogador')
+      toast.error('❌ Erro ao salvar jogador')
     }
   }
 
@@ -95,23 +98,26 @@ export default function JogadoresPage() {
     setShowForm(true)
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Deseja realmente excluir este jogador?')) return
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [jogadorParaExcluir, setJogadorParaExcluir] = useState<Jogador | null>(null)
 
+  const handleDelete = async (id: number) => {
     try {
       const res = await fetch(`/api/jogadores?id=${id}`, {
         method: 'DELETE'
       })
 
       if (res.ok) {
-        alert('Jogador excluído!')
+        toast.success('🗑️ Jogador excluído!')
         fetchJogadores()
+        setShowDeleteModal(false)
+        setJogadorParaExcluir(null)
       } else {
-        alert('Erro ao excluir jogador')
+        toast.error('❌ Erro ao excluir jogador')
       }
     } catch (error) {
       console.error('Erro:', error)
-      alert('Erro ao excluir jogador')
+      toast.error('❌ Erro ao excluir jogador')
     }
   }
 
@@ -199,7 +205,10 @@ export default function JogadoresPage() {
                   <Button size="sm" variant="secondary" onClick={() => handleEdit(jogador)}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button size="sm" variant="danger" onClick={() => handleDelete(jogador.id)}>
+                  <Button size="sm" variant="danger" onClick={() => {
+                    setJogadorParaExcluir(jogador)
+                    setShowDeleteModal(true)
+                  }}>
                     <Trash className="w-4 h-4" />
                   </Button>
                 </div>
@@ -344,6 +353,67 @@ export default function JogadoresPage() {
             </div>
           </div>
         )}
+
+        {/* Modal Excluir Jogador */}
+        {showDeleteModal && jogadorParaExcluir && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <div 
+              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Trash className="w-6 h-6 text-red-500" />
+                  Excluir Jogador
+                </h2>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-red-900/30 border border-red-500/50 p-4 rounded">
+                  <div className="text-red-300 text-sm mb-1">⚠️ Esta ação não pode ser desfeita!</div>
+                  <div className="text-white font-bold mt-3">{jogadorParaExcluir.nick}</div>
+                  <div className="text-gray-400 text-sm mt-2">
+                    {getCategoryBadge(jogadorParaExcluir.categoria).label}
+                  </div>
+                  <div className="text-gray-400 text-sm mt-1">
+                    {jogadorParaExcluir.totalCarrys} carrys • {jogadorParaExcluir.totalGanho}KK ganho
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="danger"
+                  onClick={() => handleDelete(jogadorParaExcluir.id)}
+                  className="flex-1"
+                >
+                  <Trash className="w-5 h-5 mr-2" />
+                  Sim, Excluir
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Toast Container */}
+        <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       </div>
     </div>
   )
