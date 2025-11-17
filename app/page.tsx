@@ -76,41 +76,27 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Informações dos Bosses */}
+        {/* Informações de Contato */}
         <Card className="p-6 bg-slate-800/50 border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4 text-center">
-            💎 Preços dos Carrys
+            💬 Como Comprar?
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <p className="text-sm text-slate-400">Freylith</p>
-              <p className="text-lg font-bold text-white">70KK</p>
+          <div className="text-center space-y-3">
+            <p className="text-slate-300">
+              Para consultar valores e fazer seu pedido, entre em contato via Discord:
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <div className="bg-slate-700/50 px-6 py-3 rounded-xl border border-slate-600">
+                <p className="text-white font-bold">@supaturk</p>
+              </div>
+              <div className="text-slate-500 hidden sm:block">ou</div>
+              <div className="bg-slate-700/50 px-6 py-3 rounded-xl border border-slate-600">
+                <p className="text-white font-bold">@godzera</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-slate-400">Tyrgrim</p>
-              <p className="text-lg font-bold text-white">100KK</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Skollgrim</p>
-              <p className="text-lg font-bold text-white">130KK</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Baldira</p>
-              <p className="text-lg font-bold text-white">150KK</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Thorvald</p>
-              <p className="text-lg font-bold text-white">230KK</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Glacius</p>
-              <p className="text-lg font-bold text-white">300KK</p>
-            </div>
-            <div className="md:col-span-2">
-              <p className="text-sm text-slate-400">Pacote 1-6</p>
-              <p className="text-lg font-bold text-green-400">500KK 🎁</p>
-              <p className="text-xs text-slate-500">+ Sem Morrer Grátis!</p>
-            </div>
+            <p className="text-sm text-slate-400 mt-4">
+              🔒 Preços exclusivos • Atendimento personalizado • Segurança garantida
+            </p>
           </div>
         </Card>
 
