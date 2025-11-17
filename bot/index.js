@@ -37,29 +37,74 @@ client.on('messageCreate', async (message) => {
 
   const userId = message.author.id;
   const username = message.author.username;
+  const content = message.content.toLowerCase().trim();
 
   // Registrar lead
   await registrarLead(userId, username, message.content);
 
   // Comando: !carry
-  if (message.content.toLowerCase() === '!carry') {
+  if (content === '!carry') {
     await iniciarCompra(message);
+    return;
   }
 
   // Comando: !historico
-  if (message.content.toLowerCase() === '!historico') {
+  if (content === '!historico') {
     await mostrarHistorico(message);
+    return;
   }
 
   // Comando: !status
-  if (message.content.toLowerCase() === '!status') {
+  if (content === '!status') {
     await mostrarStatus(message);
+    return;
   }
 
   // Comando: !cancelar
-  if (message.content.toLowerCase() === '!cancelar') {
+  if (content === '!cancelar') {
     sessions.delete(userId);
     await message.reply('❌ Compra cancelada. Digite `!carry` para começar novamente.');
+    return;
+  }
+
+  // Mensagem de boas-vindas / ajuda para qualquer outra mensagem
+  if (content.includes('oi') || content.includes('olá') || content.includes('ola') || 
+      content.includes('hey') || content.includes('e ai') || content.includes('bom dia') || 
+      content.includes('boa tarde') || content.includes('boa noite') || 
+      content === '!' || content === '!help' || content === '!ajuda') {
+    
+    const welcomeEmbed = new EmbedBuilder()
+      .setColor('#FFD700')
+      .setTitle('👋 Bem-vindo ao Seu Raimundo!')
+      .setDescription('**Sou o bot oficial de vendas de carrys da Time Hela!**\n\nEstou aqui para te ajudar a garantir seus itens Godly e visuais exclusivos! 🎮✨')
+      .addFields(
+        { 
+          name: '🛒 Comandos Disponíveis:', 
+          value: '`!carry` - Comprar carry de bosses\n`!historico` - Ver suas compras anteriores\n`!status` - Verificar status de um pedido\n`!cancelar` - Cancelar compra em andamento' 
+        },
+        { 
+          name: '💰 Bosses Disponíveis:', 
+          value: '**1-6 (Completo):** Freylith, Tyrgrim, Skollgrim, Baldira, Thorvald, Glacius\n**Hela:** Tormenta Deusa' 
+        },
+        { 
+          name: '🎁 Promoções:', 
+          value: '✅ Pacote completo (1-6) com desconto especial!\n✅ Cliente VIP? Ganhe desconto extra!\n✅ Primeira compra? Desconto de boas-vindas!' 
+        },
+        { 
+          name: '⚡ Como começar?', 
+          value: '**Digite `!carry` para iniciar sua compra agora!**' 
+        }
+      )
+      .setFooter({ text: '🔥 Time Hela - Carrys Profissionais' })
+      .setTimestamp();
+
+    await message.reply({ embeds: [welcomeEmbed] });
+    return;
+  }
+
+  // Se não for nenhum comando reconhecido, dar dica
+  if (content.startsWith('!')) {
+    await message.reply('❓ Comando não reconhecido. Digite `!carry` para comprar ou `!ajuda` para ver todos os comandos.');
   }
 });
 
