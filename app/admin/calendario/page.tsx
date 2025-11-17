@@ -26,6 +26,7 @@ export default function CalendarioPage() {
   const [pedidos, setPedidos] = useState<Pedido[]>([])
   const [currentDate, setCurrentDate] = useState(new Date())
   const [loading, setLoading] = useState(true)
+  const [pedidoSelecionado, setPedidoSelecionado] = useState<Pedido | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -178,18 +179,25 @@ export default function CalendarioPage() {
                   {pedidosDia.length > 0 && (
                     <div className="space-y-1">
                       {pedidosDia.slice(0, 2).map(pedido => (
-                        <div
+                        <button
                           key={pedido.id}
-                          className="text-xs p-1 bg-slate-900 text-white rounded truncate"
-                          title={pedido.nomeCliente}
+                          onClick={() => setPedidoSelecionado(pedido)}
+                          className="w-full text-xs p-1 bg-slate-900 text-white rounded truncate hover:bg-slate-700 transition-colors"
+                          title={`Clique para ver detalhes: ${pedido.nomeCliente}`}
                         >
                           {pedido.nomeCliente}
-                        </div>
+                        </button>
                       ))}
                       {pedidosDia.length > 2 && (
-                        <div className="text-xs text-slate-500 text-center">
+                        <button
+                          onClick={() => {
+                            // Abre modal com lista de todos os pedidos do dia
+                            setPedidoSelecionado(pedidosDia[0])
+                          }}
+                          className="w-full text-xs text-slate-500 hover:text-slate-700 text-center"
+                        >
                           +{pedidosDia.length - 2} mais
-                        </div>
+                        </button>
                       )}
                     </div>
                   )}
@@ -230,11 +238,12 @@ export default function CalendarioPage() {
               .sort((a, b) => new Date(a.dataAgendada!).getTime() - new Date(b.dataAgendada!).getTime())
               .slice(0, 10)
               .map(pedido => (
-                <div
+                <button
                   key={pedido.id}
-                  className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                  onClick={() => setPedidoSelecionado(pedido)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                 >
-                  <div>
+                  <div className="text-left">
                     <p className="font-bold text-slate-900">{pedido.nomeCliente}</p>
                     <p className="text-sm text-slate-600">
                       {pedido.itens.map(i => i.boss.nome).join(', ')}
@@ -246,7 +255,7 @@ export default function CalendarioPage() {
                     </p>
                     <p className="text-xs text-slate-600">{pedido.valorTotal}KK</p>
                   </div>
-                </div>
+                </button>
               ))}
 
             {pedidos.filter(p => p.dataAgendada).length === 0 && (
@@ -256,6 +265,113 @@ export default function CalendarioPage() {
             )}
           </div>
         </Card>
+
+        {/* Modal de Detalhes */}
+        {pedidoSelecionado && (
+          <div 
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+            onClick={() => setPedidoSelecionado(null)}
+          >
+            <div 
+              className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 rounded-t-xl">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-slate-900">
+                    Detalhes do Carry
+                  </h2>
+                  <button
+                    onClick={() => setPedidoSelecionado(null)}
+                    className="text-slate-400 hover:text-slate-600 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              {/* Conteúdo */}
+              <div className="p-6 space-y-6">
+                {/* Informações do Cliente */}
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase mb-2">Cliente</h3>
+                  <p className="text-xl font-bold text-slate-900">{pedidoSelecionado.nomeCliente}</p>
+                  <p className="text-slate-600">Pedido #{pedidoSelecionado.id}</p>
+                </div>
+
+                {/* Status e Data */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-500 uppercase mb-2">Status</h3>
+                    <Badge variant={
+                      pedidoSelecionado.status === 'PENDENTE' ? 'warning' :
+                      pedidoSelecionado.status === 'APROVADO' ? 'info' :
+                      pedidoSelecionado.status === 'CONCLUIDO' ? 'success' : 'default'
+                    }>
+                      {pedidoSelecionado.status}
+                    </Badge>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-500 uppercase mb-2">Data Agendada</h3>
+                    <p className="text-lg font-bold text-slate-900">
+                      {pedidoSelecionado.dataAgendada 
+                        ? new Date(pedidoSelecionado.dataAgendada).toLocaleDateString('pt-BR', {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                          })
+                        : 'Não agendado'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bosses */}
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase mb-3">Bosses</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {pedidoSelecionado.itens.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="px-4 py-2 bg-slate-100 rounded-lg font-medium text-slate-900"
+                      >
+                        {item.boss.nome}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Valor */}
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase mb-2">Valor Total</h3>
+                  <p className="text-3xl font-bold text-green-600">
+                    {pedidoSelecionado.valorTotal}KK
+                  </p>
+                </div>
+
+                {/* Ações */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      router.push(`/admin`)
+                      setPedidoSelecionado(null)
+                    }}
+                    className="flex-1 px-4 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 font-medium"
+                  >
+                    Ver Todos os Pedidos
+                  </button>
+                  <button
+                    onClick={() => setPedidoSelecionado(null)}
+                    className="px-4 py-3 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 font-medium"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
