@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
 
 interface CardProps {
@@ -6,9 +6,10 @@ interface CardProps {
   className?: string
   hover?: boolean
   gradient?: boolean
+  style?: CSSProperties
 }
 
-export function Card({ children, className, hover = false, gradient = false }: CardProps) {
+export function Card({ children, className, hover = false, gradient = false, style }: CardProps) {
   return (
     <div
       className={cn(
@@ -19,6 +20,7 @@ export function Card({ children, className, hover = false, gradient = false }: C
         hover && 'hover:bg-white/20 hover:scale-[1.02] hover:shadow-2xl cursor-pointer',
         className
       )}
+      style={style}
     >
       {children}
     </div>
