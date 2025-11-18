@@ -20,13 +20,22 @@ export async function enviarWebhookDiscord(conteudo: {
   }
 
   try {
+    // Construir embed sem propriedades undefined
     const embed: any = {
       title: conteudo.titulo,
       description: conteudo.descricao,
       color: conteudo.cor || 0xFFD700, // Dourado
-      fields: conteudo.campos || [],
-      footer: conteudo.rodape ? { text: conteudo.rodape } : undefined,
       timestamp: new Date().toISOString()
+    }
+
+    // Adicionar campos apenas se existirem
+    if (conteudo.campos && conteudo.campos.length > 0) {
+      embed.fields = conteudo.campos
+    }
+
+    // Adicionar footer apenas se existir
+    if (conteudo.rodape) {
+      embed.footer = { text: conteudo.rodape }
     }
 
     // Adicionar imagem thumbnail (pequena no canto)
@@ -38,6 +47,8 @@ export async function enviarWebhookDiscord(conteudo: {
     if (conteudo.imagemGrande) {
       embed.image = { url: conteudo.imagemGrande }
     }
+
+    console.log('🔔 [WEBHOOK] Payload a ser enviado:', JSON.stringify({ embeds: [embed] }, null, 2))
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
