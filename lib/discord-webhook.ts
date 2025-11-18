@@ -246,10 +246,7 @@ export async function notificarCarryCancelado(pedido: {
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
-  const bossesTexto = pedido.bosses.map(boss => {
-    if (boss === 'Hela') return '⚔️ ' + boss
-    return boss
-  }).join(', ')
+  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join(', ')
 
   const dataFormatada = pedido.dataAgendada
     ? new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
