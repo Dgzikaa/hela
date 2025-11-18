@@ -44,7 +44,8 @@ export async function POST(req: Request) {
       origem,
       observacoes,
       jogadores, // Array de IDs dos jogadores participantes
-      bossesPrecos // Mapa de ID do boss -> preço customizado (opcional)
+      bossesPrecos, // Mapa de ID do boss -> preço customizado (opcional)
+      compradores // Array de compradores (para múltiplos compradores)
     } = body
 
     // Validações
@@ -178,7 +179,7 @@ export async function POST(req: Request) {
         pacoteCompleto: pedido.pacoteCompleto,
         conquistaSemMorrer: pedido.conquistaSemMorrer,
         jogadores: jogadoresEscalados,
-        compradores: formData.compradores || [{ nome: pedido.nomeCliente }]
+        compradores: compradores || [{ nome: pedido.nomeCliente }]
       })
       
       console.log('✅ [API] Notificação de NOVO CARRY enviada!')
