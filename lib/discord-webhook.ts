@@ -67,7 +67,6 @@ export async function notificarNovoCarry(pedido: {
   contatoCliente: string
   valorTotal: number
   bosses: string[]
-  bossesCompletos?: Array<{ nome: string; imagemUrl: string }>
   pacoteCompleto: boolean
   conquistaSemMorrer: boolean
 }) {
@@ -180,9 +179,6 @@ export async function notificarJogadoresPagos(jogadores: Array<{
     return '🛡️ ' + boss
   }).join('\n')
 
-  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
-  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
-
   // Enviar mensagem para cada jogador cadastrado (com discordId)
   for (const jogador of jogadores) {
     if (!jogador.discordId) continue // Pular jogadores sem Discord
@@ -197,8 +193,7 @@ export async function notificarJogadoresPagos(jogadores: Array<{
           { nome: '💵 Valor Recebido', valor: `${jogador.valorRecebido}KK`, inline: true },
           { nome: '📊 Total Acumulado', valor: `${jogador.valorTotalCarrys}KK`, inline: true }
         ],
-        rodape: 'Continue com o bom trabalho! 🎉',
-        imagemUrl: imagemBoss
+        rodape: 'Continue com o bom trabalho! 🎉'
       })
     } catch (error) {
       console.error(`Erro ao enviar notificação de pagamento para ${jogador.nick}:`, error)
@@ -233,10 +228,6 @@ export async function notificarCarryCancelado(pedido: {
       })
     : 'Não agendado'
 
-  // Pegar imagem do primeiro boss (ou Hela se tiver)
-  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
-  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
-
   const campos = [
     { nome: '👤 Cliente', valor: pedido.nomeCliente, inline: true },
     { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
@@ -256,8 +247,7 @@ export async function notificarCarryCancelado(pedido: {
     descricao: `O carry #${pedido.id} foi **CANCELADO**`,
     cor: 0xFF0000, // Vermelho
     campos,
-    rodape: 'Sistema de Gestão Hela',
-    imagemUrl: imagemBoss
+    rodape: 'Sistema de Gestão Hela'
   })
 }
 
@@ -409,10 +399,6 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
     return boss
   }).join('\n')
 
-  // Pegar imagem do primeiro boss (ou Hela se tiver)
-  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
-  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
-
   for (const jogador of jogadores) {
     if (!jogador.discordId) {
       console.log(`⚠️ Jogador ${jogador.nick} não tem Discord ID configurado`)
@@ -429,8 +415,7 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
         { nome: '🎯 Bosses', valor: bossesComEmoji, inline: false },
         { nome: '📅 Data', valor: dataFormatada, inline: false }
       ],
-      rodape: `Pedido #${pedido.id} • Boa sorte!`,
-      imagemUrl: imagemBoss
+      rodape: `Pedido #${pedido.id} • Boa sorte!`
     })
 
     // Pequeno delay para não sobrecarregar a API do Discord
