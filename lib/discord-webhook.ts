@@ -5,8 +5,6 @@ export async function enviarWebhookDiscord(conteudo: {
   cor?: number
   campos?: { nome: string; valor: string; inline?: boolean }[]
   rodape?: string
-  imagemUrl?: string // URL da imagem (thumbnail pequeno)
-  imagemGrande?: string // URL da imagem grande
 }) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL
 
@@ -28,24 +26,18 @@ export async function enviarWebhookDiscord(conteudo: {
       timestamp: new Date().toISOString()
     }
 
-    // Adicionar campos apenas se existirem
+    // Adicionar campos apenas se existirem (converter para formato Discord)
     if (conteudo.campos && conteudo.campos.length > 0) {
-      embed.fields = conteudo.campos
+      embed.fields = conteudo.campos.map(campo => ({
+        name: campo.nome,   // Discord espera "name", não "nome"
+        value: campo.valor, // Discord espera "value", não "valor"
+        inline: campo.inline || false
+      }))
     }
 
     // Adicionar footer apenas se existir
     if (conteudo.rodape) {
       embed.footer = { text: conteudo.rodape }
-    }
-
-    // Adicionar imagem thumbnail (pequena no canto)
-    if (conteudo.imagemUrl) {
-      embed.thumbnail = { url: conteudo.imagemUrl }
-    }
-
-    // Adicionar imagem grande
-    if (conteudo.imagemGrande) {
-      embed.image = { url: conteudo.imagemGrande }
     }
 
     console.log('🔔 [WEBHOOK] Payload a ser enviado:', JSON.stringify({ embeds: [embed] }, null, 2))
@@ -66,17 +58,6 @@ export async function enviarWebhookDiscord(conteudo: {
   } catch (error) {
     console.error('❌ Erro ao enviar webhook Discord:', error)
   }
-}
-
-// Mapeamento de bosses para imagens
-const BOSS_IMAGES: Record<string, string> = {
-  'Hela': '/images/bosses/hela.gif',
-  'Freylith': '/images/bosses/freylith.gif',
-  'Tyrgrim': '/images/bosses/tyrgrim.gif',
-  'Skollgrim': '/images/bosses/skollgrim.gif',
-  'Baldira': '/images/bosses/baldira.gif',
-  'Thorvald': '/images/bosses/thorvald.gif',
-  'Glacius': '/images/bosses/glacius.gif'
 }
 
 // Notificar novo carry
@@ -105,10 +86,6 @@ export async function notificarNovoCarry(pedido: {
   if (pedido.pacoteCompleto) extras.push('🎁 Pacote Completo 1-6')
   if (pedido.conquistaSemMorrer) extras.push('⭐ Conquista Sem Morrer')
 
-  // Pegar imagem do primeiro boss (ou Hela se tiver)
-  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
-  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
-
   await enviarWebhookDiscord({
     titulo: '🛒 Novo Carry Registrado!',
     descricao: `**Cliente:** ${pedido.nomeCliente}\n**Contato:** ${pedido.contatoCliente}`,
@@ -119,8 +96,7 @@ export async function notificarNovoCarry(pedido: {
       { nome: '🎯 Bosses', valor: bossesTexto, inline: false },
       ...(extras.length > 0 ? [{ nome: '🎁 Extras', valor: extras.join('\n'), inline: false }] : [])
     ],
-    rodape: 'Acesse o painel para aprovar',
-    imagemUrl: imagemBoss // Thumbnail do boss no canto
+    rodape: 'Acesse o painel para aprovar'
   })
 }
 
@@ -145,12 +121,8 @@ export async function notificarCarryAgendado(pedido: {
 
   const bossesComEmoji = pedido.bosses.map(boss => {
     if (boss === 'Hela') return '⚔️ ' + boss
-    return boss
+    return '🛡️ ' + boss
   }).join(', ')
-
-  // Pegar imagem do primeiro boss
-  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
-  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
 
   await enviarWebhookDiscord({
     titulo: '📅 Carry Agendado!',
@@ -161,8 +133,7 @@ export async function notificarCarryAgendado(pedido: {
       { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
       { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
     ],
-    rodape: 'Preparar o time!',
-    imagemUrl: imagemBoss
+    rodape: 'Preparar o time!'
   })
 }
 
@@ -177,12 +148,8 @@ export async function notificarCarryConcluido(pedido: {
   
   const bossesTexto = pedido.bosses.map(boss => {
     if (boss === 'Hela') return '⚔️ ' + boss
-    return boss
+    return '🛡️ ' + boss
   }).join(', ')
-
-  // Pegar imagem do primeiro boss (ou Hela se tiver)
-  const primeiroBoss = pedido.bosses.includes('Hela') ? 'Hela' : pedido.bosses[0]
-  const imagemBoss = primeiroBoss ? `${baseUrl}${BOSS_IMAGES[primeiroBoss]}` : undefined
 
   await enviarWebhookDiscord({
     titulo: '✅ Carry Concluído!',
@@ -192,8 +159,7 @@ export async function notificarCarryConcluido(pedido: {
       { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
       { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
     ],
-    rodape: 'Parabéns ao time! 🎉',
-    imagemUrl: imagemBoss
+    rodape: 'Parabéns ao time! 🎉'
   })
 }
 
