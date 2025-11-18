@@ -294,19 +294,23 @@ export async function PATCH(req: Request) {
 
       if (status === 'AGENDADO' && dataAgendada) {
         console.log('📅 [API] Enviando notificação de AGENDAMENTO...')
+        const jogadoresEscalados = pedido.participacoes.map((p: any) => p.jogador.nick)
         await notificarCarryAgendado({
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,
           dataAgendada: dataAgendada,
           bosses: bossesNomes,
-          valorTotal: pedido.valorTotal
+          valorTotal: pedido.valorTotal,
+          jogadores: jogadoresEscalados
         })
         console.log('✅ [API] Notificação de AGENDAMENTO enviada!')
       } else if (status === 'CONCLUIDO' && !marcarPago) {
         // Só notifica conclusão se NÃO marcou como pago (para evitar duplicata)
+        const jogadoresEscalados = pedido.participacoes.map((p: any) => p.jogador.nick)
         await notificarCarryConcluido({
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,
+          jogadores: jogadoresEscalados,
           valorTotal: pedido.valorTotal,
           bosses: bossesNomes
         })

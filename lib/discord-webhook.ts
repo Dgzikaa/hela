@@ -124,6 +124,7 @@ export async function notificarCarryAgendado(pedido: {
   dataAgendada: string
   bosses: string[]
   valorTotal: number
+  jogadores?: string[]
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
@@ -141,15 +142,23 @@ export async function notificarCarryAgendado(pedido: {
     return '🛡️ ' + boss
   }).join(', ')
 
+  const campos = [
+    { nome: '📆 Data/Hora', valor: dataFormatada, inline: false },
+    { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
+    { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
+  ]
+
+  // Adicionar time escalado
+  if (pedido.jogadores && pedido.jogadores.length > 0) {
+    const jogadoresTexto = pedido.jogadores.join(', ')
+    campos.push({ nome: '⚔️ Time Escalado', valor: jogadoresTexto, inline: false })
+  }
+
   await enviarWebhookDiscord({
     titulo: '📅 Carry Agendado!',
     descricao: `**Cliente:** ${pedido.nomeCliente}\n**Bosses:** ${bossesComEmoji}`,
     cor: 0x0099FF, // Azul
-    campos: [
-      { nome: '📆 Data/Hora', valor: dataFormatada, inline: false },
-      { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
-      { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
-    ],
+    campos,
     rodape: 'Preparar o time!'
   })
 }
@@ -160,6 +169,7 @@ export async function notificarCarryConcluido(pedido: {
   nomeCliente: string
   valorTotal: number
   bosses: string[]
+  jogadores?: string[]
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
@@ -168,14 +178,22 @@ export async function notificarCarryConcluido(pedido: {
     return '🛡️ ' + boss
   }).join(', ')
 
+  const campos = [
+    { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
+    { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
+  ]
+
+  // Adicionar time que participou
+  if (pedido.jogadores && pedido.jogadores.length > 0) {
+    const jogadoresTexto = pedido.jogadores.join(', ')
+    campos.push({ nome: '⚔️ Time', valor: jogadoresTexto, inline: false })
+  }
+
   await enviarWebhookDiscord({
     titulo: '✅ Carry Concluído!',
     descricao: `**${pedido.nomeCliente}** completou:\n${bossesTexto}`,
     cor: 0xFFD700, // Dourado
-    campos: [
-      { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
-      { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
-    ],
+    campos,
     rodape: 'Parabéns ao time! 🎉'
   })
 }
