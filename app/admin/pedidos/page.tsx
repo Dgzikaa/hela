@@ -997,15 +997,11 @@ export default function PedidosPage() {
                       </p>
                       
                       {/* TIME PRINCIPAL (HELA) - Só mostra se tiver HELA selecionado */}
-                  {jogadores.filter((j: Jogador) => j.categorias?.includes('HELA')).length > 0 && (
+                  {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && 
+                   jogadores.filter((j: Jogador) => j.categorias?.includes('HELA')).length > 0 && (
                   <div className="mb-4">
                     <div className="text-sm font-semibold text-green-400 mb-2">
                       ⚔️ Time Principal (HELA)
-                      {!formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && (
-                        <span className="text-xs font-normal text-gray-400 ml-2">
-                          (selecione o boss HELA para usar este time)
-                        </span>
-                      )}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {jogadores.filter((j: Jogador) => j.categorias?.includes('HELA')).map((jogador: any) => {
@@ -1040,15 +1036,11 @@ export default function PedidosPage() {
                   )}
 
                   {/* CARRYS (Boss 4-6) - Só mostra se não tiver HELA */}
-                  {jogadores.filter((j: Jogador) => j.categorias?.includes('CARRYS')).length > 0 && (
+                  {!formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) &&
+                   jogadores.filter((j: Jogador) => j.categorias?.includes('CARRYS')).length > 0 && (
                     <div className="mb-4">
                       <div className="text-sm font-semibold text-blue-400 mb-2">
                         🎯 Time Carrys (Boss 4-6)
-                        {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && (
-                          <span className="text-xs font-normal text-gray-400 ml-2">
-                            (HELA selecionado, usando time HELA)
-                          </span>
-                        )}
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {jogadores.filter((j: Jogador) => j.categorias?.includes('CARRYS')).map((jogador: any) => {
