@@ -172,21 +172,25 @@ export async function POST(req: Request) {
         conquistaSemMorrer: pedido.conquistaSemMorrer
       })
 
+      // ========================================
+      // TEMPORARIAMENTE DESABILITADO - Pode causar rate limit do Discord
+      // TODO: Implementar delay entre mensagens quando reativar
+      // ========================================
       // Notificar jogadores participantes via DM
-      if (pedido.participacoes && pedido.participacoes.length > 0) {
-        const jogadoresParaNotificar = pedido.participacoes.map((p: any) => ({
-          discordId: p.jogador.discordId,
-          nick: p.jogador.nick
-        }))
+      // if (pedido.participacoes && pedido.participacoes.length > 0) {
+      //   const jogadoresParaNotificar = pedido.participacoes.map((p: any) => ({
+      //     discordId: p.jogador.discordId,
+      //     nick: p.jogador.nick
+      //   }))
 
-        await notificarJogadoresNovoCarry(jogadoresParaNotificar, {
-          id: pedido.id,
-          nomeCliente: pedido.nomeCliente,
-          dataAgendada: pedido.dataAgendada ? pedido.dataAgendada.toISOString() : null,
-          bosses: bossesNomes,
-          valorTotal: pedido.valorTotal
-        })
-      }
+      //   await notificarJogadoresNovoCarry(jogadoresParaNotificar, {
+      //     id: pedido.id,
+      //     nomeCliente: pedido.nomeCliente,
+      //     dataAgendada: pedido.dataAgendada ? pedido.dataAgendada.toISOString() : null,
+      //     bosses: bossesNomes,
+      //     valorTotal: pedido.valorTotal
+      //   })
+      // }
     } catch (error) {
       console.error('Erro ao notificar Discord (não crítico):', error)
     }
