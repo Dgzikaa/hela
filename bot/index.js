@@ -15,7 +15,7 @@ const client = new Client({
   ]
 });
 
-const API_URL = process.env.API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.API_URL || 'https://hela-blond.vercel.app/api';
 
 client.on('ready', () => {
   console.log(`🤖 Seu Raimundo conectado como ${client.user.tag}`);
@@ -240,14 +240,20 @@ function adicionarEmojiBoss(boss) {
 // Função para mostrar calendário de carrys da semana
 async function mostrarCalendario(message) {
   try {
+    console.log('🔍 Buscando calendário em:', `${API_URL}/pedidos`);
     const response = await fetch(`${API_URL}/pedidos`);
     
+    console.log('📊 Status da resposta:', response.status);
+    
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Erro na API:', errorText);
       await message.reply('❌ Erro ao buscar calendário. Tente novamente mais tarde.');
       return;
     }
 
     const pedidos = await response.json();
+    console.log('📦 Pedidos recebidos:', pedidos.length);
     
     // Filtrar apenas pedidos agendados nos próximos 7 dias
     const agora = new Date();
