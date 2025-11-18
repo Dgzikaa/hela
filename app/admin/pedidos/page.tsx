@@ -189,8 +189,8 @@ export default function PedidosPage() {
         const jogadoresAtivos = data.filter((j: Jogador) => j.ativo)
         setJogadores(jogadoresAtivos)
         
-        // Selecionar jogadores automaticamente
-        selecionarJogadoresAutomatico()
+        // NÃO chamar selecionarJogadoresAutomatico aqui
+        // Será chamado quando o usuário selecionar um boss
       }
     } catch (error) {
       console.error('Erro ao buscar jogadores:', error)
@@ -1066,6 +1066,54 @@ export default function PedidosPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* JOGADORES FORA DO RODÍZIO */}
+                  {(() => {
+                    const helaId = bosses.find(b => b.nome === 'Hela')?.id
+                    const temHela = formData.bossesIds.includes(helaId || 0)
+                    const categoriaTime = temHela ? 'HELA' : 'CARRYS'
+                    
+                    const timeCategoria = jogadores.filter((j: Jogador) => 
+                      j.categorias?.includes(categoriaTime) && j.ativo && !j.essencial
+                    )
+                    
+                    const jogadoresForaRodizio = timeCategoria.filter(j => 
+                      !formData.jogadoresIds.includes(j.id)
+                    )
+                    
+                    return jogadoresForaRodizio.length > 0 && (
+                      <div className="mb-4">
+                        <div className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
+                          😴 Fora do Rodízio (Não participam deste carry)
+                          <span className="text-xs font-normal text-gray-400">
+                            Clique para adicionar manualmente
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {jogadoresForaRodizio.map((jogador: any) => {
+                            const isSelected = formData.jogadoresIds.includes(jogador.id)
+                            
+                            return (
+                              <button
+                                key={jogador.id}
+                                onClick={() => toggleJogador(jogador.id)}
+                                className={`p-3 rounded border-2 transition-colors text-left ${
+                                  isSelected
+                                    ? 'bg-orange-600 border-orange-500 text-white'
+                                    : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-orange-500'
+                                }`}
+                              >
+                                <div className="flex items-center gap-1 font-bold">
+                                  😴 {jogador.nick}
+                                </div>
+                                <div className="text-xs">Fora do rodízio</div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })()}
 
                   {/* SUPLENTES (APENAS PARA HELA E SUBSTITUIÇÃO MANUAL) */}
                   {formData.bossesIds.includes(bosses.find(b => b.nome === 'Hela')?.id || 0) && 
