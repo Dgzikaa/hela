@@ -305,8 +305,9 @@ export async function PATCH(req: Request) {
           jogadores: jogadoresEscalados
         })
         console.log('✅ [API] Notificação de AGENDAMENTO enviada!')
-      } else if (status === 'CONCLUIDO' && !marcarPago) {
-        // Só notifica conclusão se NÃO marcou como pago (para evitar duplicata)
+      } else if (status === 'CONCLUIDO') {
+        // Sempre notificar conclusão no canal público
+        console.log('✅ [API] Enviando notificação de CONCLUSÃO...')
         const jogadoresEscalados = pedido.participacoes.map((p: any) => p.jogador.nick)
         await notificarCarryConcluido({
           id: pedido.id,
@@ -315,6 +316,7 @@ export async function PATCH(req: Request) {
           valorTotal: pedido.valorTotal,
           bosses: bossesNomes
         })
+        console.log('✅ [API] Notificação de CONCLUSÃO enviada!')
       } else if (status === 'CANCELADO') {
         await notificarCarryCancelado({
           id: pedido.id,
