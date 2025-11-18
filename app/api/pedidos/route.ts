@@ -161,7 +161,12 @@ export async function POST(req: Request) {
 
     // Notificar no Discord (webhook público)
     try {
+      console.log('🔔 [API] Preparando notificação de NOVO CARRY para Discord...')
       const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
+      console.log('🔔 [API] Bosses:', bossesNomes)
+      console.log('🔔 [API] Cliente:', pedido.nomeCliente)
+      console.log('🔔 [API] DISCORD_WEBHOOK_URL configurado?', !!process.env.DISCORD_WEBHOOK_URL)
+      
       await notificarNovoCarry({
         id: pedido.id,
         nomeCliente: pedido.nomeCliente,
@@ -171,6 +176,8 @@ export async function POST(req: Request) {
         pacoteCompleto: pedido.pacoteCompleto,
         conquistaSemMorrer: pedido.conquistaSemMorrer
       })
+      
+      console.log('✅ [API] Notificação de NOVO CARRY enviada!')
 
       // ========================================
       // TEMPORARIAMENTE DESABILITADO - Pode causar rate limit do Discord
@@ -278,9 +285,11 @@ export async function PATCH(req: Request) {
 
     // Notificar no Discord baseado no status
     try {
+      console.log('🔔 [API] PATCH - Status mudou para:', status)
       const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
 
       if (status === 'AGENDADO' && dataAgendada) {
+        console.log('📅 [API] Enviando notificação de AGENDAMENTO...')
         await notificarCarryAgendado({
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,
@@ -288,6 +297,7 @@ export async function PATCH(req: Request) {
           bosses: bossesNomes,
           valorTotal: pedido.valorTotal
         })
+        console.log('✅ [API] Notificação de AGENDAMENTO enviada!')
       } else if (status === 'CONCLUIDO' && !marcarPago) {
         // Só notifica conclusão se NÃO marcou como pago (para evitar duplicata)
         await notificarCarryConcluido({

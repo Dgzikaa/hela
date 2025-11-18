@@ -10,6 +10,10 @@ export async function enviarWebhookDiscord(conteudo: {
 }) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL
 
+  console.log('🔔 [WEBHOOK] Função enviarWebhookDiscord chamada')
+  console.log('🔔 [WEBHOOK] Título:', conteudo.titulo)
+  console.log('🔔 [WEBHOOK] Webhook URL existe?', !!webhookUrl)
+
   if (!webhookUrl) {
     console.warn('⚠️ DISCORD_WEBHOOK_URL não configurado - mensagem não enviada')
     return
