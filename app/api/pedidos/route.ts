@@ -163,8 +163,10 @@ export async function POST(req: Request) {
     try {
       console.log('🔔 [API] Preparando notificação de NOVO CARRY para Discord...')
       const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
+      const jogadoresEscalados = pedido.participacoes.map((p: any) => p.jogador.nick)
       console.log('🔔 [API] Bosses:', bossesNomes)
       console.log('🔔 [API] Cliente:', pedido.nomeCliente)
+      console.log('🔔 [API] Jogadores:', jogadoresEscalados)
       console.log('🔔 [API] DISCORD_WEBHOOK_URL configurado?', !!process.env.DISCORD_WEBHOOK_URL)
       
       await notificarNovoCarry({
@@ -174,7 +176,9 @@ export async function POST(req: Request) {
         valorTotal: pedido.valorTotal,
         bosses: bossesNomes,
         pacoteCompleto: pedido.pacoteCompleto,
-        conquistaSemMorrer: pedido.conquistaSemMorrer
+        conquistaSemMorrer: pedido.conquistaSemMorrer,
+        jogadores: jogadoresEscalados,
+        compradores: formData.compradores || [{ nome: pedido.nomeCliente }]
       })
       
       console.log('✅ [API] Notificação de NOVO CARRY enviada!')

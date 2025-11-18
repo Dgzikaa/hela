@@ -69,6 +69,8 @@ export async function notificarNovoCarry(pedido: {
   bosses: string[]
   pacoteCompleto: boolean
   conquistaSemMorrer: boolean
+  jogadores?: string[]
+  compradores?: Array<{ nome: string; bossesIds?: number[] }>
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
@@ -85,16 +87,32 @@ export async function notificarNovoCarry(pedido: {
   if (pedido.pacoteCompleto) extras.push('🎁 Pacote Completo 1-6')
   if (pedido.conquistaSemMorrer) extras.push('⭐ Conquista Sem Morrer')
 
+  const campos = [
+    { nome: '💰 Valor Total', valor: `${pedido.valorTotal}KK`, inline: true },
+    { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true },
+    { nome: '🎯 Bosses', valor: bossesTexto, inline: false },
+    ...(extras.length > 0 ? [{ nome: '🎁 Extras', valor: extras.join('\n'), inline: false }] : [])
+  ]
+
+  // Adicionar compradores
+  if (pedido.compradores && pedido.compradores.length > 0) {
+    const compradoresTexto = pedido.compradores.map((c, i) => 
+      `${i + 1}. ${c.nome}`
+    ).join('\n')
+    campos.push({ nome: '🛒 Compradores', valor: compradoresTexto, inline: false })
+  }
+
+  // Adicionar time escalado
+  if (pedido.jogadores && pedido.jogadores.length > 0) {
+    const jogadoresTexto = pedido.jogadores.join(', ')
+    campos.push({ nome: '⚔️ Time Escalado', valor: jogadoresTexto, inline: false })
+  }
+
   await enviarWebhookDiscord({
     titulo: '🛒 Novo Carry Registrado!',
     descricao: `**Cliente:** ${pedido.nomeCliente}\n**Contato:** ${pedido.contatoCliente}`,
     cor: 0x00FF00, // Verde
-    campos: [
-      { nome: '💰 Valor Total', valor: `${pedido.valorTotal}KK`, inline: true },
-      { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true },
-      { nome: '🎯 Bosses', valor: bossesTexto, inline: false },
-      ...(extras.length > 0 ? [{ nome: '🎁 Extras', valor: extras.join('\n'), inline: false }] : [])
-    ],
+    campos,
     rodape: 'Acesse o painel para aprovar'
   })
 }
