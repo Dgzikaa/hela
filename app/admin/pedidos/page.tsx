@@ -246,12 +246,15 @@ export default function PedidosPage() {
     try {
       const valorTotal = calcularValorTotal()
       
+      // Pegar dados do primeiro comprador (principal)
+      const primeiroComprador = formData.compradores[0]
+      
       const res = await fetch('/api/pedidos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nomeCliente: formData.nomeCliente,
-          contatoCliente: formData.contatoCliente,
+          nomeCliente: primeiroComprador.nome,
+          contatoCliente: primeiroComprador.contato,
           bosses: formData.bossesIds,
           jogadores: formData.jogadoresIds,
           jogadoresNaoCadastrados: formData.jogadoresNaoCadastrados,
