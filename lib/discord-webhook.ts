@@ -1,3 +1,17 @@
+// Helper para adicionar emoji numérico aos bosses
+function adicionarEmojiBoss(boss: string): string {
+  const emojis: Record<string, string> = {
+    'Freylith': '1️⃣',
+    'Tyrgrim': '2️⃣',
+    'Skollgrim': '3️⃣',
+    'Baldira': '4️⃣',
+    'Thorvald': '5️⃣',
+    'Glacius': '6️⃣',
+    'Hela': '🔴' // Vermelho para destacar
+  }
+  return `${emojis[boss] || '❓'} ${boss}`
+}
+
 // Função para enviar mensagens via Discord Webhook
 export async function enviarWebhookDiscord(conteudo: {
   titulo: string
@@ -74,15 +88,8 @@ export async function notificarNovoCarry(pedido: {
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
-  // Usar emojis para os bosses
-  const bossesComEmoji = pedido.bosses.map(boss => {
-    if (boss === 'Hela') return '⚔️ ' + boss
-    if (['Freylith', 'Tyrgrim', 'Skollgrim'].includes(boss)) return '🛡️ ' + boss
-    if (['Baldira', 'Thorvald', 'Glacius'].includes(boss)) return '⚔️ ' + boss
-    return boss
-  })
-  
-  const bossesTexto = bossesComEmoji.join('\n')
+  // Usar emojis numéricos para os bosses
+  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join('\n')
   const extras = []
   if (pedido.pacoteCompleto) extras.push('🎁 Pacote Completo 1-6')
   if (pedido.conquistaSemMorrer) extras.push('⭐ Conquista Sem Morrer')
@@ -137,10 +144,7 @@ export async function notificarCarryAgendado(pedido: {
     minute: '2-digit'
   })
 
-  const bossesComEmoji = pedido.bosses.map(boss => {
-    if (boss === 'Hela') return '⚔️ ' + boss
-    return '🛡️ ' + boss
-  }).join(', ')
+  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join(', ')
 
   const campos = [
     { nome: '📆 Data/Hora', valor: dataFormatada, inline: false },
@@ -156,7 +160,7 @@ export async function notificarCarryAgendado(pedido: {
 
   await enviarWebhookDiscord({
     titulo: '📅 Carry Agendado!',
-    descricao: `**Cliente:** ${pedido.nomeCliente}\n**Bosses:** ${bossesComEmoji}`,
+    descricao: `**Cliente:** ${pedido.nomeCliente}\n**Bosses:** ${bossesTexto}`,
     cor: 0x0099FF, // Azul
     campos,
     rodape: 'Preparar o time!'
@@ -173,10 +177,7 @@ export async function notificarCarryConcluido(pedido: {
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
-  const bossesTexto = pedido.bosses.map(boss => {
-    if (boss === 'Hela') return '⚔️ ' + boss
-    return '🛡️ ' + boss
-  }).join(', ')
+  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join(', ')
 
   const campos = [
     { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
@@ -210,10 +211,7 @@ export async function notificarJogadoresPagos(jogadores: Array<{
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
-  const bossesTexto = pedido.bosses.map(boss => {
-    if (boss === 'Hela') return '⚔️ ' + boss
-    return '🛡️ ' + boss
-  }).join('\n')
+  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join('\n')
 
   // Enviar mensagem para cada jogador cadastrado (com discordId)
   for (const jogador of jogadores) {
@@ -428,12 +426,7 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
       })
     : 'A definir'
 
-  const bossesComEmoji = pedido.bosses.map(boss => {
-    if (boss === 'Hela') return '⚔️ ' + boss
-    if (['Freylith', 'Tyrgrim', 'Skollgrim'].includes(boss)) return '🛡️ ' + boss
-    if (['Baldira', 'Thorvald', 'Glacius'].includes(boss)) return '⚔️ ' + boss
-    return boss
-  }).join('\n')
+  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join('\n')
 
   for (const jogador of jogadores) {
     if (!jogador.discordId) {
@@ -448,7 +441,7 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
       campos: [
         { nome: '👤 Cliente', valor: pedido.nomeCliente, inline: true },
         { nome: '💰 Valor Total', valor: `${pedido.valorTotal}KK`, inline: true },
-        { nome: '🎯 Bosses', valor: bossesComEmoji, inline: false },
+        { nome: '🎯 Bosses', valor: bossesTexto, inline: false },
         { nome: '📅 Data', valor: dataFormatada, inline: false }
       ],
       rodape: `Pedido #${pedido.id} • Boa sorte!`
