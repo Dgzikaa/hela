@@ -93,6 +93,12 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
+  // Comando: !calendario
+  if (content === '!calendario' || content === '!agenda' || content === '!programacao') {
+    await mostrarCalendario(message);
+    return;
+  }
+
   // Mensagem de boas-vindas / ajuda
   if (content.includes('oi') || content.includes('olá') || content.includes('ola') || 
       content.includes('hey') || content.includes('e ai') || content.includes('bom dia') || 
@@ -106,7 +112,7 @@ client.on('messageCreate', async (message) => {
       .addFields(
         { 
           name: '🛒 Comandos Disponíveis:', 
-          value: '`!carry` - Informações sobre carrys disponíveis\n`!historico` - Ver suas compras anteriores\n`!status` - Verificar status de um pedido' 
+          value: '`!carry` - Informações sobre carrys disponíveis\n`!historico` - Ver suas compras anteriores\n`!status` - Verificar status de um pedido\n`!calendario` - Ver agenda de carrys da semana' 
         },
         { 
           name: '💰 Bosses Disponíveis:', 
@@ -214,6 +220,115 @@ async function mostrarStatus(message) {
   } catch (error) {
     console.error('Erro ao buscar status:', error);
     await message.reply('❌ Erro ao buscar status. Tente novamente mais tarde.');
+  }
+}
+
+// Função para adicionar emoji de boss
+function adicionarEmojiBoss(boss) {
+  const emojis = {
+    'Freylith': '1️⃣',
+    'Tyrgrim': '2️⃣',
+    'Skollgrim': '3️⃣',
+    'Baldira': '4️⃣',
+    'Thorvald': '5️⃣',
+    'Glacius': '6️⃣',
+    'Hela': '🔴'
+  };
+  return `${emojis[boss] || '❓'} ${boss}`;
+}
+
+// Função para mostrar calendário de carrys da semana
+async function mostrarCalendario(message) {
+  try {
+    const response = await fetch(`${API_URL}/pedidos`);
+    
+    if (!response.ok) {
+      await message.reply('❌ Erro ao buscar calendário. Tente novamente mais tarde.');
+      return;
+    }
+
+    const pedidos = await response.json();
+    
+    // Filtrar apenas pedidos agendados nos próximos 7 dias
+    const agora = new Date();
+    const proximos7Dias = new Date(agora);
+    proximos7Dias.setDate(agora.getDate() + 7);
+    
+    const carrysAgendados = pedidos
+      .filter(p => p.status === 'AGENDADO' && p.dataAgendada)
+      .map(p => ({
+        ...p,
+        dataAgendada: new Date(p.dataAgendada)
+      }))
+      .filter(p => p.dataAgendada >= agora && p.dataAgendada <= proximos7Dias)
+      .sort((a, b) => a.dataAgendada - b.dataAgendada);
+
+    if (carrysAgendados.length === 0) {
+      const embed = new EmbedBuilder()
+        .setColor('#FFD700')
+        .setTitle('📅 Calendário de Carrys')
+        .setDescription('**Não há carrys agendados para os próximos 7 dias.**\n\n💬 Entre em contato para agendar:\n<@614167750457163796> ou <@116981167101575171>')
+        .setFooter({ text: '🔥 Time Hela - Carrys Profissionais' })
+        .setTimestamp();
+
+      await message.reply({ embeds: [embed] });
+      return;
+    }
+
+    // Agrupar por dia
+    const porDia = {};
+    carrysAgendados.forEach(carry => {
+      const dia = carry.dataAgendada.toLocaleDateString('pt-BR', { 
+        weekday: 'long', 
+        day: '2-digit', 
+        month: 'long' 
+      });
+      
+      if (!porDia[dia]) {
+        porDia[dia] = [];
+      }
+      
+      porDia[dia].push(carry);
+    });
+
+    const embed = new EmbedBuilder()
+      .setColor('#FFD700')
+      .setTitle('📅 Calendário de Carrys - Próximos 7 Dias')
+      .setDescription(`**${carrysAgendados.length} carry(s) agendado(s)**\n\n`);
+
+    // Adicionar campos por dia
+    for (const [dia, carrys] of Object.entries(porDia)) {
+      const carryTexto = carrys.map(c => {
+        const hora = c.dataAgendada.toLocaleTimeString('pt-BR', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        // Pegar os bosses do array de itens se disponível
+        let bosses = 'N/A';
+        if (c.itens && c.itens.length > 0) {
+          bosses = c.itens.map(item => 
+            item.boss ? adicionarEmojiBoss(item.boss.nome) : '❓'
+          ).join(', ');
+        }
+        
+        return `⏰ **${hora}** - ${bosses}\n👤 Cliente: ${c.nomeCliente || 'N/A'}`;
+      }).join('\n\n');
+
+      embed.addFields({
+        name: `📆 ${dia.charAt(0).toUpperCase() + dia.slice(1)}`,
+        value: carryTexto,
+        inline: false
+      });
+    }
+
+    embed.setFooter({ text: '🔥 Time Hela - Use !carry para fazer seu pedido' })
+      .setTimestamp();
+
+    await message.reply({ embeds: [embed] });
+  } catch (error) {
+    console.error('Erro ao buscar calendário:', error);
+    await message.reply('❌ Erro ao buscar calendário. Tente novamente mais tarde.');
   }
 }
 
