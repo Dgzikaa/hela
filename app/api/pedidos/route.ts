@@ -163,9 +163,9 @@ export async function POST(req: Request) {
     // Notificar no Discord (webhook público)
     try {
       console.log('🔔 [API] Preparando notificação de NOVO CARRY para Discord...')
-      const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
+      const bossesCompletos = pedido.itens.map((i: any) => ({ id: i.boss.id, nome: i.boss.nome }))
       const jogadoresEscalados = pedido.participacoes.map((p: any) => p.jogador.nick)
-      console.log('🔔 [API] Bosses:', bossesNomes)
+      console.log('🔔 [API] Bosses:', bossesCompletos)
       console.log('🔔 [API] Cliente:', pedido.nomeCliente)
       console.log('🔔 [API] Jogadores:', jogadoresEscalados)
       console.log('🔔 [API] DISCORD_WEBHOOK_URL configurado?', !!process.env.DISCORD_WEBHOOK_URL)
@@ -175,7 +175,7 @@ export async function POST(req: Request) {
         nomeCliente: pedido.nomeCliente,
         contatoCliente: pedido.contatoCliente,
         valorTotal: pedido.valorTotal,
-        bosses: bossesNomes,
+        bossesCompletos: bossesCompletos,
         pacoteCompleto: pedido.pacoteCompleto,
         conquistaSemMorrer: pedido.conquistaSemMorrer,
         jogadores: jogadoresEscalados,

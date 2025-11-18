@@ -80,7 +80,7 @@ export async function notificarNovoCarry(pedido: {
   nomeCliente: string
   contatoCliente: string
   valorTotal: number
-  bosses: string[]
+  bossesCompletos: Array<{ id: number; nome: string }>
   pacoteCompleto: boolean
   conquistaSemMorrer: boolean
   jogadores?: string[]
@@ -88,8 +88,24 @@ export async function notificarNovoCarry(pedido: {
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
-  // Usar emojis numéricos para os bosses
-  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join('\n')
+  // Mapear cada boss com seu comprador (se houver)
+  const bossesTexto = pedido.bossesCompletos.map(boss => {
+    let texto = adicionarEmojiBoss(boss.nome)
+    
+    // Para bosses 1-6, adicionar nome do comprador
+    if (boss.nome !== 'Hela' && pedido.compradores && pedido.compradores.length > 0) {
+      // Encontrar qual comprador selecionou este boss
+      const comprador = pedido.compradores.find(c => 
+        c.bossesIds && c.bossesIds.includes(boss.id)
+      )
+      if (comprador) {
+        texto += ` (${comprador.nome})`
+      }
+    }
+    
+    return texto
+  }).join('\n')
+  
   const extras = []
   if (pedido.pacoteCompleto) extras.push('🎁 Pacote Completo 1-6')
   if (pedido.conquistaSemMorrer) extras.push('⭐ Conquista Sem Morrer')
@@ -101,8 +117,9 @@ export async function notificarNovoCarry(pedido: {
     ...(extras.length > 0 ? [{ nome: '🎁 Extras', valor: extras.join('\n'), inline: false }] : [])
   ]
 
-  // Adicionar compradores
-  if (pedido.compradores && pedido.compradores.length > 0) {
+  // Não precisa mais listar compradores separadamente, já está nos bosses
+  // Mas manter se tiver múltiplos compradores para clareza
+  if (pedido.compradores && pedido.compradores.length > 1) {
     const compradoresTexto = pedido.compradores.map((c, i) => 
       `${i + 1}. ${c.nome}`
     ).join('\n')
