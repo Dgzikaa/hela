@@ -38,6 +38,15 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
+  // Permitir apenas no canal #carry ou em DMs
+  const isDM = message.channel.type === 1; // 1 = DM
+  const isCarryChannel = message.channel.name === 'carry';
+  
+  if (!isDM && !isCarryChannel) {
+    console.log(`🚫 Ignorando mensagem fora do canal #carry (canal: ${message.channel.name})`);
+    return;
+  }
+
   console.log(`📩 Mensagem recebida de ${message.author.username}: "${message.content}"`);
 
   const userId = message.author.id;
