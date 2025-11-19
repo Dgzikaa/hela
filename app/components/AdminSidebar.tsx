@@ -12,7 +12,8 @@ import {
   LogOut,
   Menu,
   X,
-  Gamepad2
+  Gamepad2,
+  Trash2
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -148,6 +149,28 @@ export function AdminSidebar() {
                 </button>
               )
             })}
+
+            {/* Separador */}
+            <div className="my-4 border-t border-gray-200"></div>
+
+            {/* Limpar Dados - Ação Crítica */}
+            <button
+              onClick={() => {
+                router.push('/admin/limpar')
+                setIsMobileMenuOpen(false)
+              }}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-xl
+                transition-all duration-200 group
+                ${isActive('/admin/limpar')
+                  ? 'bg-red-600 text-white shadow-lg shadow-red-600/30 scale-[1.02]' 
+                  : 'text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200'
+                }
+              `}
+            >
+              <Trash2 className={`w-5 h-5 transition-transform ${isActive('/admin/limpar') ? '' : 'group-hover:scale-110'}`} />
+              <span className="font-semibold text-sm">⚠️ Limpar Dados</span>
+            </button>
           </nav>
 
           {/* Logout */}
