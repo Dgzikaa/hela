@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { enviarLembreteDiarioCarrys } from '@/lib/discord-webhook'
+import { enviarMensagemGrupoWhatsApp, formatarLembreteCarrysWhatsApp } from '@/lib/whatsapp'
 
 // GET - Enviar lembrete diário para jogadores
 export async function GET(req: Request) {
@@ -104,14 +105,25 @@ export async function GET(req: Request) {
       carrys
     }))
 
-    // Enviar notificações
+    // Enviar notificações Discord
     await enviarLembreteDiarioCarrys(jogadoresParaNotificar)
+
+    // Enviar notificação WhatsApp (se configurado)
+    const whatsappGrupoId = process.env.WHATSAPP_GRUPO_ID
+    if (whatsappGrupoId) {
+      const mensagemWhatsApp = formatarLembreteCarrysWhatsApp(jogadoresParaNotificar)
+      await enviarMensagemGrupoWhatsApp({
+        grupoId: whatsappGrupoId,
+        mensagem: mensagemWhatsApp
+      })
+    }
 
     return NextResponse.json({
       success: true,
       message: `Lembretes enviados para ${jogadoresParaNotificar.length} jogador(es)`,
       jogadores: jogadoresParaNotificar.length,
-      pedidos: pedidosHoje.length
+      pedidos: pedidosHoje.length,
+      whatsapp: !!whatsappGrupoId
     })
   } catch (error: any) {
     console.error('Erro ao enviar lembrete diário:', error)

@@ -478,24 +478,69 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
     horario: string
   }>
 }>) {
-  for (const jogador of jogadores) {
-    if (!jogador.discordId || jogador.carrys.length === 0) continue
+  if (jogadores.length === 0) return
 
-    const listaCarrys = jogador.carrys.map(c => 
-      `**${c.horario}** - ${c.nomeCliente}\n🎯 ${c.bosses.join(', ')}`
-    ).join('\n\n')
+  // Agrupar carries por horário
+  const carrysPorHorario = new Map<string, Array<{
+    cliente: string
+    bosses: string[]
+    jogadores: string[]
+  }>>()
 
-    await enviarMensagemPrivada(jogador.discordId, {
-      titulo: '☀️ Bom dia! Carries de Hoje',
-      descricao: `Olá **${jogador.nick}**! Você tem **${jogador.carrys.length} carry(s)** agendado(s) para hoje:`,
-      cor: 0xFFD700,
-      campos: [
-        { nome: '📋 Seus Carries de Hoje', valor: listaCarrys, inline: false }
-      ],
-      rodape: 'Boa sorte! 🎮'
+  jogadores.forEach(jogador => {
+    jogador.carrys.forEach(carry => {
+      if (!carrysPorHorario.has(carry.horario)) {
+        carrysPorHorario.set(carry.horario, [])
+      }
+      
+      const carryExistente = carrysPorHorario.get(carry.horario)!.find(
+        c => c.cliente === carry.nomeCliente
+      )
+      
+      if (carryExistente) {
+        carryExistente.jogadores.push(jogador.nick)
+      } else {
+        carrysPorHorario.get(carry.horario)!.push({
+          cliente: carry.nomeCliente,
+          bosses: carry.bosses,
+          jogadores: [jogador.nick]
+        })
+      }
     })
+  })
 
-    await new Promise(resolve => setTimeout(resolve, 500))
-  }
+  // Montar mensagem
+  let descricao = '☀️ **Bom dia, equipe!** Temos carries agendados para hoje!\n\n'
+  
+  const carrysOrdenados = Array.from(carrysPorHorario.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+
+  carrysOrdenados.forEach(([horario, carries]) => {
+    carries.forEach(carry => {
+      descricao += `🕐 **${horario}** - ${carry.cliente}\n`
+      descricao += `🎯 ${carry.bosses.join(', ')}\n`
+      descricao += `👥 ${carry.jogadores.join(', ')}\n\n`
+    })
+  })
+
+  // Coletar todos os jogadores únicos com Discord ID
+  const jogadoresUnicos = new Set<string>()
+  jogadores.forEach(j => {
+    if (j.discordId) jogadoresUnicos.add(j.discordId)
+  })
+
+  // Adicionar menções
+  const mencoes = Array.from(jogadoresUnicos).map(id => `<@${id}>`).join(' ')
+  descricao += `\n📢 **Atenção:** ${mencoes}\n`
+  descricao += `\n📋 Total: **${carrysOrdenados.reduce((acc, [, carries]) => acc + carries.length, 0)} carry(s)** | **${jogadoresUnicos.size} jogador(es)** escalados\n`
+  descricao += `🎮 Preparem-se! Boa sorte a todos!`
+
+  // Enviar no canal
+  await enviarWebhookDiscord({
+    titulo: '🌅 Carries do Dia',
+    descricao,
+    cor: 0xFFD700,
+    rodape: `${new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}`
+  })
 }
 
