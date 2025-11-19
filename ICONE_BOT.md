@@ -97,3 +97,5 @@ Seu bot agora vai aparecer com a carinha do Seu Raimundo clássico da Escolinha!
 
 Ficou com alguma dúvida ou quer editar a imagem antes de usar?
 
+
+

@@ -79,6 +79,15 @@ export default function PedidosPage() {
   // Modal de edição
   const [showEditModal, setShowEditModal] = useState(false)
   const [pedidoParaEditar, setPedidoParaEditar] = useState<Pedido | null>(null)
+  const [editFormData, setEditFormData] = useState({
+    nomeCliente: '',
+    contatoCliente: '',
+    bossesIds: [] as number[],
+    valorTotal: 0,
+    observacoes: '',
+    precoCustomizado: false,
+    bossesPrecos: {} as Record<number, number>
+  })
   
   // Form state para criar novo pedido
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -353,6 +362,82 @@ export default function PedidosPage() {
     }
   }
 
+  const handleUpdatePedido = async () => {
+    try {
+      if (!pedidoParaEditar) return
+
+      const res = await fetch('/api/pedidos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: pedidoParaEditar.id,
+          nomeCliente: editFormData.nomeCliente,
+          contatoCliente: editFormData.contatoCliente,
+          bosses: editFormData.bossesIds,
+          valorTotal: editFormData.valorTotal,
+          observacoes: editFormData.observacoes,
+          bossesPrecos: editFormData.precoCustomizado ? editFormData.bossesPrecos : null
+        })
+      })
+      
+      if (res.ok) {
+        toast.success('✅ Pedido atualizado com sucesso!')
+        setShowEditModal(false)
+        setPedidoParaEditar(null)
+        fetchPedidos()
+      } else {
+        toast.error('❌ Erro ao atualizar pedido')
+      }
+    } catch (error) {
+      console.error('Erro:', error)
+      toast.error('❌ Erro ao atualizar pedido')
+    }
+  }
+
+  const calcularValorTotalEdit = () => {
+    if (editFormData.precoCustomizado) {
+      return editFormData.bossesIds.reduce((acc, bossId) => {
+        return acc + (editFormData.bossesPrecos[bossId] || 0)
+      }, 0)
+    }
+    
+    return editFormData.bossesIds.reduce((acc, bossId) => {
+      const boss = bosses.find(b => b.id === bossId)
+      return acc + (boss?.preco || 0)
+    }, 0)
+  }
+
+  const toggleBossEdit = (bossId: number) => {
+    const boss = bosses.find(b => b.id === bossId)
+    setEditFormData(prev => {
+      const isAdding = !prev.bossesIds.includes(bossId)
+      const newBossesIds = isAdding 
+        ? [...prev.bossesIds, bossId]
+        : prev.bossesIds.filter(id => id !== bossId)
+      
+      const newBossesPrecos = { ...prev.bossesPrecos }
+      if (isAdding && boss && prev.precoCustomizado) {
+        newBossesPrecos[bossId] = boss.preco
+      }
+      
+      return {
+        ...prev,
+        bossesIds: newBossesIds,
+        bossesPrecos: newBossesPrecos
+      }
+    })
+  }
+
+  const setBossPrecoEdit = (bossId: number, preco: number) => {
+    setEditFormData(prev => ({
+      ...prev,
+      bossesPrecos: {
+        ...prev.bossesPrecos,
+        [bossId]: preco
+      }
+    }))
+  }
+
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { variant: any, label: string }> = {
       PENDENTE: { variant: 'warning', label: 'Pendente' },
@@ -521,6 +606,21 @@ export default function PedidosPage() {
                       variant="secondary"
                       onClick={() => {
                         setPedidoParaEditar(pedido)
+                        // Preencher formulário de edição com dados atuais
+                        const bossesPrecos: Record<number, number> = {}
+                        pedido.itens.forEach(item => {
+                          bossesPrecos[item.boss.id] = item.preco
+                        })
+                        
+                        setEditFormData({
+                          nomeCliente: pedido.nomeCliente,
+                          contatoCliente: pedido.contatoCliente,
+                          bossesIds: pedido.itens.map(i => i.boss.id),
+                          valorTotal: pedido.valorTotal,
+                          observacoes: '',
+                          precoCustomizado: false,
+                          bossesPrecos: bossesPrecos
+                        })
                         setShowEditModal(true)
                       }}
                       title="Editar pedido"
@@ -1541,14 +1641,14 @@ export default function PedidosPage() {
           </div>
         )}
 
-        {/* Modal Editar - Temporário: avisa que está em desenvolvimento */}
+        {/* Modal Editar Pedido */}
         {showEditModal && pedidoParaEditar && (
           <div 
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto"
             onClick={() => setShowEditModal(false)}
           >
             <div 
-              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
+              className="bg-gray-800 rounded-lg max-w-3xl w-full p-6 my-8"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
@@ -1566,34 +1666,147 @@ export default function PedidosPage() {
                 </button>
               </div>
 
-              <div className="space-y-4 mb-6">
-                <div className="bg-blue-900/30 border border-blue-500/50 p-4 rounded">
-                  <div className="text-blue-300 text-sm mb-2">📝 Dados do pedido:</div>
-                  <div className="text-white font-bold mb-2">{pedidoParaEditar.nomeCliente}</div>
-                  <div className="text-gray-300 text-sm">
-                    <div>Contato: {pedidoParaEditar.contatoCliente}</div>
-                    <div>Valor: {pedidoParaEditar.valorTotal}KK</div>
-                    <div>Bosses: {pedidoParaEditar.itens.map(i => i.boss.nome).join(', ')}</div>
+              <div className="space-y-4 mb-6 max-h-[70vh] overflow-y-auto pr-2">
+                {/* Informações do Cliente */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-2">👤 Nome do Cliente</label>
+                  <input
+                    type="text"
+                    value={editFormData.nomeCliente}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, nomeCliente: e.target.value }))}
+                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                    placeholder="Nome completo"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 text-sm mb-2">📱 Contato</label>
+                  <input
+                    type="text"
+                    value={editFormData.contatoCliente}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, contatoCliente: e.target.value }))}
+                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                    placeholder="Discord, WhatsApp, etc."
+                  />
+                </div>
+
+                {/* Seleção de Bosses */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-2">🎯 Bosses Selecionados</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {bosses.map(boss => (
+                      <button
+                        key={boss.id}
+                        type="button"
+                        onClick={() => toggleBossEdit(boss.id)}
+                        className={`p-3 rounded text-sm border-2 transition-colors ${
+                          editFormData.bossesIds.includes(boss.id)
+                            ? boss.ordem === 0 
+                              ? 'bg-purple-600 border-purple-500 text-white' 
+                              : 'bg-blue-600 border-blue-500 text-white'
+                            : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        <div className="font-bold">{boss.nome}</div>
+                        <div className="text-xs">{boss.preco}KK</div>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                <div className="bg-yellow-900/30 border border-yellow-500/50 p-4 rounded">
-                  <div className="text-yellow-300 text-sm">
-                    🚧 <strong>Funcionalidade em desenvolvimento!</strong>
+                {/* Preço Customizado */}
+                <div className="border border-gray-600 rounded p-4">
+                  <label className="flex items-center gap-2 text-gray-300 mb-3">
+                    <input
+                      type="checkbox"
+                      checked={editFormData.precoCustomizado}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        setEditFormData(prev => {
+                          const newBossesPrecos: Record<number, number> = {}
+                          if (checked) {
+                            prev.bossesIds.forEach(bossId => {
+                              const boss = bosses.find(b => b.id === bossId)
+                              if (boss) {
+                                newBossesPrecos[bossId] = boss.preco
+                              }
+                            })
+                          }
+                          return {
+                            ...prev,
+                            precoCustomizado: checked,
+                            bossesPrecos: newBossesPrecos
+                          }
+                        })
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span className="font-semibold">💰 Preço Customizado</span>
+                  </label>
+
+                  {editFormData.precoCustomizado && editFormData.bossesIds.length > 0 && (
+                    <div className="space-y-2">
+                      {editFormData.bossesIds.map(bossId => {
+                        const boss = bosses.find(b => b.id === bossId)
+                        if (!boss) return null
+                        
+                        return (
+                          <div key={bossId} className="flex items-center justify-between bg-gray-700/50 p-2 rounded">
+                            <span className="text-sm text-gray-300">{boss.nome}</span>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="number"
+                                value={editFormData.bossesPrecos[bossId] || boss.preco}
+                                onChange={(e) => setBossPrecoEdit(bossId, parseInt(e.target.value) || 0)}
+                                className="w-20 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm"
+                              />
+                              <span className="text-xs text-gray-400">KK</span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Valor Total */}
+                <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/50 p-4 rounded">
+                  <div className="text-green-300 text-sm mb-1">💵 Valor Total Calculado</div>
+                  <div className="text-3xl font-bold text-white">
+                    {calcularValorTotalEdit()}KK
                   </div>
-                  <p className="text-gray-300 text-sm mt-2">
-                    A edição de pedidos estará disponível em breve. Por enquanto, você pode cancelar o pedido e criar um novo.
-                  </p>
+                </div>
+
+                {/* Observações */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-2">📝 Observações (opcional)</label>
+                  <textarea
+                    value={editFormData.observacoes}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, observacoes: e.target.value }))}
+                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                    rows={3}
+                    placeholder="Informações adicionais sobre o pedido..."
+                  />
                 </div>
               </div>
 
-              <Button
-                variant="secondary"
-                onClick={() => setShowEditModal(false)}
-                className="w-full"
-              >
-                Fechar
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleUpdatePedido}
+                  className="flex-1"
+                  disabled={!editFormData.nomeCliente || !editFormData.contatoCliente || editFormData.bossesIds.length === 0}
+                >
+                  💾 Salvar Alterações
+                </Button>
+              </div>
             </div>
           </div>
         )}

@@ -364,3 +364,83 @@ export async function DELETE(req: Request) {
   }
 }
 
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json()
+    const { 
+      id,
+      nomeCliente, 
+      contatoCliente, 
+      bosses, 
+      valorTotal,
+      observacoes,
+      bossesPrecos
+    } = body
+
+    // Buscar o pedido atual
+    const pedidoAtual = await prisma.pedido.findUnique({
+      where: { id },
+      include: { itens: true }
+    })
+
+    if (!pedidoAtual) {
+      return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
+    }
+
+    // Deletar itens antigos
+    await prisma.itensPedido.deleteMany({
+      where: { pedidoId: id }
+    })
+
+    // Criar novos itens
+    const itensData = await Promise.all(
+      bosses.map(async (bossId: number) => {
+        const boss = await prisma.boss.findUnique({ where: { id: bossId } })
+        if (!boss) throw new Error(`Boss não encontrado: ${bossId}`)
+        
+        // Usar preço customizado se fornecido, senão usar preço padrão do boss
+        const preco = bossesPrecos && bossesPrecos[bossId] 
+          ? bossesPrecos[bossId] 
+          : boss.preco
+        
+        return {
+          bossId,
+          preco,
+          pedidoId: id
+        }
+      })
+    )
+
+    // Atualizar pedido com novos dados
+    const pedidoAtualizado = await prisma.pedido.update({
+      where: { id },
+      data: {
+        nomeCliente,
+        contatoCliente,
+        valorTotal,
+        valorFinal: valorTotal, // Assumindo que não há desconto na edição
+        observacoes,
+        itens: {
+          create: itensData
+        }
+      },
+      include: {
+        itens: {
+          include: {
+            boss: true
+          }
+        }
+      }
+    })
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Pedido atualizado com sucesso',
+      pedido: pedidoAtualizado
+    })
+  } catch (error: any) {
+    console.error('Erro ao atualizar pedido:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+
