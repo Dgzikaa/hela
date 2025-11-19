@@ -106,7 +106,13 @@ export default function PedidosPage() {
     bossesPrecos: {} as Record<number, number>, // ID do boss -> preço customizado
     numeroCompradores: 1, // Quantos compradores participarão (default 1)
     compradores: [
-      { nome: '', contato: '', bossesIds: [] as number[] }
+      { 
+        nome: '', 
+        contato: '', 
+        bossesIds: [] as number[],
+        pacoteCompleto: false,
+        conquistaSemMorrer: false
+      }
     ] // Dados de cada comprador individual
   })
 
@@ -757,7 +763,13 @@ export default function PedidosPage() {
                     onChange={(e) => {
                       const num = Number(e.target.value)
                       const novosCompradores = Array.from({ length: num }, (_, i) => 
-                        formData.compradores[i] || { nome: '', contato: '', bossesIds: [] }
+                        formData.compradores[i] || { 
+                          nome: '', 
+                          contato: '', 
+                          bossesIds: [],
+                          pacoteCompleto: false,
+                          conquistaSemMorrer: false
+                        }
                       )
                       setFormData({ 
                         ...formData, 
@@ -859,18 +871,37 @@ export default function PedidosPage() {
                               🎯 Bosses que {comprador.nome || `Comprador ${index + 1}`} quer fazer:
                             </label>
                             <div className="grid grid-cols-2 gap-2">
-                              {bosses.map(boss => (
+                              {bosses.map(boss => {
+                                const helaId = bosses.find(b => b.ordem === 0)?.id
+                                const bossesDoComprador = comprador.bossesIds || []
+                                const helaSelecionado = helaId && bossesDoComprador.includes(helaId)
+                                const ehHela = boss.ordem === 0
+                                
+                                // Desabilitar outros bosses se Hela foi selecionado
+                                // Desabilitar Hela se outros bosses foram selecionados
+                                const desabilitado = (helaSelecionado && !ehHela) || 
+                                                     (!helaSelecionado && ehHela && bossesDoComprador.length > 0)
+                                
+                                return (
                                 <button
                                   key={boss.id}
                                   type="button"
                                   onClick={() => {
+                                    if (desabilitado) return
+                                    
                                     const novosCompradores = [...formData.compradores]
                                     const bossesAtuais = novosCompradores[index].bossesIds
+                                    
+                                    // Se está selecionando Hela, limpar outros bosses
+                                    // Se está desmarcando, apenas remover
+                                    const incluiBoss = bossesAtuais.includes(boss.id)
                                     novosCompradores[index] = {
                                       ...novosCompradores[index],
-                                      bossesIds: bossesAtuais.includes(boss.id)
+                                      bossesIds: incluiBoss
                                         ? bossesAtuais.filter(id => id !== boss.id)
-                                        : [...bossesAtuais, boss.id]
+                                        : ehHela 
+                                          ? [boss.id] // Seleciona APENAS Hela
+                                          : [...bossesAtuais, boss.id] // Adiciona normalmente
                                     }
                                     
                                     // Atualizar bosses totais do pedido
@@ -886,19 +917,61 @@ export default function PedidosPage() {
                                     
                                     setTimeout(() => selecionarJogadoresAutomatico(), 100)
                                   }}
+                                  disabled={desabilitado}
                                   className={`p-2 rounded text-sm border-2 transition-colors ${
-                                    comprador.bossesIds.includes(boss.id)
+                                    desabilitado
+                                      ? 'bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed opacity-50'
+                                      : comprador.bossesIds.includes(boss.id)
                                       ? boss.ordem === 0
                                         ? 'bg-purple-600 border-purple-500 text-white'
                                         : 'bg-blue-600 border-blue-500 text-white'
                                       : 'bg-gray-700 border-gray-600 text-gray-300'
                                   }`}
                                 >
-                                  <div className="font-bold">{boss.nome}</div>
+                                  <div className="font-bold">{boss.nome} {boss.ordem === 0 ? '🔴' : ''}</div>
                                   <div className="text-xs">{boss.preco}KK</div>
+                                  {desabilitado && <div className="text-[10px] mt-0.5">🔒</div>}
                                 </button>
-                              ))}
+                                )
+                              })}
                             </div>
+                          </div>
+                          
+                          {/* Opções extras por comprador */}
+                          <div className="space-y-2 mt-3 pt-3 border-t border-gray-600">
+                            <label className="flex items-center gap-2 text-gray-300 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={comprador.conquistaSemMorrer || false}
+                                onChange={(e) => {
+                                  const novosCompradores = [...formData.compradores]
+                                  novosCompradores[index] = {
+                                    ...novosCompradores[index],
+                                    conquistaSemMorrer: e.target.checked
+                                  }
+                                  setFormData({ ...formData, compradores: novosCompradores })
+                                }}
+                                className="w-4 h-4"
+                              />
+                              <span>⭐ Conquista Sem Morrer (+150KK)</span>
+                            </label>
+
+                            <label className="flex items-center gap-2 text-gray-300 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={comprador.pacoteCompleto || false}
+                                onChange={(e) => {
+                                  const novosCompradores = [...formData.compradores]
+                                  novosCompradores[index] = {
+                                    ...novosCompradores[index],
+                                    pacoteCompleto: e.target.checked
+                                  }
+                                  setFormData({ ...formData, compradores: novosCompradores })
+                                }}
+                                className="w-4 h-4"
+                              />
+                              <span>🎁 Pacote Completo 1-6 (Conquista Grátis)</span>
+                            </label>
                           </div>
                         </div>
                       </div>
@@ -950,17 +1023,19 @@ export default function PedidosPage() {
                             const incluiBoss = bossesAtuais.includes(boss.id)
                             
                             // Toggle boss no comprador
+                            // Se estiver selecionando Hela, limpar outros bosses
+                            // Se estiver desmarcando Hela, apenas remover
                             novosCompradores[0] = {
                               ...novosCompradores[0],
                               bossesIds: incluiBoss
                                 ? bossesAtuais.filter(id => id !== boss.id)
-                                : [...bossesAtuais, boss.id]
+                                : [boss.id] // Seleciona APENAS Hela
                             }
                             
                             // Atualizar bosses do pedido
                             const novosBossesIds = incluiBoss
                               ? formData.bossesIds.filter(id => id !== boss.id)
-                              : [...formData.bossesIds, boss.id]
+                              : [boss.id] // Seleciona APENAS Hela
                             
                             setFormData({ 
                               ...formData, 
@@ -976,8 +1051,9 @@ export default function PedidosPage() {
                               : 'bg-gray-700 border-gray-600 text-gray-300'
                           }`}
                         >
-                          <div className="font-bold text-lg">{boss.nome}</div>
+                          <div className="font-bold text-lg">{boss.nome} 🔴</div>
                           <div className="text-sm">{boss.preco}KK (padrão)</div>
+                          <div className="text-xs text-purple-200 mt-1">⚠️ Exclusivo - não pode combinar com outros</div>
                         </button>
                         {formData.precoCustomizado && formData.bossesIds.includes(boss.id) && (
                           <input
@@ -993,11 +1069,18 @@ export default function PedidosPage() {
                     ))}
                     
                     {/* Bosses 1-6 */}
-                    {bosses.filter(b => b.ordem > 0).map(boss => (
+                    {bosses.filter(b => b.ordem > 0).map(boss => {
+                      const helaId = bosses.find(b => b.ordem === 0)?.id
+                      const helaSelecionado = helaId && formData.bossesIds.includes(helaId)
+                      const desabilitado = helaSelecionado
+                      
+                      return (
                       <div key={boss.id}>
                         <button
                           type="button"
                           onClick={() => {
+                            if (desabilitado) return
+                            
                             const novosCompradores = [...formData.compradores]
                             const bossesAtuais = novosCompradores[0].bossesIds
                             const incluiBoss = bossesAtuais.includes(boss.id)
@@ -1023,14 +1106,18 @@ export default function PedidosPage() {
                             
                             setTimeout(() => selecionarJogadoresAutomatico(), 100)
                           }}
+                          disabled={desabilitado}
                           className={`w-full p-3 rounded border-2 transition-colors ${
-                            formData.bossesIds.includes(boss.id)
+                            desabilitado
+                              ? 'bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed opacity-50'
+                              : formData.bossesIds.includes(boss.id)
                               ? 'bg-blue-600 border-blue-500 text-white'
                               : 'bg-gray-700 border-gray-600 text-gray-300'
                           }`}
                         >
                           <div className="font-bold">{boss.nome}</div>
                           <div className="text-sm">{boss.preco}KK</div>
+                          {desabilitado && <div className="text-xs mt-1">🔒 Bloqueado (Hela selecionado)</div>}
                         </button>
                         {formData.precoCustomizado && formData.bossesIds.includes(boss.id) && (
                           <input
@@ -1043,7 +1130,8 @@ export default function PedidosPage() {
                           />
                         )}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                   {formData.precoCustomizado && (
                     <div className="mt-2 text-xs text-yellow-400 bg-yellow-900/20 p-2 rounded">
@@ -1057,21 +1145,43 @@ export default function PedidosPage() {
                   <label className="flex items-center gap-2 text-gray-300">
                     <input
                       type="checkbox"
-                      checked={formData.conquistaSemMorrer}
-                      onChange={(e) => setFormData({ ...formData, conquistaSemMorrer: e.target.checked })}
+                      checked={formData.compradores[0]?.conquistaSemMorrer || false}
+                      onChange={(e) => {
+                        const novosCompradores = [...formData.compradores]
+                        novosCompradores[0] = {
+                          ...novosCompradores[0],
+                          conquistaSemMorrer: e.target.checked
+                        }
+                        setFormData({ 
+                          ...formData, 
+                          compradores: novosCompradores,
+                          conquistaSemMorrer: e.target.checked // Manter compatibilidade
+                        })
+                      }}
                       className="w-5 h-5"
                     />
-                    <span>Conquista Sem Morrer (+150KK)</span>
+                    <span>⭐ Conquista Sem Morrer (+150KK)</span>
                   </label>
 
                   <label className="flex items-center gap-2 text-gray-300">
                     <input
                       type="checkbox"
-                      checked={formData.pacoteCompleto}
-                      onChange={(e) => setFormData({ ...formData, pacoteCompleto: e.target.checked })}
+                      checked={formData.compradores[0]?.pacoteCompleto || false}
+                      onChange={(e) => {
+                        const novosCompradores = [...formData.compradores]
+                        novosCompradores[0] = {
+                          ...novosCompradores[0],
+                          pacoteCompleto: e.target.checked
+                        }
+                        setFormData({ 
+                          ...formData, 
+                          compradores: novosCompradores,
+                          pacoteCompleto: e.target.checked // Manter compatibilidade
+                        })
+                      }}
                       className="w-5 h-5"
                     />
-                    <span>Pacote Completo 1-6 (Conquista Grátis)</span>
+                    <span>🎁 Pacote Completo 1-6 (Conquista Grátis)</span>
                   </label>
                 </div>
 

@@ -19,6 +19,7 @@ export async function enviarWebhookDiscord(conteudo: {
   cor?: number
   campos?: { nome: string; valor: string; inline?: boolean }[]
   rodape?: string
+  mencionarAqui?: boolean // Adicionar @here
 }) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL
 
@@ -54,14 +55,21 @@ export async function enviarWebhookDiscord(conteudo: {
       embed.footer = { text: conteudo.rodape }
     }
 
-    console.log('🔔 [WEBHOOK] Payload a ser enviado:', JSON.stringify({ embeds: [embed] }, null, 2))
+    const payload: any = {
+      embeds: [embed]
+    }
+
+    // Adicionar @here se solicitado
+    if (conteudo.mencionarAqui) {
+      payload.content = '@here'
+    }
+
+    console.log('🔔 [WEBHOOK] Payload a ser enviado:', JSON.stringify(payload, null, 2))
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        embeds: [embed]
-      })
+      body: JSON.stringify(payload)
     })
 
     if (!response.ok) {
@@ -180,7 +188,8 @@ export async function notificarCarryAgendado(pedido: {
     descricao: `**Cliente:** ${pedido.nomeCliente}\n**Bosses:** ${bossesTexto}`,
     cor: 0x0099FF, // Azul
     campos,
-    rodape: 'Preparar o time!'
+    rodape: 'Preparar o time!',
+    mencionarAqui: true // Notificar @here
   })
 }
 
