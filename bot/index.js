@@ -38,12 +38,12 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
-  // Permitir apenas no canal #carry ou em DMs
+  // Permitir apenas no canal #agendamentos-bot-carry ou em DMs
   const isDM = message.channel.type === 1; // 1 = DM
-  const isCarryChannel = message.channel.name === 'carry';
+  const isCarryChannel = message.channel.name === 'agendamentos-bot-carry';
   
   if (!isDM && !isCarryChannel) {
-    console.log(`🚫 Ignorando mensagem fora do canal #carry (canal: ${message.channel.name})`);
+    console.log(`🚫 Ignorando mensagem fora do canal #agendamentos-bot-carry (canal: ${message.channel.name})`);
     return;
   }
 
