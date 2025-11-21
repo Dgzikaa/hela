@@ -30,7 +30,8 @@ client.on('messageCreate', async (message) => {
   console.log(`📝 Autor: ${message.author.tag} (ID: ${message.author.id})`);
   console.log(`🤖 É bot?: ${message.author.bot}`);
   console.log(`💬 Conteúdo: "${message.content}"`);
-  console.log(`📍 Canal: ${message.channel.type} (ID: ${message.channelId})`);
+  console.log(`📍 Canal Type: ${message.channel.type} (ID: ${message.channelId})`);
+  console.log(`📍 Canal Name: "${message.channel.name}"`);
   
   // Ignorar bots
   if (message.author.bot) {
@@ -38,12 +39,19 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
+  // DEBUG: Responder em TODOS os canais temporariamente para testar
+  console.log(`✅ MENSAGEM RECEBIDA! Canal: "${message.channel.name}" | Conteúdo: "${message.content}"`);
+  
   // Permitir apenas no canal #agendamentos-bot-carry ou em DMs
   const isDM = message.channel.type === 1; // 1 = DM
   const isCarryChannel = message.channel.name === 'agendamentos-bot-carry';
   
+  console.log(`🔍 isDM: ${isDM} | isCarryChannel: ${isCarryChannel}`);
+  
   if (!isDM && !isCarryChannel) {
-    console.log(`🚫 Ignorando mensagem fora do canal #agendamentos-bot-carry (canal: ${message.channel.name})`);
+    console.log(`🚫 Ignorando mensagem fora do canal #agendamentos-bot-carry (canal: "${message.channel.name}")`);
+    // TEMPORÁRIO: enviar mensagem para debug
+    await message.reply(`⚠️ Bot configurado para responder apenas em #agendamentos-bot-carry. Canal atual: "${message.channel.name}"`);
     return;
   }
 
