@@ -50,8 +50,6 @@ client.on('messageCreate', async (message) => {
   
   if (!isDM && !isCarryChannel) {
     console.log(`🚫 Ignorando mensagem fora do canal #agendamentos-bot-carry (canal: "${message.channel.name}")`);
-    // TEMPORÁRIO: enviar mensagem para debug
-    await message.reply(`⚠️ Bot configurado para responder apenas em #agendamentos-bot-carry. Canal atual: "${message.channel.name}"`);
     return;
   }
 
