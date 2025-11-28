@@ -96,22 +96,24 @@ export default function ProjecaoPage() {
       // Pedidos concluídos (já recebeu)
       const pedidosConcluidos = pedidos.filter(p => 
         p.status === 'CONCLUIDO' && 
+        p.participacoes && 
         p.participacoes.some(part => part.jogadorId === jogador.id)
       )
 
       const ganhosConcluidos = pedidosConcluidos.reduce((total, pedido) => {
-        const participacao = pedido.participacoes.find(p => p.jogadorId === jogador.id)
+        const participacao = pedido.participacoes?.find(p => p.jogadorId === jogador.id)
         return total + (participacao?.valorRecebido || 0)
       }, 0)
 
       // Pedidos agendados (vai receber)
       const pedidosAgendados = pedidos.filter(p => 
         ['PENDENTE', 'APROVADO', 'AGENDADO', 'EM_ANDAMENTO'].includes(p.status) &&
+        p.participacoes && 
         p.participacoes.some(part => part.jogadorId === jogador.id)
       )
 
       const projecaoTotal = pedidosAgendados.reduce((total, pedido) => {
-        const numParticipantes = pedido.participacoes.length
+        const numParticipantes = pedido.participacoes?.length || 0
         const valorPorJogador = numParticipantes > 0 ? Math.floor(pedido.valorTotal / numParticipantes) : 0
         return total + valorPorJogador
       }, 0)
@@ -124,7 +126,7 @@ export default function ProjecaoPage() {
       })
 
       const projecaoSemana = pedidosSemana.reduce((total, pedido) => {
-        const numParticipantes = pedido.participacoes.length
+        const numParticipantes = pedido.participacoes?.length || 0
         const valorPorJogador = numParticipantes > 0 ? Math.floor(pedido.valorTotal / numParticipantes) : 0
         return total + valorPorJogador
       }, 0)
@@ -137,7 +139,7 @@ export default function ProjecaoPage() {
       })
 
       const projecaoMes = pedidosMes.reduce((total, pedido) => {
-        const numParticipantes = pedido.participacoes.length
+        const numParticipantes = pedido.participacoes?.length || 0
         const valorPorJogador = numParticipantes > 0 ? Math.floor(pedido.valorTotal / numParticipantes) : 0
         return total + valorPorJogador
       }, 0)
