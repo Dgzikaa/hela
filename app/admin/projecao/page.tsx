@@ -48,9 +48,16 @@ export default function ProjecaoPage() {
   const [projecoes, setProjecoes] = useState<ProjecaoJogador[]>([])
   const [loading, setLoading] = useState(true)
   const [filtroCategoria, setFiltroCategoria] = useState<string>('TODOS')
+  const [taxaConversao, setTaxaConversao] = useState<number>(0.35) // 1kk = 0.35 reais
+  const [mostrarEmReais, setMostrarEmReais] = useState<boolean>(false)
 
   useEffect(() => {
     fetchData()
+    // Carregar taxa salva do localStorage
+    const taxaSalva = localStorage.getItem('taxaConversaoKK')
+    if (taxaSalva) {
+      setTaxaConversao(parseFloat(taxaSalva))
+    }
   }, [])
 
   useEffect(() => {
@@ -160,6 +167,19 @@ export default function ProjecaoPage() {
     return `${valor}kk`
   }
 
+  const formatarValorReais = (valorKK: number): string => {
+    const valorReais = valorKK * taxaConversao
+    return valorReais.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    })
+  }
+
+  const salvarTaxaConversao = (novaTaxa: number) => {
+    setTaxaConversao(novaTaxa)
+    localStorage.setItem('taxaConversaoKK', novaTaxa.toString())
+  }
+
   const getCategoriaColor = (categorias: string) => {
     if (categorias.includes('HELA')) return 'bg-purple-600'
     if (categorias.includes('CARRYS')) return 'bg-blue-600'
@@ -200,8 +220,49 @@ export default function ProjecaoPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">📊 Projeção de Ganhos</h1>
-          <p className="text-gray-600">Acompanhe os ganhos realizados e projetados de cada jogador</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">📊 Projeção de Ganhos</h1>
+              <p className="text-gray-600">Acompanhe os ganhos realizados e projetados de cada jogador</p>
+            </div>
+            
+            {/* Configuração de Taxa de Conversão */}
+            <div className="bg-white p-4 rounded-lg border-2 border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div>
+                  <label className="text-xs text-gray-600 font-semibold mb-1 block">
+                    💱 Taxa de Conversão
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">1kk =</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={taxaConversao}
+                      onChange={(e) => salvarTaxaConversao(parseFloat(e.target.value) || 0)}
+                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm font-semibold"
+                    />
+                    <span className="text-sm text-gray-600">reais</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    1b = R$ {(taxaConversao * 1000).toFixed(2)}
+                  </div>
+                </div>
+                
+                <div className="border-l border-gray-300 pl-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={mostrarEmReais}
+                      onChange={(e) => setMostrarEmReais(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Mostrar em R$</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Estatísticas Gerais */}
@@ -213,7 +274,12 @@ export default function ProjecaoPage() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Ganhos Concluídos</div>
-                <div className="text-2xl font-bold text-gray-900">{formatarValor(totalGanhosConcluidos)}</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {mostrarEmReais ? formatarValorReais(totalGanhosConcluidos) : formatarValor(totalGanhosConcluidos)}
+                </div>
+                {mostrarEmReais && (
+                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalGanhosConcluidos)}</div>
+                )}
               </div>
             </div>
           </Card>
@@ -225,7 +291,12 @@ export default function ProjecaoPage() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Projeção Total</div>
-                <div className="text-2xl font-bold text-gray-900">{formatarValor(totalProjecao)}</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {mostrarEmReais ? formatarValorReais(totalProjecao) : formatarValor(totalProjecao)}
+                </div>
+                {mostrarEmReais && (
+                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalProjecao)}</div>
+                )}
               </div>
             </div>
           </Card>
@@ -237,7 +308,12 @@ export default function ProjecaoPage() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Próximos 7 dias</div>
-                <div className="text-2xl font-bold text-gray-900">{formatarValor(totalProjecaoSemana)}</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {mostrarEmReais ? formatarValorReais(totalProjecaoSemana) : formatarValor(totalProjecaoSemana)}
+                </div>
+                {mostrarEmReais && (
+                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalProjecaoSemana)}</div>
+                )}
               </div>
             </div>
           </Card>
@@ -249,7 +325,12 @@ export default function ProjecaoPage() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Próximos 30 dias</div>
-                <div className="text-2xl font-bold text-gray-900">{formatarValor(totalProjecaoMes)}</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {mostrarEmReais ? formatarValorReais(totalProjecaoMes) : formatarValor(totalProjecaoMes)}
+                </div>
+                {mostrarEmReais && (
+                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalProjecaoMes)}</div>
+                )}
               </div>
             </div>
           </Card>
@@ -321,35 +402,61 @@ export default function ProjecaoPage() {
                     {/* Ganhos Concluídos */}
                     <div className="bg-green-50 p-3 rounded-lg">
                       <div className="text-xs text-green-600 font-semibold mb-1">✅ Já Recebeu</div>
-                      <div className="text-2xl font-bold text-green-700">{formatarValor(projecao.ganhosConcluidos)}</div>
+                      <div className="text-2xl font-bold text-green-700">
+                        {mostrarEmReais ? formatarValorReais(projecao.ganhosConcluidos) : formatarValor(projecao.ganhosConcluidos)}
+                      </div>
+                      {mostrarEmReais && (
+                        <div className="text-xs text-green-600">{formatarValor(projecao.ganhosConcluidos)}</div>
+                      )}
                       <div className="text-xs text-green-600 mt-1">{projecao.carrysConcluidos} carrys</div>
                     </div>
 
                     {/* Projeção Total */}
                     <div className="bg-blue-50 p-3 rounded-lg">
                       <div className="text-xs text-blue-600 font-semibold mb-1">🎯 Vai Receber</div>
-                      <div className="text-2xl font-bold text-blue-700">{formatarValor(projecao.projecaoTotal)}</div>
+                      <div className="text-2xl font-bold text-blue-700">
+                        {mostrarEmReais ? formatarValorReais(projecao.projecaoTotal) : formatarValor(projecao.projecaoTotal)}
+                      </div>
+                      {mostrarEmReais && (
+                        <div className="text-xs text-blue-600">{formatarValor(projecao.projecaoTotal)}</div>
+                      )}
                       <div className="text-xs text-blue-600 mt-1">{projecao.carrysAgendados} agendados</div>
                     </div>
 
                     {/* Projeção Semana */}
                     <div className="bg-purple-50 p-3 rounded-lg">
                       <div className="text-xs text-purple-600 font-semibold mb-1">📅 Próximos 7 dias</div>
-                      <div className="text-xl font-bold text-purple-700">{formatarValor(projecao.projecaoSemana)}</div>
+                      <div className="text-xl font-bold text-purple-700">
+                        {mostrarEmReais ? formatarValorReais(projecao.projecaoSemana) : formatarValor(projecao.projecaoSemana)}
+                      </div>
+                      {mostrarEmReais && (
+                        <div className="text-xs text-purple-600">{formatarValor(projecao.projecaoSemana)}</div>
+                      )}
                     </div>
 
                     {/* Projeção Mês */}
                     <div className="bg-orange-50 p-3 rounded-lg">
                       <div className="text-xs text-orange-600 font-semibold mb-1">📆 Próximos 30 dias</div>
-                      <div className="text-xl font-bold text-orange-700">{formatarValor(projecao.projecaoMes)}</div>
+                      <div className="text-xl font-bold text-orange-700">
+                        {mostrarEmReais ? formatarValorReais(projecao.projecaoMes) : formatarValor(projecao.projecaoMes)}
+                      </div>
+                      {mostrarEmReais && (
+                        <div className="text-xs text-orange-600">{formatarValor(projecao.projecaoMes)}</div>
+                      )}
                     </div>
 
                     {/* Total Geral */}
                     <div className="bg-gray-900 p-3 rounded-lg">
                       <div className="text-xs text-gray-300 font-semibold mb-1">💰 Total Geral</div>
                       <div className="text-xl font-bold text-white">
-                        {formatarValor(projecao.ganhosConcluidos + projecao.projecaoTotal)}
+                        {mostrarEmReais 
+                          ? formatarValorReais(projecao.ganhosConcluidos + projecao.projecaoTotal)
+                          : formatarValor(projecao.ganhosConcluidos + projecao.projecaoTotal)
+                        }
                       </div>
+                      {mostrarEmReais && (
+                        <div className="text-xs text-gray-300">{formatarValor(projecao.ganhosConcluidos + projecao.projecaoTotal)}</div>
+                      )}
                       <div className="text-xs text-gray-300 mt-1">
                         {projecao.carrysConcluidos + projecao.carrysAgendados} carrys
                       </div>

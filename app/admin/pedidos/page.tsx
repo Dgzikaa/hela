@@ -569,7 +569,10 @@ export default function PedidosPage() {
           <Card hover>
             <div className="text-purple-600 text-sm font-semibold mb-1">Valor Total</div>
             <div className="text-3xl font-bold text-gray-900">
-              {pedidos.reduce((acc, p) => acc + p.valorFinal, 0)}KK
+              {(() => {
+                const total = pedidos.reduce((acc, p) => acc + p.valorTotal, 0)
+                return total >= 1000 ? `${(total / 1000).toFixed(1)}b` : `${total}kk`
+              })()}
             </div>
           </Card>
         </div>
@@ -608,15 +611,19 @@ export default function PedidosPage() {
                   <div className={`mb-3 ${isFinalizado ? 'text-gray-500' : 'text-gray-600'}`}>
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <DollarSign className="w-4 h-4" />
-                      <span>Valor: {pedido.valorTotal}KK | Final: {pedido.valorFinal}KK</span>
+                      <span className="font-semibold">
+                        Valor: {pedido.valorTotal >= 1000 ? `${(pedido.valorTotal / 1000).toFixed(1)}b` : `${pedido.valorTotal}kk`}
+                      </span>
                       {pedido.desconto > 0 && (
-                        <span className="text-green-600 font-semibold">(Desconto: -{pedido.desconto}KK)</span>
+                        <span className="text-green-600 font-semibold">
+                          (Desconto: -{pedido.desconto >= 1000 ? `${(pedido.desconto / 1000).toFixed(1)}b` : `${pedido.desconto}kk`})
+                        </span>
                       )}
                     </div>
                     {pedido.reservaPaga && (
                       <div className="flex items-center gap-2 mb-1">
                         <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                          💰 Sinal Pago: {pedido.valorReserva}KK
+                          💰 Sinal Pago: {pedido.valorReserva >= 1000 ? `${(pedido.valorReserva / 1000).toFixed(1)}b` : `${pedido.valorReserva}kk`}
                         </span>
                         {pedido.dataReserva && (
                           <span className="text-xs text-gray-500">
