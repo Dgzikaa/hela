@@ -16,6 +16,16 @@ export async function GET() {
             nome: true,
             email: true
           }
+        },
+        participacoes: {
+          include: {
+            jogador: {
+              select: {
+                id: true,
+                nick: true
+              }
+            }
+          }
         }
       },
       orderBy: { createdAt: 'desc' }
