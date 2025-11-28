@@ -220,6 +220,11 @@ model Pedido {
   observacoes              String?
   jogadoresNaoCadastrados  String? // Nomes separados por vírgula para jogadores não cadastrados
   
+  // Sistema de Reserva (pagamento antecipado)
+  reservaPaga    Boolean   @default(false)
+  valorReserva   Int       @default(0)
+  dataReserva    DateTime?
+  
   // Aprovação
   aprovadoPor      Int?
   dataAprovacao    DateTime?

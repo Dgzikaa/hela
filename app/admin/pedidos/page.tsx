@@ -39,6 +39,9 @@ interface Pedido {
   pacoteCompleto: boolean
   origem: string
   createdAt: string
+  reservaPaga: boolean
+  valorReserva: number
+  dataReserva: string | null
   itens: {
     id: number
     preco: number
@@ -127,7 +130,36 @@ export default function PedidosPage() {
       const res = await fetch('/api/pedidos')
       if (res.ok) {
         const data = await res.json()
-        setPedidos(data)
+        
+        // Ordenar pedidos: futuros primeiro (mais próximo), depois concluídos/passados
+        const pedidosOrdenados = data.sort((a: Pedido, b: Pedido) => {
+          const hoje = new Date()
+          const dataA = a.dataAgendada ? new Date(a.dataAgendada) : null
+          const dataB = b.dataAgendada ? new Date(b.dataAgendada) : null
+          
+          // Pedidos concluídos ou cancelados vão pro final
+          const aFinalizado = ['CONCLUIDO', 'CANCELADO'].includes(a.status)
+          const bFinalizado = ['CONCLUIDO', 'CANCELADO'].includes(b.status)
+          
+          if (aFinalizado && !bFinalizado) return 1
+          if (!aFinalizado && bFinalizado) return -1
+          
+          // Se ambos finalizados, ordenar por data (mais recente primeiro)
+          if (aFinalizado && bFinalizado) {
+            if (!dataA && !dataB) return 0
+            if (!dataA) return 1
+            if (!dataB) return -1
+            return dataB.getTime() - dataA.getTime()
+          }
+          
+          // Para pedidos ativos, ordenar por data (mais próximo primeiro)
+          if (!dataA && !dataB) return 0
+          if (!dataA) return 1
+          if (!dataB) return -1
+          return dataA.getTime() - dataB.getTime()
+        })
+        
+        setPedidos(pedidosOrdenados)
       }
     } catch (error) {
       console.error('Erro ao buscar pedidos:', error)
@@ -301,7 +333,7 @@ export default function PedidosPage() {
           precoCustomizado: false,
           bossesPrecos: {},
           numeroCompradores: 1,
-          compradores: [{ nome: '', contato: '', bossesIds: [] }]
+          compradores: [{ nome: '', contato: '', bossesIds: [], pacoteCompleto: false, conquistaSemMorrer: false }]
         })
         fetchPedidos()
       } else {
@@ -544,29 +576,67 @@ export default function PedidosPage() {
 
         {/* Lista de Pedidos */}
         <div className="space-y-4">
-          {pedidos.map(pedido => (
-            <Card key={pedido.id} hover>
+          {pedidos.map(pedido => {
+            // Verificar se o pedido está concluído ou cancelado
+            const isFinalizado = ['CONCLUIDO', 'CANCELADO'].includes(pedido.status)
+            const dataAgendada = pedido.dataAgendada ? new Date(pedido.dataAgendada) : null
+            const hoje = new Date()
+            const isPast = dataAgendada && dataAgendada < hoje && !isFinalizado
+            
+            return (
+            <Card 
+              key={pedido.id} 
+              hover 
+              className={isFinalizado ? 'opacity-60 border-l-4 border-l-gray-400' : isPast ? 'border-l-4 border-l-yellow-500' : ''}
+            >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold text-gray-900">{pedido.nomeCliente}</h3>
+                    <h3 className={`text-xl font-bold ${isFinalizado ? 'text-gray-500' : 'text-gray-900'}`}>
+                      {pedido.nomeCliente}
+                    </h3>
                     {getStatusBadge(pedido.status)}
                     <Badge variant="default">{pedido.origem}</Badge>
+                    {isFinalizado && (
+                      <Badge variant="default">✓ Finalizado</Badge>
+                    )}
+                    {isPast && !isFinalizado && (
+                      <Badge variant="warning">⚠️ Data passada</Badge>
+                    )}
                   </div>
                   
-                  <div className="text-gray-600 mb-3">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className={`mb-3 ${isFinalizado ? 'text-gray-500' : 'text-gray-600'}`}>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <DollarSign className="w-4 h-4" />
                       <span>Valor: {pedido.valorTotal}KK | Final: {pedido.valorFinal}KK</span>
                       {pedido.desconto > 0 && (
                         <span className="text-green-600 font-semibold">(Desconto: -{pedido.desconto}KK)</span>
                       )}
                     </div>
+                    {pedido.reservaPaga && (
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                          💰 Sinal Pago: {pedido.valorReserva}KK
+                        </span>
+                        {pedido.dataReserva && (
+                          <span className="text-xs text-gray-500">
+                            em {new Date(pedido.dataReserva).toLocaleDateString('pt-BR')}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       <span>
                         {pedido.dataAgendada 
-                          ? new Date(pedido.dataAgendada).toLocaleString('pt-BR')
+                          ? new Date(pedido.dataAgendada).toLocaleString('pt-BR', {
+                              weekday: 'long',
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
                           : 'Não agendado'}
                       </span>
                     </div>
@@ -586,7 +656,7 @@ export default function PedidosPage() {
                     )}
                   </div>
 
-                  <div className="text-sm text-gray-500 font-medium">
+                  <div className={`text-sm font-medium ${isFinalizado ? 'text-gray-400' : 'text-gray-500'}`}>
                     Contato: {pedido.contatoCliente} • Criado em {new Date(pedido.createdAt).toLocaleDateString('pt-BR')}
                   </div>
                 </div>
@@ -725,7 +795,8 @@ export default function PedidosPage() {
                 </div>
               </div>
             </Card>
-          ))}
+            )
+          })}
         </div>
 
         {/* Modal Criar Pedido */}
@@ -1072,7 +1143,7 @@ export default function PedidosPage() {
                     {bosses.filter(b => b.ordem > 0).map(boss => {
                       const helaId = bosses.find(b => b.ordem === 0)?.id
                       const helaSelecionado = helaId && formData.bossesIds.includes(helaId)
-                      const desabilitado = helaSelecionado
+                      const desabilitado = !!helaSelecionado
                       
                       return (
                       <div key={boss.id}>

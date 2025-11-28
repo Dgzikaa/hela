@@ -3,17 +3,16 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { 
-  LayoutDashboard,
   ShoppingCart,
   Users,
   Calendar,
-  MessageSquare,
   Crown,
   LogOut,
   Menu,
   X,
   Gamepad2,
-  Trash2
+  Trash2,
+  TrendingUp
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -24,11 +23,10 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
+  { name: 'Projeção', href: '/admin/projecao', icon: TrendingUp },
   { name: 'Calendário', href: '/admin/calendario', icon: Calendar },
   { name: 'Jogadores', href: '/admin/jogadores', icon: Gamepad2 },
-  { name: 'Leads', href: '/admin/leads', icon: MessageSquare },
   { name: 'Clientes VIP', href: '/admin/clientes', icon: Crown },
   { name: 'Usuários', href: '/admin/usuarios', icon: Users },
 ]
