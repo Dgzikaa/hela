@@ -59,7 +59,7 @@ const RUNAS = [
 // Itens >1B (valores estimados - não vendem no market)
 const FIXED_PRICES: Record<string, number> = {
   espiritoPoderoso: 2000000000,
-  espiritoLigeiro: 2200000000,
+  espiritoLigeiro: 2000000000,
   espiritoAstuto: 2800000000,
   talismaYinYang: 1000000000,
   orbeYokai: 2000000000,
