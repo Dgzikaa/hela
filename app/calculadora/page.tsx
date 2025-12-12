@@ -82,13 +82,15 @@ const CAIXA_SOMATOLOGIA_ITEMS = [
 ]
 
 // Dados dos Tesouros
+// Drops: 100% compêndios + 1 roll (12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% raro, 1% caixa)
 const TREASURES = {
   escarlate: {
     name: "Tesouro Escarlate",
     costItemKey: 'poEscarlate',
     costAmount: 100,
-    drops: [
-      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+    guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
+    extras: [
+      { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
       { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
       { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
@@ -100,8 +102,9 @@ const TREASURES = {
     name: "Tesouro Solar",
     costItemKey: 'poSolar',
     costAmount: 100,
-    drops: [
-      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+    guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
+    extras: [
+      { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
       { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
       { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
@@ -113,8 +116,9 @@ const TREASURES = {
     name: "Tesouro Verdejante",
     costItemKey: 'poVerdejante',
     costAmount: 100,
-    drops: [
-      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+    guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
+    extras: [
+      { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
       { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
       { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
@@ -126,8 +130,9 @@ const TREASURES = {
     name: "Tesouro Celeste",
     costItemKey: 'poCeleste',
     costAmount: 100,
-    drops: [
-      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+    guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
+    extras: [
+      { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
       { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
       { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
@@ -139,8 +144,9 @@ const TREASURES = {
     name: "Tesouro Oceânico",
     costItemKey: 'poOceanica',
     costAmount: 100,
-    drops: [
-      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+    guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
+    extras: [
+      { name: "Nada extra", chance: 13, quantity: 0, fixedPrice: 0 }, // 13% pois não tem caixa
       { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
       { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
@@ -151,8 +157,9 @@ const TREASURES = {
     name: "Tesouro Crepuscular",
     costItemKey: 'poCrepuscular',
     costAmount: 100,
-    drops: [
-      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+    guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
+    extras: [
+      { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
       { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
       { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
@@ -334,32 +341,42 @@ export default function CalculadoraPage() {
   }, [])
 
   // Calcula tesouros
+  // 100% compêndios + 1 roll para extras (12% nada, 70% desmembrador, etc)
   const calculateTreasureResults = () => {
     const results: Record<string, any> = {}
 
     for (const [key, treasure] of Object.entries(TREASURES)) {
-      const costPerUnit = prices[treasure.costItemKey] || 150000
+      const costPerUnit = prices[treasure.costItemKey] || 0
       const totalCost = costPerUnit * treasure.costAmount
 
-      let expectedValue = 0
-      const dropDetails = treasure.drops.map(drop => {
+      // Valor garantido dos compêndios
+      const guaranteedValue = treasure.guaranteed.quantity * treasure.guaranteed.fixedPrice
+      
+      // Valor esperado dos extras (1 roll)
+      let extrasExpectedValue = 0
+      const extraDetails = treasure.extras.map(extra => {
         let price = 0
-        if (drop.fixedPrice) price = drop.fixedPrice
-        else if (drop.fixedKey) price = FIXED_PRICES[drop.fixedKey] || 0
-        else if (drop.priceKey) price = prices[drop.priceKey] || 0
+        if (extra.fixedPrice !== undefined) price = extra.fixedPrice
+        else if (extra.fixedKey) price = FIXED_PRICES[extra.fixedKey] || 0
+        else if (extra.priceKey) price = prices[extra.priceKey] || 0
         
-        const dropValue = (drop.chance / 100) * price * drop.quantity
-        expectedValue += dropValue
-        return { ...drop, price, expectedValue: dropValue }
+        const dropValue = (extra.chance / 100) * price * extra.quantity
+        extrasExpectedValue += dropValue
+        return { ...extra, price, expectedValue: dropValue }
       })
+
+      const expectedValue = guaranteedValue + extrasExpectedValue
 
       results[key] = {
         name: treasure.name,
         totalCost,
+        guaranteedValue,
+        extrasExpectedValue,
         expectedValue,
         profit: expectedValue - totalCost,
         isWorthIt: expectedValue > totalCost,
-        drops: dropDetails
+        guaranteed: treasure.guaranteed,
+        extras: extraDetails.filter(e => e.name !== 'Nada extra')
       }
     }
 
@@ -520,11 +537,17 @@ export default function CalculadoraPage() {
 
             {/* Preços */}
             <Card className="p-4 bg-slate-800/50 border-slate-700">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm text-slate-400">Preços dos Pós de Meteorita</span>
+                {!prices.poEscarlate && <span className="text-xs text-yellow-400">⚠️ Clique em Atualizar</span>}
+              </div>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
                 {['poEscarlate', 'poSolar', 'poVerdejante', 'poCeleste', 'poOceanica', 'poCrepuscular'].map(key => (
                   <div key={key} className="text-center">
                     <div className="text-slate-500 text-xs">{key.replace('po', '')}</div>
-                    <div className="text-white font-medium">{prices[key] ? formatZeny(prices[key]) : '-'}</div>
+                    <div className={`font-medium ${prices[key] ? 'text-white' : 'text-slate-600'}`}>
+                      {prices[key] ? formatZeny(prices[key]) : '---'}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -536,9 +559,15 @@ export default function CalculadoraPage() {
                 <Card key={key} className="bg-slate-800/50 border-slate-700">
                   <div className="p-4 border-b border-slate-700 flex justify-between items-center">
                     <h3 className="font-semibold text-white">{t.name}</h3>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${t.isWorthIt ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
-                      {t.isWorthIt ? '✓ Vale' : '✗ Não'}
-                    </span>
+                    {t.totalCost > 0 ? (
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${t.isWorthIt ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                        {t.isWorthIt ? '✓ Vale' : '✗ Não'}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-slate-600/20 text-slate-400">
+                        Atualizar
+                      </span>
+                    )}
                   </div>
                   <div className="p-4 space-y-3">
                     <div className="grid grid-cols-3 gap-2 text-center text-sm">
@@ -551,10 +580,15 @@ export default function CalculadoraPage() {
                     </button>
                     {expandedCard === key && (
                       <div className="text-xs space-y-1 pt-2 border-t border-slate-700">
-                        {t.drops.map((d: any, i: number) => (
+                        <div className="flex justify-between text-emerald-400">
+                          <span>✓ {t.guaranteed.quantity}x Compêndios</span>
+                          <span>100%</span>
+                        </div>
+                        <div className="text-slate-500 text-[10px] mt-1 mb-1">+ 1 roll (12% nada):</div>
+                        {t.extras.map((d: any, i: number) => (
                           <div key={i} className="flex justify-between text-slate-400">
                             <span>{d.quantity}x {d.name}</span>
-                            <span>{d.chance}%</span>
+                            <span>{d.chance}% • {formatZeny(d.price)}</span>
                           </div>
                         ))}
                       </div>
