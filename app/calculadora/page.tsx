@@ -101,7 +101,7 @@ const TREASURES = {
   escarlate: {
     name: "Tesouro Escarlate",
     costItemKey: 'poEscarlate',
-    costAmount: 100,
+    costAmount: 400, // 400 pós de meteorita por tesouro
     guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
     extras: [
       { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
@@ -115,7 +115,7 @@ const TREASURES = {
   solar: {
     name: "Tesouro Solar",
     costItemKey: 'poSolar',
-    costAmount: 100,
+    costAmount: 400,
     guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
     extras: [
       { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
@@ -129,7 +129,7 @@ const TREASURES = {
   verdejante: {
     name: "Tesouro Verdejante",
     costItemKey: 'poVerdejante',
-    costAmount: 100,
+    costAmount: 400,
     guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
     extras: [
       { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
@@ -143,7 +143,7 @@ const TREASURES = {
   celeste: {
     name: "Tesouro Celeste",
     costItemKey: 'poCeleste',
-    costAmount: 100,
+    costAmount: 400,
     guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
     extras: [
       { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
@@ -157,7 +157,7 @@ const TREASURES = {
   oceanico: {
     name: "Tesouro Oceânico",
     costItemKey: 'poOceanica',
-    costAmount: 100,
+    costAmount: 400,
     guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
     extras: [
       { name: "Nada extra", chance: 13, quantity: 0, fixedPrice: 0 }, // 13% pois não tem caixa
@@ -170,7 +170,7 @@ const TREASURES = {
   crepuscular: {
     name: "Tesouro Crepuscular",
     costItemKey: 'poCrepuscular',
-    costAmount: 100,
+    costAmount: 400,
     guaranteed: { name: "Compêndios (4x)", quantity: 4, fixedPrice: 500000 },
     extras: [
       { name: "Nada extra", chance: 12, quantity: 0, fixedPrice: 0 },
@@ -579,7 +579,7 @@ export default function CalculadoraPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">Tesouros de Expedição</h2>
-                <p className="text-sm text-slate-400">100 Pó de Meteorita = 1 Tesouro</p>
+                <p className="text-sm text-slate-400">400 Pó de Meteorita = 1 Tesouro</p>
               </div>
               <button
                 onClick={fetchAllPrices}
