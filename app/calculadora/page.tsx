@@ -432,7 +432,7 @@ export default function CalculadoraPage() {
     }
   }
 
-  // Simula expedição (N tiradas de tesouro)
+  // Simula expedição (N tiradas de tesouro) - CÁLCULO REALISTA
   const calculateExpeditionSimulation = (treasureKey: string, count: number) => {
     const treasure = TREASURES[treasureKey as keyof typeof TREASURES]
     if (!treasure) return null
@@ -440,16 +440,16 @@ export default function CalculadoraPage() {
     const costPerUnit = prices[treasure.costItemKey] || 0
     const totalCost = costPerUnit * treasure.costAmount * count
     
-    // Garantido: compêndios
-    const guaranteedValue = treasure.guaranteed.quantity * treasure.guaranteed.fixedPrice * count
+    // Garantido: compêndios (4x por tiro, ~500k cada)
+    const compendioPrice = treasure.guaranteed.fixedPrice
+    const compendiosTotal = treasure.guaranteed.quantity * compendioPrice * count
     
-    // Extras: calcular chances
-    // 12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% raro, 1% caixa
+    // Preços dos drops
     const desmembradorPrice = prices.desmembrador || 50000
     const bencaoPrice = prices.bencaoFerreiro || 5000000
     const mestrePrice = prices.bencaoMestreFerreiro || 50000000
     
-    // Item raro específico do tesouro (2%)
+    // Item raro específico (2%)
     let raroPrice = 0
     let raroName = ''
     if (treasureKey === 'escarlate') { raroPrice = FIXED_PRICES.espiritoPoderoso; raroName = 'Espírito Poderoso' }
@@ -461,78 +461,67 @@ export default function CalculadoraPage() {
     
     const caixaPrice = FIXED_PRICES.caixaForcaExp
     
-    // Valor esperado dos extras por tirada
-    const extrasExpected = 
-      0.70 * desmembradorPrice +
-      0.10 * bencaoPrice +
-      0.05 * mestrePrice +
-      0.02 * raroPrice +
-      0.01 * caixaPrice
+    // Quantidades esperadas
+    const expectedDesmembradores = Math.floor(count * 0.70)
+    const expectedBencaos = Math.floor(count * 0.10)
+    const expectedMestres = Math.floor(count * 0.05)
     
-    const totalExtrasExpected = extrasExpected * count
-    const totalExpected = guaranteedValue + totalExtrasExpected
+    // Valores dos drops comuns
+    const desmembradoresValue = expectedDesmembradores * desmembradorPrice
+    const bencaosValue = expectedBencaos * bencaoPrice
+    const mestresValue = expectedMestres * mestrePrice
     
-    // Chances de pelo menos 1 drop raro em N tiradas
+    // RETORNO REALISTA (sem raros) - o que você PROVAVELMENTE vai ganhar
+    const retornoRealista = compendiosTotal + desmembradoresValue + bencaosValue + mestresValue
+    const lucroRealista = retornoRealista - totalCost
+    
+    // Chances de pelo menos 1 drop raro
     const chanceRaro = (1 - Math.pow(0.98, count)) * 100
     const chanceCaixa = (1 - Math.pow(0.99, count)) * 100
-    const chanceBencao = (1 - Math.pow(0.90, count)) * 100
-    const chanceMestre = (1 - Math.pow(0.95, count)) * 100
     
-    // Números esperados
-    const expectedDesmembradores = count * 0.70
-    const expectedBencaos = count * 0.10
-    const expectedMestres = count * 0.05
-    const expectedRaros = count * 0.02
-    const expectedCaixas = count * 0.01
+    // SE PEGAR RARO - quanto ganha a mais
+    const lucroComRaro = lucroRealista + raroPrice
+    const lucroComCaixa = lucroRealista + caixaPrice
     
-    // Cenários
-    // Pior: só compêndios (12% das vezes por tirada)
-    const worstCase = guaranteedValue - totalCost
-    // Normal: compêndios + desmembradores esperados
-    const normalCase = guaranteedValue + (expectedDesmembradores * desmembradorPrice) + (expectedBencaos * bencaoPrice) - totalCost
-    // Bom: normal + 1 raro
-    const goodCase = normalCase + raroPrice
-    // Melhor: normal + 1 caixa
-    const bestCase = normalCase + caixaPrice
-    
+    // Nível de risco baseado na chance de recuperar o investimento
     let riskLevel: 'alto' | 'medio' | 'baixo'
-    let recommendation: string
     
-    if (count < 10) {
-      riskLevel = 'alto'
-      recommendation = `Muito arriscado! Chance de ${raroName}: ${chanceRaro.toFixed(1)}%. Maioria das vezes só desmembrador.`
-    } else if (count < 50) {
+    if (chanceRaro < 30) {
+      riskLevel = 'alto' // Menos de 30% de chance de raro = alto risco
+    } else if (chanceRaro < 65) {
       riskLevel = 'medio'
-      recommendation = `Risco moderado. ~${expectedBencaos.toFixed(0)} Bênçãos esperadas. ${chanceRaro.toFixed(0)}% de chance de ${raroName}.`
     } else {
-      riskLevel = 'baixo'
-      recommendation = `Boas chances! ~${expectedRaros.toFixed(1)} ${raroName} esperado. ${chanceCaixa.toFixed(0)}% de caixa.`
+      riskLevel = 'baixo' // Mais de 65% de chance de pelo menos 1 raro
     }
     
     return {
       treasureName: treasure.name,
       count,
       totalCost,
-      guaranteedValue,
-      totalExpected,
-      profit: totalExpected - totalCost,
+      // Detalhes dos drops
+      compendiosTotal,
+      expectedDesmembradores,
+      desmembradoresValue,
+      desmembradorPrice,
+      expectedBencaos,
+      bencaosValue,
+      bencaoPrice,
+      expectedMestres,
+      mestresValue,
+      mestrePrice,
+      // Retorno realista (sem raros)
+      retornoRealista,
+      lucroRealista,
+      // Chances de raros
       chanceRaro,
       chanceCaixa,
-      chanceBencao,
-      chanceMestre,
-      expectedDesmembradores,
-      expectedBencaos,
-      expectedMestres,
-      expectedRaros,
-      expectedCaixas,
       raroName,
       raroPrice,
-      worstCase,
-      normalCase,
-      goodCase,
-      bestCase,
-      riskLevel,
-      recommendation
+      caixaPrice,
+      // Se pegar raro
+      lucroComRaro,
+      lucroComCaixa,
+      riskLevel
     }
   }
 
@@ -644,73 +633,125 @@ export default function CalculadoraPage() {
                 {[10, 50, 100].map(count => {
                   const sim = calculateExpeditionSimulation(selectedTreasure, count)
                   if (!sim) return null
+                  
+                  // Calcula quantos de cada item é GARANTIDO pela matemática
+                  const garantidoDesmembradores = Math.floor(count * 0.70)
+                  const garantidoBencaos = Math.floor(count * 0.10)
+                  const garantidoMestres = Math.floor(count * 0.05)
+                  const garantidoRaros = Math.floor(count * 0.02)
+                  const garantidoCaixas = Math.floor(count * 0.01)
+                  
+                  // Valor de cada item
+                  const valorDesmembradores = garantidoDesmembradores * sim.desmembradorPrice
+                  const valorBencaos = garantidoBencaos * sim.bencaoPrice
+                  const valorMestres = garantidoMestres * sim.mestrePrice
+                  const valorRaros = garantidoRaros * sim.raroPrice
+                  const valorCaixas = garantidoCaixas * sim.caixaPrice
+                  
+                  // Retorno garantido (compêndios + drops garantidos pela %)
+                  const retornoGarantido = sim.compendiosTotal + valorDesmembradores + valorBencaos + valorMestres + valorRaros + valorCaixas
+                  const lucroGarantido = retornoGarantido - sim.totalCost
+                  
+                  // Veredicto
+                  const vale = lucroGarantido >= 0
+                  
                   return (
                     <div key={count} className={`bg-slate-900/50 rounded-lg p-4 border ${
-                      sim.riskLevel === 'baixo' ? 'border-emerald-500/30' :
-                      sim.riskLevel === 'medio' ? 'border-yellow-500/30' : 'border-red-500/30'
+                      vale ? 'border-emerald-500/30' : 'border-red-500/30'
                     }`}>
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-xl font-bold text-white">{count}x</span>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          sim.riskLevel === 'baixo' ? 'bg-emerald-500/20 text-emerald-400' :
-                          sim.riskLevel === 'medio' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
+                        <span className="text-xl font-bold text-white">{count}x Tiros</span>
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${
+                          vale ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                         }`}>
-                          {sim.riskLevel === 'baixo' ? '🟢 Seguro' : sim.riskLevel === 'medio' ? '🟡 Médio' : '🔴 Risco'}
+                          {vale ? '✓ Vale a pena' : '✗ Prejuízo'}
                         </span>
                       </div>
                       
-                      <div className="space-y-2 text-sm">
+                      {/* Investimento */}
+                      <div className="bg-slate-800/50 rounded p-2 mb-3">
+                        <div className="text-xs text-slate-400">💰 Investimento</div>
+                        <div className="text-lg font-bold text-white">{formatZeny(sim.totalCost)}</div>
+                      </div>
+
+                      {/* Retorno Garantido - detalhado */}
+                      <div className="text-xs text-slate-400 mb-2">📦 Retorno garantido pela %:</div>
+                      <div className="space-y-1.5 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Investimento:</span>
-                          <span className="text-white">{formatZeny(sim.totalCost)}</span>
+                          <span className="text-slate-300">{count * 4}x Compêndios</span>
+                          <span className="text-white">{formatZeny(sim.compendiosTotal)}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-400">Retorno esperado:</span>
-                          <span className="text-white">{formatZeny(sim.totalExpected)}</span>
+                        {garantidoDesmembradores > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-300">{garantidoDesmembradores}x Desmembrador</span>
+                            <span className="text-white">{formatZeny(valorDesmembradores)}</span>
+                          </div>
+                        )}
+                        {garantidoBencaos > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-300">{garantidoBencaos}x Bênção</span>
+                            <span className="text-white">{formatZeny(valorBencaos)}</span>
+                          </div>
+                        )}
+                        {garantidoMestres > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-300">{garantidoMestres}x Mestre</span>
+                            <span className="text-white">{formatZeny(valorMestres)}</span>
+                          </div>
+                        )}
+                        {garantidoRaros > 0 && (
+                          <div className="flex justify-between text-yellow-400">
+                            <span>{garantidoRaros}x {sim.raroName}</span>
+                            <span>{formatZeny(valorRaros)}</span>
+                          </div>
+                        )}
+                        {garantidoCaixas > 0 && (
+                          <div className="flex justify-between text-emerald-400">
+                            <span>{garantidoCaixas}x Caixa Expedição</span>
+                            <span>{formatZeny(valorCaixas)}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Total e Lucro */}
+                      <div className="mt-3 pt-3 border-t border-slate-700">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-400">Total retorno:</span>
+                          <span className="text-white font-medium">{formatZeny(retornoGarantido)}</span>
                         </div>
-                        <div className="flex justify-between border-t border-slate-700 pt-2">
-                          <span className="text-slate-400">Lucro esperado:</span>
-                          <span className={sim.profit >= 0 ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium'}>
-                            {sim.profit >= 0 ? '+' : ''}{formatZeny(sim.profit)}
+                        <div className="flex justify-between text-lg mt-1">
+                          <span className="text-slate-400">Lucro:</span>
+                          <span className={`font-bold ${lucroGarantido >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {lucroGarantido >= 0 ? '+' : ''}{formatZeny(lucroGarantido)}
                           </span>
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-slate-700 space-y-1 text-xs">
-                        <div className="flex justify-between text-slate-400">
-                          <span>~{sim.expectedDesmembradores.toFixed(0)} Desmembradores</span>
-                          <span>70%</span>
+                      {/* Bônus se tiver sorte */}
+                      {(garantidoRaros === 0 || garantidoCaixas === 0) && (
+                        <div className="mt-3 pt-3 border-t border-slate-700 text-xs text-slate-500">
+                          <div className="text-slate-400 mb-1">🍀 Se tiver sorte:</div>
+                          {garantidoRaros === 0 && (
+                            <div className="flex justify-between">
+                              <span>+1 {sim.raroName}</span>
+                              <span className="text-yellow-400">+{formatZeny(sim.raroPrice)}</span>
+                            </div>
+                          )}
+                          {garantidoCaixas === 0 && (
+                            <div className="flex justify-between">
+                              <span>+1 Caixa Expedição</span>
+                              <span className="text-emerald-400">+{formatZeny(sim.caixaPrice)}</span>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex justify-between text-slate-400">
-                          <span>~{sim.expectedBencaos.toFixed(1)} Bênçãos</span>
-                          <span>{sim.chanceBencao.toFixed(0)}% ≥1</span>
-                        </div>
-                        <div className="flex justify-between text-slate-400">
-                          <span>~{sim.expectedMestres.toFixed(1)} Mestres</span>
-                          <span>{sim.chanceMestre.toFixed(0)}% ≥1</span>
-                        </div>
-                        <div className="flex justify-between text-yellow-400">
-                          <span>~{sim.expectedRaros.toFixed(2)} {sim.raroName.split(' ')[0]}</span>
-                          <span>{sim.chanceRaro.toFixed(0)}% ≥1</span>
-                        </div>
-                        <div className="flex justify-between text-emerald-400">
-                          <span>~{sim.expectedCaixas.toFixed(2)} Caixas</span>
-                          <span>{sim.chanceCaixa.toFixed(0)}% ≥1</span>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 pt-3 border-t border-slate-700 text-xs text-slate-500">
-                        <div>Pior: {formatZeny(sim.worstCase)}</div>
-                        <div>Normal: {formatZeny(sim.normalCase)}</div>
-                        <div className="text-emerald-400">+Raro: {formatZeny(sim.goodCase)}</div>
-                      </div>
+                      )}
                     </div>
                   )
                 })}
               </div>
 
               <p className="text-xs text-slate-500 mt-4">
-                * Drops: 12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% {expSimulation?.raroName || 'raro'}, 1% caixa
+                * Drops extras (além dos compêndios): 12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% {treasureResults[selectedTreasure]?.extras?.find((e: any) => e.name?.includes('Espírito') || e.name?.includes('Orbe') || e.name?.includes('Garra') || e.name?.includes('Talismã'))?.name || 'raro'}, 1% caixa
               </p>
             </Card>
 
