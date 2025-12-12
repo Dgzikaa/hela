@@ -258,6 +258,8 @@ export default function CalculadoraPage() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const [showRunas, setShowRunas] = useState(false)
   const [simCount, setSimCount] = useState(10)
+  const [expSimCount, setExpSimCount] = useState(10)
+  const [selectedTreasure, setSelectedTreasure] = useState('escarlate')
 
   // Busca TODOS os preços do Supabase
   const fetchAllPrices = useCallback(async () => {
@@ -430,9 +432,114 @@ export default function CalculadoraPage() {
     }
   }
 
+  // Simula expedição (N tiradas de tesouro)
+  const calculateExpeditionSimulation = (treasureKey: string, count: number) => {
+    const treasure = TREASURES[treasureKey as keyof typeof TREASURES]
+    if (!treasure) return null
+    
+    const costPerUnit = prices[treasure.costItemKey] || 0
+    const totalCost = costPerUnit * treasure.costAmount * count
+    
+    // Garantido: compêndios
+    const guaranteedValue = treasure.guaranteed.quantity * treasure.guaranteed.fixedPrice * count
+    
+    // Extras: calcular chances
+    // 12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% raro, 1% caixa
+    const desmembradorPrice = prices.desmembrador || 50000
+    const bencaoPrice = prices.bencaoFerreiro || 5000000
+    const mestrePrice = prices.bencaoMestreFerreiro || 50000000
+    
+    // Item raro específico do tesouro (2%)
+    let raroPrice = 0
+    let raroName = ''
+    if (treasureKey === 'escarlate') { raroPrice = FIXED_PRICES.espiritoPoderoso; raroName = 'Espírito Poderoso' }
+    if (treasureKey === 'solar') { raroPrice = FIXED_PRICES.talismaYinYang; raroName = 'Talismã Yin Yang' }
+    if (treasureKey === 'verdejante') { raroPrice = FIXED_PRICES.orbeYokai; raroName = 'Orbe de Yokai' }
+    if (treasureKey === 'celeste') { raroPrice = FIXED_PRICES.garraPrata; raroName = 'Garra de Prata' }
+    if (treasureKey === 'oceanico') { raroPrice = FIXED_PRICES.espiritoAstuto; raroName = 'Espírito Astuto' }
+    if (treasureKey === 'crepuscular') { raroPrice = FIXED_PRICES.espiritoLigeiro; raroName = 'Espírito Ligeiro' }
+    
+    const caixaPrice = FIXED_PRICES.caixaForcaExp
+    
+    // Valor esperado dos extras por tirada
+    const extrasExpected = 
+      0.70 * desmembradorPrice +
+      0.10 * bencaoPrice +
+      0.05 * mestrePrice +
+      0.02 * raroPrice +
+      0.01 * caixaPrice
+    
+    const totalExtrasExpected = extrasExpected * count
+    const totalExpected = guaranteedValue + totalExtrasExpected
+    
+    // Chances de pelo menos 1 drop raro em N tiradas
+    const chanceRaro = (1 - Math.pow(0.98, count)) * 100
+    const chanceCaixa = (1 - Math.pow(0.99, count)) * 100
+    const chanceBencao = (1 - Math.pow(0.90, count)) * 100
+    const chanceMestre = (1 - Math.pow(0.95, count)) * 100
+    
+    // Números esperados
+    const expectedDesmembradores = count * 0.70
+    const expectedBencaos = count * 0.10
+    const expectedMestres = count * 0.05
+    const expectedRaros = count * 0.02
+    const expectedCaixas = count * 0.01
+    
+    // Cenários
+    // Pior: só compêndios (12% das vezes por tirada)
+    const worstCase = guaranteedValue - totalCost
+    // Normal: compêndios + desmembradores esperados
+    const normalCase = guaranteedValue + (expectedDesmembradores * desmembradorPrice) + (expectedBencaos * bencaoPrice) - totalCost
+    // Bom: normal + 1 raro
+    const goodCase = normalCase + raroPrice
+    // Melhor: normal + 1 caixa
+    const bestCase = normalCase + caixaPrice
+    
+    let riskLevel: 'alto' | 'medio' | 'baixo'
+    let recommendation: string
+    
+    if (count < 10) {
+      riskLevel = 'alto'
+      recommendation = `Muito arriscado! Chance de ${raroName}: ${chanceRaro.toFixed(1)}%. Maioria das vezes só desmembrador.`
+    } else if (count < 50) {
+      riskLevel = 'medio'
+      recommendation = `Risco moderado. ~${expectedBencaos.toFixed(0)} Bênçãos esperadas. ${chanceRaro.toFixed(0)}% de chance de ${raroName}.`
+    } else {
+      riskLevel = 'baixo'
+      recommendation = `Boas chances! ~${expectedRaros.toFixed(1)} ${raroName} esperado. ${chanceCaixa.toFixed(0)}% de caixa.`
+    }
+    
+    return {
+      treasureName: treasure.name,
+      count,
+      totalCost,
+      guaranteedValue,
+      totalExpected,
+      profit: totalExpected - totalCost,
+      chanceRaro,
+      chanceCaixa,
+      chanceBencao,
+      chanceMestre,
+      expectedDesmembradores,
+      expectedBencaos,
+      expectedMestres,
+      expectedRaros,
+      expectedCaixas,
+      raroName,
+      raroPrice,
+      worstCase,
+      normalCase,
+      goodCase,
+      bestCase,
+      riskLevel,
+      recommendation
+    }
+  }
+
   const treasureResults = calculateTreasureResults()
   const somatologyResult = calculateSomatologyResult()
   const simulation = calculateSimulation(simCount)
+  const expSimulation = calculateExpeditionSimulation(selectedTreasure, expSimCount)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
@@ -511,46 +618,110 @@ export default function CalculadoraPage() {
               </div>
             </Card>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.entries(treasureResults).map(([key, t]) => (
-                <Card key={key} className="bg-slate-800/50 border-slate-700">
-                  <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-                    <h3 className="font-semibold text-white">{t.name}</h3>
-                    {t.totalCost > 0 ? (
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${t.isWorthIt ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
-                        {t.isWorthIt ? '✓ Vale' : '✗ Não'}
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-slate-600/20 text-slate-400">
-                        Atualizar
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-4 space-y-3">
-                    <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                      <div><div className="text-slate-500 text-xs">Custo</div><div className="text-white">{formatZeny(t.totalCost)}</div></div>
-                      <div><div className="text-slate-500 text-xs">Esperado</div><div className="text-white">{formatZeny(t.expectedValue)}</div></div>
-                      <div><div className="text-slate-500 text-xs">Lucro</div><div className={t.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{t.profit >= 0 ? '+' : ''}{formatZeny(t.profit)}</div></div>
-                    </div>
-                    <button onClick={() => setExpandedCard(expandedCard === key ? null : key)} className="text-xs text-slate-400 hover:text-slate-300">
-                      {expandedCard === key ? '▼ Ocultar' : '▶ Drops'}
-                    </button>
-                    {expandedCard === key && (
-                      <div className="text-xs space-y-1 pt-2 border-t border-slate-700">
-                        <div className="flex justify-between text-emerald-400">
-                          <span>✓ {t.guaranteed.quantity}x Compêndios</span>
-                          <span>100%</span>
-                        </div>
-                        <div className="text-slate-500 text-[10px] mt-1 mb-1">+ 1 roll (12% nada):</div>
-                        {t.extras.map((d: any, i: number) => (
-                          <div key={i} className="flex justify-between text-slate-400">
-                            <span>{d.quantity}x {d.name}</span>
-                            <span>{d.chance}% • {formatZeny(d.price)}</span>
-                          </div>
-                        ))}
+            {/* Simulador de Expedição */}
+            <Card className="bg-slate-800/50 border-slate-700 p-4">
+              <h3 className="text-lg font-semibold text-white mb-4">📊 Simulação de Tiradas</h3>
+              
+              {/* Seletor de tesouro */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {Object.entries(treasureResults).map(([key, t]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedTreasure(key)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      selectedTreasure === key
+                        ? 'bg-white text-slate-900'
+                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    }`}
+                  >
+                    {t.name.replace('Tesouro ', '')}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tabela comparativa: 10, 50, 100 tiros */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[10, 50, 100].map(count => {
+                  const sim = calculateExpeditionSimulation(selectedTreasure, count)
+                  if (!sim) return null
+                  return (
+                    <div key={count} className={`bg-slate-900/50 rounded-lg p-4 border ${
+                      sim.riskLevel === 'baixo' ? 'border-emerald-500/30' :
+                      sim.riskLevel === 'medio' ? 'border-yellow-500/30' : 'border-red-500/30'
+                    }`}>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-xl font-bold text-white">{count}x</span>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          sim.riskLevel === 'baixo' ? 'bg-emerald-500/20 text-emerald-400' :
+                          sim.riskLevel === 'medio' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {sim.riskLevel === 'baixo' ? '🟢 Seguro' : sim.riskLevel === 'medio' ? '🟡 Médio' : '🔴 Risco'}
+                        </span>
                       </div>
-                    )}
+                      
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Investimento:</span>
+                          <span className="text-white">{formatZeny(sim.totalCost)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Retorno esperado:</span>
+                          <span className="text-white">{formatZeny(sim.totalExpected)}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-slate-700 pt-2">
+                          <span className="text-slate-400">Lucro esperado:</span>
+                          <span className={sim.profit >= 0 ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium'}>
+                            {sim.profit >= 0 ? '+' : ''}{formatZeny(sim.profit)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-slate-700 space-y-1 text-xs">
+                        <div className="flex justify-between text-slate-400">
+                          <span>~{sim.expectedDesmembradores.toFixed(0)} Desmembradores</span>
+                          <span>70%</span>
+                        </div>
+                        <div className="flex justify-between text-slate-400">
+                          <span>~{sim.expectedBencaos.toFixed(1)} Bênçãos</span>
+                          <span>{sim.chanceBencao.toFixed(0)}% ≥1</span>
+                        </div>
+                        <div className="flex justify-between text-slate-400">
+                          <span>~{sim.expectedMestres.toFixed(1)} Mestres</span>
+                          <span>{sim.chanceMestre.toFixed(0)}% ≥1</span>
+                        </div>
+                        <div className="flex justify-between text-yellow-400">
+                          <span>~{sim.expectedRaros.toFixed(2)} {sim.raroName.split(' ')[0]}</span>
+                          <span>{sim.chanceRaro.toFixed(0)}% ≥1</span>
+                        </div>
+                        <div className="flex justify-between text-emerald-400">
+                          <span>~{sim.expectedCaixas.toFixed(2)} Caixas</span>
+                          <span>{sim.chanceCaixa.toFixed(0)}% ≥1</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-slate-700 text-xs text-slate-500">
+                        <div>Pior: {formatZeny(sim.worstCase)}</div>
+                        <div>Normal: {formatZeny(sim.normalCase)}</div>
+                        <div className="text-emerald-400">+Raro: {formatZeny(sim.goodCase)}</div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <p className="text-xs text-slate-500 mt-4">
+                * Drops: 12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% {expSimulation?.raroName || 'raro'}, 1% caixa
+              </p>
+            </Card>
+
+            {/* Grid resumido */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              {Object.entries(treasureResults).map(([key, t]) => (
+                <Card key={key} className={`bg-slate-800/50 border-slate-700 p-3 text-center cursor-pointer hover:border-slate-500 transition-all ${selectedTreasure === key ? 'ring-2 ring-white' : ''}`} onClick={() => setSelectedTreasure(key)}>
+                  <div className="text-xs text-slate-400 mb-1">{t.name.replace('Tesouro ', '')}</div>
+                  <div className="text-sm text-white">{formatZeny(t.totalCost)}</div>
+                  <div className={`text-xs ${t.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {t.profit >= 0 ? '+' : ''}{formatZeny(t.profit)}/tiro
                   </div>
                 </Card>
               ))}

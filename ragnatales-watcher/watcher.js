@@ -27,9 +27,9 @@ const ITEMS_TO_SYNC = [
     { key: 'poOceanica', id: 1000402, name: 'Pó de Meteorita Oceânica' },
     { key: 'poCrepuscular', id: 1000403, name: 'Pó de Meteorita Crepuscular' },
     { key: 'almaSombria', id: 25986, name: 'Alma Sombria' },
-    { key: 'bencaoFerreiro', id: 6226, name: 'Bênção do Ferreiro' },
-    { key: 'bencaoMestreFerreiro', id: 6225, name: 'Bênção do Mestre-Ferreiro' },
-    { key: 'desmembrador', id: 1000389, name: 'Desmembrador Químico' },
+    { key: 'bencaoFerreiro', id: 6635, name: 'Bênção do Ferreiro' },
+    { key: 'bencaoMestreFerreiro', id: 1006442, name: 'Bênção do Mestre-Ferreiro' },
+    { key: 'desmembrador', id: 1600008, name: 'Desmembrador Químico' },
     { key: 'auraMente', id: 19439, name: 'Aura da Mente Corrompida' },
     { key: 'mantoAbstrato', id: 20986, name: 'Manto Abstrato' },
     { key: 'livroPerverso', id: 540042, name: 'Livro Perverso' },
@@ -109,7 +109,7 @@ async function deleteDiscordMessage(webhookUrl, messageId) {
 // Atualiza item no Supabase
 async function updateSupabase(table, data) {
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${table === 'market_prices' ? 'item_key' : 'runa_id'}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,8 +119,13 @@ async function updateSupabase(table, data) {
             },
             body: JSON.stringify(data)
         });
+        if (!response.ok) {
+            const text = await response.text();
+            console.log(`   ⚠️ Supabase ${table}: ${response.status} - ${text.slice(0, 100)}`);
+        }
         return response.ok;
     } catch (error) {
+        console.log(`   ⚠️ Supabase erro: ${error.message}`);
         return false;
     }
 }
@@ -133,17 +138,33 @@ async function syncPricesToSupabase(page) {
     
     let itemCount = 0;
     let runaCount = 0;
+    let errors = [];
     
     // Sincroniza itens gerais
+    console.log('📦 Buscando itens...');
     for (const item of ITEMS_TO_SYNC) {
         try {
             const url = `https://api.ragnatales.com.br/market/item/shopping?nameid=${item.id}`;
             const response = await page.evaluate(async (url) => {
-                const res = await fetch(url);
-                return res.json();
+                try {
+                    const res = await fetch(url);
+                    const text = await res.text();
+                    // Verifica se é JSON válido
+                    if (text.startsWith('<') || text.startsWith('<!')) {
+                        return { error: 'Cloudflare block' };
+                    }
+                    return JSON.parse(text);
+                } catch (e) {
+                    return { error: e.message };
+                }
             }, url);
 
-            if (response && response.length > 0) {
+            if (response && response.error) {
+                if (errors.length < 3) errors.push(`${item.name}: ${response.error}`);
+                continue;
+            }
+
+            if (response && Array.isArray(response) && response.length > 0) {
                 const prices = response.map(d => d.price).sort((a, b) => a - b);
                 const top5 = prices.slice(0, Math.min(5, prices.length));
                 const avgPrice = Math.round(top5.reduce((a, b) => a + b, 0) / top5.length);
@@ -157,24 +178,40 @@ async function syncPricesToSupabase(page) {
                     updated_at: new Date().toISOString()
                 });
 
-                if (updated) itemCount++;
+                if (updated) {
+                    itemCount++;
+                    console.log(`   ✓ ${item.name}: ${formatZeny(avgPrice)}`);
+                } else {
+                    errors.push(`${item.name}: Supabase error`);
+                }
             }
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 300));
         } catch (error) {
-            // silencioso
+            errors.push(`${item.name}: ${error.message}`);
         }
     }
 
     // Sincroniza runas
+    console.log('🧬 Buscando runas...');
     for (const runa of RUNAS_TO_SYNC) {
         try {
             const url = `https://api.ragnatales.com.br/market/item/shopping?nameid=${runa.id}`;
             const response = await page.evaluate(async (url) => {
-                const res = await fetch(url);
-                return res.json();
+                try {
+                    const res = await fetch(url);
+                    const text = await res.text();
+                    if (text.startsWith('<') || text.startsWith('<!')) {
+                        return { error: 'Cloudflare' };
+                    }
+                    return JSON.parse(text);
+                } catch (e) {
+                    return { error: e.message };
+                }
             }, url);
 
-            if (response && response.length > 0) {
+            if (response && response.error) continue;
+
+            if (response && Array.isArray(response) && response.length > 0) {
                 const prices = response.map(d => d.price).sort((a, b) => a - b);
                 const top5 = prices.slice(0, Math.min(5, prices.length));
                 const avgPrice = Math.round(top5.reduce((a, b) => a + b, 0) / top5.length);
@@ -189,13 +226,16 @@ async function syncPricesToSupabase(page) {
 
                 if (updated) runaCount++;
             }
-            await new Promise(r => setTimeout(r, 150));
+            await new Promise(r => setTimeout(r, 200));
         } catch (error) {
-            // silencioso
+            // silencioso para runas
         }
     }
 
-    console.log(`✅ Supabase atualizado: ${itemCount} itens, ${runaCount} runas`);
+    console.log(`\n✅ Supabase atualizado: ${itemCount} itens, ${runaCount} runas`);
+    if (errors.length > 0) {
+        console.log(`⚠️ Erros: ${errors.slice(0, 3).join(', ')}`);
+    }
     console.log(`🕐 Próxima sync em 1 hora\n`);
 }
 
