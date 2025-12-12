@@ -376,61 +376,46 @@ export default function CalculadoraPage() {
     }
   }
 
-  // SIMULADOR - Análise estatística de N tiradas
+  // SIMULADOR - Cálculo GARANTIDO pela matemática
   // Drops: 89% só runa | 10% runa+caixa | 1% runa+aura (mutuamente exclusivos)
   const calculateSimulation = (count: number) => {
     const result = calculateSomatologyResult()
     const totalCost = result.totalCost * count
-    const expectedReturn = result.expectedValue * count
-    const expectedProfit = expectedReturn - totalCost
     
-    // Chances de drops extras em N tiradas (mutuamente exclusivos)
-    // 89% nada extra, 10% caixa, 1% aura
-    const chanceAlgumExtra = 1 - Math.pow(0.89, count) // Chance de pelo menos 1 extra (caixa ou aura)
-    const chanceCaixa = 1 - Math.pow(0.90, count) // Chance de pelo menos 1 caixa
-    const chanceAura = 1 - Math.pow(0.99, count) // Chance de pelo menos 1 aura
-    const expectedCaixas = count * 0.10 // Número esperado de caixas
-    const expectedAuras = count * 0.01 // Número esperado de auras
+    // GARANTIDO pela matemática (floor = mínimo garantido)
+    const garantidoRunas = count // 100% das vezes
+    const garantidoCaixas = Math.floor(count * 0.10) // 10%
+    const garantidoAuras = Math.floor(count * 0.01) // 1%
     
-    // Análise de risco
-    let riskLevel: 'alto' | 'medio' | 'baixo'
-    let recommendation: string
+    // Valores de cada item
+    const valorRunas = result.avgRuna * garantidoRunas
+    const valorCaixas = garantidoCaixas * result.avgCaixaSomatologia
+    const valorAuras = garantidoAuras * result.auraMente
     
-    if (count < 10) {
-      riskLevel = 'alto'
-      recommendation = 'Muito arriscado! Com poucas tiradas, você depende muito da sorte. 89% de chance de não dropar nada extra.'
-    } else if (count < 50) {
-      riskLevel = 'medio'
-      recommendation = 'Risco moderado. Boa chance de pelo menos 1 caixa, mas aura ainda é sorte.'
-    } else {
-      riskLevel = 'baixo'
-      recommendation = 'Estatisticamente seguro. Deve pegar ~' + expectedCaixas.toFixed(0) + ' caixas e talvez 1 aura.'
-    }
+    // RETORNO GARANTIDO (soma dos items garantidos)
+    const retornoGarantido = valorRunas + valorCaixas + valorAuras
+    const lucroGarantido = retornoGarantido - totalCost
     
-    // Cenários
-    const worstCase = (result.avgRuna * count) - totalCost // Só runas, sem extras (89% das vezes)
-    const normalCase = (result.avgRuna * count) + (expectedCaixas * result.avgCaixaSomatologia) - totalCost // Com caixas esperadas
-    const bestCase = (result.avgRuna * count) + (expectedCaixas * result.avgCaixaSomatologia) + result.auraMente - totalCost // Com aura
+    // Veredicto baseado no garantido
+    const vale = lucroGarantido >= 0
     
     return {
       count,
       totalCost,
-      expectedReturn,
-      expectedProfit,
-      profitPercent: totalCost > 0 ? ((expectedReturn / totalCost) - 1) * 100 : 0,
-      chanceAlgumExtra: chanceAlgumExtra * 100,
-      chanceCaixa: chanceCaixa * 100,
-      chanceAura: chanceAura * 100,
-      expectedCaixas,
-      expectedAuras,
-      riskLevel,
-      recommendation,
-      worstCase,
-      normalCase,
-      bestCase,
-      isWorthIt: expectedProfit > 0,
+      // Garantidos
+      garantidoRunas,
+      garantidoCaixas,
+      garantidoAuras,
+      valorRunas,
+      valorCaixas,
+      valorAuras,
+      avgRuna: result.avgRuna,
       avgCaixaSomatologia: result.avgCaixaSomatologia,
-      auraMente: result.auraMente
+      auraMente: result.auraMente,
+      // Totais
+      retornoGarantido,
+      lucroGarantido,
+      vale
     }
   }
 
@@ -816,7 +801,7 @@ export default function CalculadoraPage() {
               </div>
             </Card>
 
-            {/* SIMULADOR */}
+            {/* SIMULADOR - mesma lógica da Expedição */}
             <Card className="bg-slate-800/50 border-slate-700">
               <div className="p-4 border-b border-slate-700">
                 <div className="flex items-center gap-2 text-white font-semibold">
@@ -840,73 +825,78 @@ export default function CalculadoraPage() {
                   ))}
                 </div>
 
-                {/* Resultado da simulação */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="bg-slate-900/50 p-3 rounded-lg">
-                    <div className="text-xs text-slate-500">Investimento</div>
-                    <div className="text-lg text-white font-semibold">{formatZeny(simulation.totalCost)}</div>
-                  </div>
-                  <div className="bg-slate-900/50 p-3 rounded-lg">
-                    <div className="text-xs text-slate-500">Retorno Esperado</div>
-                    <div className="text-lg text-white font-semibold">{formatZeny(simulation.expectedReturn)}</div>
-                  </div>
-                  <div className="bg-slate-900/50 p-3 rounded-lg">
-                    <div className="text-xs text-slate-500">Lucro Esperado</div>
-                    <div className={`text-lg font-semibold ${simulation.expectedProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {simulation.expectedProfit >= 0 ? '+' : ''}{formatZeny(simulation.expectedProfit)}
-                    </div>
-                    <div className="text-xs text-slate-500">({simulation.profitPercent.toFixed(1)}%)</div>
-                  </div>
-                  <div className="bg-slate-900/50 p-3 rounded-lg">
-                    <div className="text-xs text-slate-500">Risco</div>
-                    <div className={`text-lg font-semibold ${
-                      simulation.riskLevel === 'baixo' ? 'text-emerald-400' :
-                      simulation.riskLevel === 'medio' ? 'text-yellow-400' : 'text-red-400'
-                    }`}>
-                      {simulation.riskLevel === 'baixo' ? '🟢 Baixo' :
-                       simulation.riskLevel === 'medio' ? '🟡 Médio' : '🔴 Alto'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Chances */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-slate-900/30 p-3 rounded-lg">
-                    <div className="text-slate-400">Chance de ≥1 Caixa (10%)</div>
-                    <div className="text-emerald-400 font-medium">{simulation.chanceCaixa.toFixed(1)}%</div>
-                    <div className="text-xs text-slate-500">~{simulation.expectedCaixas.toFixed(1)} caixas • {formatZeny(simulation.avgCaixaSomatologia)} cada</div>
-                  </div>
-                  <div className="bg-slate-900/30 p-3 rounded-lg">
-                    <div className="text-slate-400">Chance de ≥1 Aura (1%)</div>
-                    <div className="text-yellow-400 font-medium">{simulation.chanceAura.toFixed(1)}%</div>
-                    <div className="text-xs text-slate-500">~{simulation.expectedAuras.toFixed(2)} auras • {formatZeny(simulation.auraMente)} cada</div>
-                  </div>
-                </div>
-
-                {/* Recomendação */}
-                <div className={`p-4 rounded-lg border ${
-                  simulation.riskLevel === 'baixo' ? 'bg-emerald-500/10 border-emerald-500/30' :
-                  simulation.riskLevel === 'medio' ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-red-500/10 border-red-500/30'
+                {/* Card principal */}
+                <div className={`bg-slate-900/50 rounded-lg p-4 border ${
+                  simulation.vale ? 'border-emerald-500/30' : 'border-red-500/30'
                 }`}>
-                  <p className="text-white">{simulation.recommendation}</p>
-                  <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
-                    <div className="text-center">
-                      <div className="text-slate-500 text-xs">Só runas (89%)</div>
-                      <div className={simulation.worstCase >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                        {simulation.worstCase >= 0 ? '+' : ''}{formatZeny(simulation.worstCase)}
-                      </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-xl font-bold text-white">{simulation.count}x Runas</span>
+                    <span className={`text-xs px-2 py-1 rounded font-medium ${
+                      simulation.vale ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                    }`}>
+                      {simulation.vale ? '✓ Vale a pena' : '✗ Prejuízo'}
+                    </span>
+                  </div>
+                  
+                  {/* Investimento */}
+                  <div className="bg-slate-800/50 rounded p-2 mb-4">
+                    <div className="text-xs text-slate-400">💰 Investimento ({simulation.count} × 9.990 almas)</div>
+                    <div className="text-lg font-bold text-white">{formatZeny(simulation.totalCost)}</div>
+                  </div>
+
+                  {/* Retorno Garantido - detalhado */}
+                  <div className="text-xs text-slate-400 mb-2">📦 Retorno garantido pela %:</div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-300">{simulation.garantidoRunas}x Runas (100%)</span>
+                      <span className="text-white">{formatZeny(simulation.valorRunas)}</span>
                     </div>
-                    <div className="text-center">
-                      <div className="text-slate-500 text-xs">+ Caixas esperadas</div>
-                      <div className={simulation.normalCase >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                        {simulation.normalCase >= 0 ? '+' : ''}{formatZeny(simulation.normalCase)}
+                    {simulation.garantidoCaixas > 0 && (
+                      <div className="flex justify-between text-emerald-400">
+                        <span>{simulation.garantidoCaixas}x Caixa Somatologia (10%)</span>
+                        <span>{formatZeny(simulation.valorCaixas)}</span>
                       </div>
+                    )}
+                    {simulation.garantidoAuras > 0 && (
+                      <div className="flex justify-between text-yellow-400">
+                        <span>{simulation.garantidoAuras}x Aura da Mente (1%)</span>
+                        <span>{formatZeny(simulation.valorAuras)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Total e Lucro */}
+                  <div className="mt-4 pt-4 border-t border-slate-700">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">Total retorno:</span>
+                      <span className="text-white font-medium">{formatZeny(simulation.retornoGarantido)}</span>
                     </div>
-                    <div className="text-center">
-                      <div className="text-slate-500 text-xs">+ Aura (sorte!)</div>
-                      <div className="text-emerald-400">+{formatZeny(simulation.bestCase)}</div>
+                    <div className="flex justify-between text-lg mt-1">
+                      <span className="text-slate-400">Lucro:</span>
+                      <span className={`font-bold ${simulation.lucroGarantido >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {simulation.lucroGarantido >= 0 ? '+' : ''}{formatZeny(simulation.lucroGarantido)}
+                      </span>
                     </div>
                   </div>
+
+                  {/* Bônus se tiver sorte */}
+                  {(simulation.garantidoCaixas === 0 || simulation.garantidoAuras === 0) && (
+                    <div className="mt-4 pt-4 border-t border-slate-700 text-xs text-slate-500">
+                      <div className="text-slate-400 mb-1">🍀 Se tiver sorte:</div>
+                      {simulation.garantidoCaixas === 0 && (
+                        <div className="flex justify-between">
+                          <span>+1 Caixa Somatologia</span>
+                          <span className="text-emerald-400">+{formatZeny(simulation.avgCaixaSomatologia)}</span>
+                        </div>
+                      )}
+                      {simulation.garantidoAuras === 0 && (
+                        <div className="flex justify-between">
+                          <span>+1 Aura da Mente</span>
+                          <span className="text-yellow-400">+{formatZeny(simulation.auraMente)}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
