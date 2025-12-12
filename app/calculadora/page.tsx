@@ -67,19 +67,27 @@ const FIXED_PRICES: Record<string, number> = {
   caixaForcaExp: 3500000000,
 }
 
+// Aura da Mente Corrompida - drop SEPARADO (1%), não da caixa
+const AURA_MENTE_ID = 19439
+
 // Itens da Caixa de Somatologia - buscar do market
+// Estimativa: média de 200kk-500kk dependendo do mercado
 const CAIXA_SOMATOLOGIA_ITEMS = [
-  { id: 19439, name: 'Aura da Mente Corrompida', key: 'auraMente' },
-  { id: 20986, name: 'Manto Abstrato', key: 'mantoAbstrato' },
-  { id: 540042, name: 'Livro Perverso', key: 'livroPerverso' },
-  { id: 1837, name: 'Garra de Ferro', key: 'garraFerro' },
-  { id: 28767, name: 'Jack Estripadora', key: 'jackEstripadora' },
-  { id: 5985, name: 'Máscara da Nobreza', key: 'mascaraNobreza' },
-  { id: 18752, name: 'Livro Amaldiçoado', key: 'livroAmaldicoado' },
-  { id: 19379, name: 'Quepe do General', key: 'quepeGeneral' },
-  { id: 5905, name: 'Chapéu de Maestro', key: 'chapeuMaestro' },
+  { id: 20986, name: 'Manto Abstrato', key: 'mantoAbstrato' },          // ~105kk
+  { id: 540042, name: 'Livro Perverso', key: 'livroPerverso' },         // ~21kk
+  { id: 1837, name: 'Garra de Ferro', key: 'garraFerro' },              // ~23kk
+  { id: 28767, name: 'Jack Estripadora', key: 'jackEstripadora' },       // ~121kk
+  { id: 5985, name: 'Máscara da Nobreza', key: 'mascaraNobreza' },       // ~2.4kk
+  { id: 18752, name: 'Livro Amaldiçoado', key: 'livroAmaldicoado' },     // ~31kk
+  { id: 19379, name: 'Quepe do General', key: 'quepeGeneral' },          // ~33kk
+  { id: 5905, name: 'Chapéu de Maestro', key: 'chapeuMaestro' },         // ~696kk (raro!)
   // Couraça de Senshi = vale nada (não incluir)
+  // Faltam: Botas de Teste (1B+), Botas Capricórnio, Palheta Elunium, Anel Júpiter (1.4B), Luvas Corrida
 ]
+
+// Média estimada da caixa considerando todos os itens (incluindo os caros >1B)
+// Com os raros: (105+21+23+121+2.4+31+33+696+1000+100+50+1400+100) / 13 ≈ 280kk
+const CAIXA_SOMATOLOGIA_FALLBACK = 300000000 // 300kk de média estimada
 
 // Dados dos Tesouros
 // Drops: 100% compêndios + 1 roll (12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% raro, 1% caixa)
@@ -352,7 +360,7 @@ export default function CalculadoraPage() {
     const almaCost = prices.almaSombria || 9500
     const totalCost = almaCost * 9990
     const avgRuna = prices.avgRuna || 15000000
-    const avgCaixaSomatologia = prices.avgCaixaSomatologia || 500000000
+    const avgCaixaSomatologia = prices.avgCaixaSomatologia || CAIXA_SOMATOLOGIA_FALLBACK
     const auraMente = prices.auraMente || 5000000000
     
     // 100% runa sempre
