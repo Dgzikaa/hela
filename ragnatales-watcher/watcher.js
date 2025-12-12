@@ -39,6 +39,9 @@ const ITEMS_TO_SYNC = [
     { key: 'livroAmaldicoado', id: 18752, name: 'Livro Amaldiçoado' },
     { key: 'quepeGeneral', id: 19379, name: 'Quepe do General' },
     { key: 'chapeuMaestro', id: 5905, name: 'Chapéu de Maestro' },
+    { key: 'botasCapricornio', id: 470010, name: 'Botas de Capricórnio' },
+    { key: 'palhetaElunium', id: 490141, name: 'Palheta de Elunium' },
+    { key: 'luvasCorrida', id: 2935, name: 'Luvas de Corrida' },
 ];
 
 // Runas para sincronizar

@@ -70,23 +70,29 @@ const FIXED_PRICES: Record<string, number> = {
 // Aura da Mente Corrompida - drop SEPARADO (1%), não da caixa
 const AURA_MENTE_ID = 19439
 
-// Itens da Caixa de Somatologia - buscar do market
-// Estimativa: média de 200kk-500kk dependendo do mercado
+// Itens da Caixa de Somatologia - buscar do market (1° item = preço mais barato)
 const CAIXA_SOMATOLOGIA_ITEMS = [
-  { id: 20986, name: 'Manto Abstrato', key: 'mantoAbstrato' },          // ~105kk
-  { id: 540042, name: 'Livro Perverso', key: 'livroPerverso' },         // ~21kk
-  { id: 1837, name: 'Garra de Ferro', key: 'garraFerro' },              // ~23kk
-  { id: 28767, name: 'Jack Estripadora', key: 'jackEstripadora' },       // ~121kk
-  { id: 5985, name: 'Máscara da Nobreza', key: 'mascaraNobreza' },       // ~2.4kk
-  { id: 18752, name: 'Livro Amaldiçoado', key: 'livroAmaldicoado' },     // ~31kk
-  { id: 19379, name: 'Quepe do General', key: 'quepeGeneral' },          // ~33kk
-  { id: 5905, name: 'Chapéu de Maestro', key: 'chapeuMaestro' },         // ~696kk (raro!)
+  { id: 20986, name: 'Manto Abstrato', key: 'mantoAbstrato' },
+  { id: 540042, name: 'Livro Perverso', key: 'livroPerverso' },
+  { id: 1837, name: 'Garra de Ferro', key: 'garraFerro' },
+  { id: 28767, name: 'Jack Estripadora', key: 'jackEstripadora' },
+  { id: 5985, name: 'Máscara da Nobreza', key: 'mascaraNobreza' },
+  { id: 18752, name: 'Livro Amaldiçoado', key: 'livroAmaldicoado' },
+  { id: 19379, name: 'Quepe do General', key: 'quepeGeneral' },
+  { id: 5905, name: 'Chapéu de Maestro', key: 'chapeuMaestro' },
+  { id: 470010, name: 'Botas de Capricórnio', key: 'botasCapricornio' },
+  { id: 490141, name: 'Palheta de Elunium', key: 'palhetaElunium' },
+  { id: 2935, name: 'Luvas de Corrida', key: 'luvasCorrida' },
   // Couraça de Senshi = vale nada (não incluir)
-  // Faltam: Botas de Teste (1B+), Botas Capricórnio, Palheta Elunium, Anel Júpiter (1.4B), Luvas Corrida
 ]
 
-// Média estimada da caixa considerando todos os itens (incluindo os caros >1B)
-// Com os raros: (105+21+23+121+2.4+31+33+696+1000+100+50+1400+100) / 13 ≈ 280kk
+// Itens >1B (não vendem no market, valores fixos)
+const CAIXA_SOMATOLOGIA_FIXED = {
+  botasTeste: 1000000000, // 1B
+  anelJupiter: 1500000000, // 1.5B
+}
+
+// Fallback se não conseguir buscar preços
 const CAIXA_SOMATOLOGIA_FALLBACK = 300000000 // 300kk de média estimada
 
 // Dados dos Tesouros
@@ -286,9 +292,12 @@ export default function CalculadoraPage() {
         supabasePrices['avgRuna'] = Math.round(supabaseRunas.reduce((a, b) => a + b.price, 0) / supabaseRunas.length)
       }
       
-      // Calcula média da caixa de somatologia
-      const caixaKeys = ['auraMente', 'mantoAbstrato', 'livroPerverso', 'garraFerro', 'jackEstripadora', 'mascaraNobreza', 'livroAmaldicoado', 'quepeGeneral', 'chapeuMaestro']
+      // Calcula média da caixa de somatologia (itens do market + fixos >1B)
+      const caixaKeys = ['mantoAbstrato', 'livroPerverso', 'garraFerro', 'jackEstripadora', 'mascaraNobreza', 'livroAmaldicoado', 'quepeGeneral', 'chapeuMaestro', 'botasCapricornio', 'palhetaElunium', 'luvasCorrida']
       const caixaPrices = caixaKeys.map(k => supabasePrices[k]).filter(p => p > 0)
+      // Adiciona itens fixos (>1B que não vendem no market)
+      caixaPrices.push(CAIXA_SOMATOLOGIA_FIXED.botasTeste) // 1B
+      caixaPrices.push(CAIXA_SOMATOLOGIA_FIXED.anelJupiter) // 1.5B
       if (caixaPrices.length > 0) {
         supabasePrices['avgCaixaSomatologia'] = Math.round(caixaPrices.reduce((a, b) => a + b, 0) / caixaPrices.length)
       }
