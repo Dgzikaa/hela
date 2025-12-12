@@ -169,6 +169,10 @@ const TREASURES = {
   }
 }
 
+// Supabase config
+const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co'
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3ZkZHNna3NieXVwdG5rZXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzU5NTksImV4cCI6MjA3ODk1MTk1OX0.wkx2__g4rFmEoiBiF-S85txtaQXK1RTDztgC3vSexp4'
+
 function formatZeny(value: number): string {
   if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
   if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
@@ -176,18 +180,62 @@ function formatZeny(value: number): string {
   return value.toLocaleString('pt-BR')
 }
 
-async function fetchItemPrice(nameid: number): Promise<{ price: number, sellers: number } | null> {
+// Busca preços do Supabase
+async function fetchPricesFromSupabase(): Promise<Record<string, number>> {
   try {
-    const response = await fetch(`https://api.ragnatales.com.br/market/item/shopping?nameid=${nameid}`)
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/market_prices?select=item_key,price`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    })
+    if (!response.ok) return {}
+    const data = await response.json()
+    const prices: Record<string, number> = {}
+    data.forEach((item: any) => {
+      if (item.price > 0) prices[item.item_key] = item.price
+    })
+    return prices
+  } catch {
+    return {}
+  }
+}
+
+// Busca runas do Supabase
+async function fetchRunasFromSupabase(): Promise<RunaPrice[]> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/runa_prices?select=runa_id,runa_name,price,sellers&order=price.desc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    })
+    if (!response.ok) return []
+    const data = await response.json()
+    return data.filter((r: any) => r.price > 0).map((r: any) => ({
+      id: r.runa_id,
+      name: r.runa_name,
+      price: r.price,
+      sellers: r.sellers || 0
+    }))
+  } catch {
+    return []
+  }
+}
+
+// Busca última atualização
+async function fetchLastUpdate(): Promise<Date | null> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/market_prices?select=updated_at&order=updated_at.desc&limit=1`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    })
     if (!response.ok) return null
     const data = await response.json()
-    if (!data || data.length === 0) return null
-    const prices = data.map((d: any) => d.price).sort((a: number, b: number) => a - b)
-    const top5 = prices.slice(0, Math.min(5, prices.length))
-    return {
-      price: Math.round(top5.reduce((a: number, b: number) => a + b, 0) / top5.length),
-      sellers: data.length
-    }
+    if (data.length > 0) return new Date(data[0].updated_at)
+    return null
   } catch {
     return null
   }
@@ -211,134 +259,44 @@ export default function CalculadoraPage() {
   const [showRunas, setShowRunas] = useState(false)
   const [simCount, setSimCount] = useState(10)
 
-  // Busca preços EXPEDIÇÃO
-  const fetchExpedicaoPrices = useCallback(async () => {
+  // Busca TODOS os preços do Supabase
+  const fetchAllPrices = useCallback(async () => {
     setLoading(true)
-    const newPrices: Record<string, number> = { ...prices }
+    setLoadingMessage('Buscando preços do Supabase...')
     
-    const items = [
-      { key: 'poEscarlate', id: ITEM_IDS.poEscarlate },
-      { key: 'poSolar', id: ITEM_IDS.poSolar },
-      { key: 'poVerdejante', id: ITEM_IDS.poVerdejante },
-      { key: 'poCeleste', id: ITEM_IDS.poCeleste },
-      { key: 'poOceanica', id: ITEM_IDS.poOceanica },
-      { key: 'poCrepuscular', id: ITEM_IDS.poCrepuscular },
-      { key: 'bencaoFerreiro', id: ITEM_IDS.bencaoFerreiro },
-      { key: 'bencaoMestreFerreiro', id: ITEM_IDS.bencaoMestreFerreiro },
-      { key: 'desmembrador', id: ITEM_IDS.desmembrador },
-    ]
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i]
-      setLoadingMessage(`${item.key} (${i + 1}/${items.length})`)
-      const result = await fetchItemPrice(item.id)
-      if (result) newPrices[item.key] = result.price
-      await new Promise(r => setTimeout(r, 300))
-    }
-
-    setPrices(newPrices)
-    setLastUpdate(new Date())
-    setLoading(false)
-    setLoadingMessage('')
-    localStorage.setItem('tigrinho-prices', JSON.stringify({ prices: newPrices, date: new Date().toISOString() }))
-  }, [prices])
-
-  // Busca preços SOMATOLOGIA
-  const fetchSomatologiaPrices = useCallback(async () => {
-    setLoading(true)
-    const newPrices: Record<string, number> = { ...prices }
+    const supabasePrices = await fetchPricesFromSupabase()
+    const supabaseRunas = await fetchRunasFromSupabase()
+    const lastUpd = await fetchLastUpdate()
     
-    // Alma Sombria
-    setLoadingMessage('Alma Sombria...')
-    const almaResult = await fetchItemPrice(ITEM_IDS.almaSombria)
-    if (almaResult) newPrices['almaSombria'] = almaResult.price
-    
-    // Aura da Mente (1% chance extra)
-    setLoadingMessage('Aura da Mente Corrompida...')
-    const auraResult = await fetchItemPrice(19439)
-    if (auraResult) newPrices['auraMente'] = auraResult.price
-    
-    // Itens da Caixa de Somatologia
-    const caixaItemPrices: number[] = []
-    for (let i = 0; i < CAIXA_SOMATOLOGIA_ITEMS.length; i++) {
-      const item = CAIXA_SOMATOLOGIA_ITEMS[i]
-      setLoadingMessage(`${item.name} (${i + 1}/${CAIXA_SOMATOLOGIA_ITEMS.length})`)
-      
-      const result = await fetchItemPrice(item.id)
-      if (result) {
-        newPrices[item.key] = result.price
-        caixaItemPrices.push(result.price)
+    if (Object.keys(supabasePrices).length > 0) {
+      // Calcula média das runas
+      if (supabaseRunas.length > 0) {
+        supabasePrices['avgRuna'] = Math.round(supabaseRunas.reduce((a, b) => a + b.price, 0) / supabaseRunas.length)
       }
       
-      await new Promise(r => setTimeout(r, 200))
-    }
-    
-    // Média da Caixa de Somatologia (10% chance)
-    if (caixaItemPrices.length > 0) {
-      newPrices['avgCaixaSomatologia'] = Math.round(caixaItemPrices.reduce((a, b) => a + b, 0) / caixaItemPrices.length)
-    }
-    
-    // TODAS as runas
-    const newRunaPrices: RunaPrice[] = []
-    for (let i = 0; i < RUNAS.length; i++) {
-      const runa = RUNAS[i]
-      setLoadingMessage(`${runa.name} (${i + 1}/${RUNAS.length})`)
-      
-      const result = await fetchItemPrice(runa.id)
-      if (result) {
-        newRunaPrices.push({
-          id: runa.id,
-          name: runa.name,
-          price: result.price,
-          sellers: result.sellers
-        })
+      // Calcula média da caixa de somatologia
+      const caixaKeys = ['auraMente', 'mantoAbstrato', 'livroPerverso', 'garraFerro', 'jackEstripadora', 'mascaraNobreza', 'livroAmaldicoado', 'quepeGeneral', 'chapeuMaestro']
+      const caixaPrices = caixaKeys.map(k => supabasePrices[k]).filter(p => p > 0)
+      if (caixaPrices.length > 0) {
+        supabasePrices['avgCaixaSomatologia'] = Math.round(caixaPrices.reduce((a, b) => a + b, 0) / caixaPrices.length)
       }
       
-      await new Promise(r => setTimeout(r, 200))
+      setPrices(supabasePrices)
+      setRunaPrices(supabaseRunas)
+      if (lastUpd) setLastUpdate(lastUpd)
+      console.log('✅ Preços carregados do Supabase:', Object.keys(supabasePrices).length, 'itens')
+    } else {
+      console.log('⚠️ Nenhum preço encontrado no Supabase')
     }
-
-    // Média das runas
-    if (newRunaPrices.length > 0) {
-      newPrices['avgRuna'] = Math.round(newRunaPrices.reduce((a, b) => a + b.price, 0) / newRunaPrices.length)
-    }
-
-    setRunaPrices(newRunaPrices)
-    setPrices(newPrices)
-    setLastUpdate(new Date())
+    
     setLoading(false)
     setLoadingMessage('')
-    localStorage.setItem('tigrinho-runas', JSON.stringify({ 
-      prices: newPrices, 
-      runas: newRunaPrices,
-      date: new Date().toISOString() 
-    }))
-  }, [prices])
-
-  // Carrega do localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('tigrinho-prices')
-    const savedRunas = localStorage.getItem('tigrinho-runas')
-    
-    let loadedPrices: Record<string, number> = {}
-    
-    if (saved) {
-      try {
-        const { prices } = JSON.parse(saved)
-        loadedPrices = { ...loadedPrices, ...prices }
-      } catch {}
-    }
-    
-    if (savedRunas) {
-      try {
-        const { prices, runas, date } = JSON.parse(savedRunas)
-        loadedPrices = { ...loadedPrices, ...prices }
-        if (runas) setRunaPrices(runas)
-        if (date) setLastUpdate(new Date(date))
-      } catch {}
-    }
-    
-    setPrices(loadedPrices)
   }, [])
+
+  // Carrega do Supabase automaticamente
+  useEffect(() => {
+    fetchAllPrices()
+  }, [fetchAllPrices])
 
   // Calcula tesouros
   // 100% compêndios + 1 roll para extras (12% nada, 70% desmembrador, etc)
@@ -524,7 +482,7 @@ export default function CalculadoraPage() {
                 <p className="text-sm text-slate-400">100 Pó de Meteorita = 1 Tesouro</p>
               </div>
               <button
-                onClick={fetchExpedicaoPrices}
+                onClick={fetchAllPrices}
                 disabled={loading}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg disabled:opacity-50"
               >
@@ -538,8 +496,8 @@ export default function CalculadoraPage() {
             {/* Preços */}
             <Card className="p-4 bg-slate-800/50 border-slate-700">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-sm text-slate-400">Preços dos Pós de Meteorita</span>
-                {!prices.poEscarlate && <span className="text-xs text-yellow-400">⚠️ Clique em Atualizar</span>}
+                <span className="text-sm text-slate-400">Preços dos Pós de Meteorita (via Supabase)</span>
+                {!prices.poEscarlate && <span className="text-xs text-yellow-400">⚠️ Execute o sync-prices.js</span>}
               </div>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
                 {['poEscarlate', 'poSolar', 'poVerdejante', 'poCeleste', 'poOceanica', 'poCrepuscular'].map(key => (
@@ -609,7 +567,7 @@ export default function CalculadoraPage() {
                 <p className="text-sm text-slate-400">9.990 Almas = 1 Runa</p>
               </div>
               <button
-                onClick={fetchSomatologiaPrices}
+                onClick={fetchAllPrices}
                 disabled={loading}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg disabled:opacity-50"
               >
