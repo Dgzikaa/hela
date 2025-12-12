@@ -63,7 +63,7 @@ const FIXED_PRICES: Record<string, number> = {
   espiritoAstuto: 2800000000,
   talismaYinYang: 1000000000,
   orbeYokai: 2000000000,
-  garraPrata: 2000000000,
+  garraPrata: 1400000000, // 1.4B
   caixaForcaExp: 3500000000,
 }
 
