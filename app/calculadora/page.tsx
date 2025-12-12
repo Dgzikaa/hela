@@ -175,8 +175,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 function formatZeny(value: number): string {
   if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
-  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
-  if (value >= 1000) return Math.round(value / 1000) + 'K'
+  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'kk'
+  if (value >= 1000) return Math.round(value / 1000) + 'k'
   return value.toLocaleString('pt-BR')
 }
 
