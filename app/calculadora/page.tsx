@@ -65,9 +65,21 @@ const FIXED_PRICES: Record<string, number> = {
   orbeYokai: 2000000000,
   garraPrata: 2000000000,
   caixaForcaExp: 3500000000,
-  auraMenteCorreompida: 5000000000,
-  caixaSomatologia: 1000000000,
 }
+
+// Itens da Caixa de Somatologia - buscar do market
+const CAIXA_SOMATOLOGIA_ITEMS = [
+  { id: 19439, name: 'Aura da Mente Corrompida', key: 'auraMente' },
+  { id: 20986, name: 'Manto Abstrato', key: 'mantoAbstrato' },
+  { id: 540042, name: 'Livro Perverso', key: 'livroPerverso' },
+  { id: 1837, name: 'Garra de Ferro', key: 'garraFerro' },
+  { id: 28767, name: 'Jack Estripadora', key: 'jackEstripadora' },
+  { id: 5985, name: 'Máscara da Nobreza', key: 'mascaraNobreza' },
+  { id: 18752, name: 'Livro Amaldiçoado', key: 'livroAmaldicoado' },
+  { id: 19379, name: 'Quepe do General', key: 'quepeGeneral' },
+  { id: 5905, name: 'Chapéu de Maestro', key: 'chapeuMaestro' },
+  // Couraça de Senshi = vale nada (não incluir)
+]
 
 // Dados dos Tesouros
 const TREASURES = {
@@ -234,6 +246,31 @@ export default function CalculadoraPage() {
     const almaResult = await fetchItemPrice(ITEM_IDS.almaSombria)
     if (almaResult) newPrices['almaSombria'] = almaResult.price
     
+    // Aura da Mente (1% chance extra)
+    setLoadingMessage('Aura da Mente Corrompida...')
+    const auraResult = await fetchItemPrice(19439)
+    if (auraResult) newPrices['auraMente'] = auraResult.price
+    
+    // Itens da Caixa de Somatologia
+    const caixaItemPrices: number[] = []
+    for (let i = 0; i < CAIXA_SOMATOLOGIA_ITEMS.length; i++) {
+      const item = CAIXA_SOMATOLOGIA_ITEMS[i]
+      setLoadingMessage(`${item.name} (${i + 1}/${CAIXA_SOMATOLOGIA_ITEMS.length})`)
+      
+      const result = await fetchItemPrice(item.id)
+      if (result) {
+        newPrices[item.key] = result.price
+        caixaItemPrices.push(result.price)
+      }
+      
+      await new Promise(r => setTimeout(r, 200))
+    }
+    
+    // Média da Caixa de Somatologia (10% chance)
+    if (caixaItemPrices.length > 0) {
+      newPrices['avgCaixaSomatologia'] = Math.round(caixaItemPrices.reduce((a, b) => a + b, 0) / caixaItemPrices.length)
+    }
+    
     // TODAS as runas
     const newRunaPrices: RunaPrice[] = []
     for (let i = 0; i < RUNAS.length; i++) {
@@ -334,15 +371,20 @@ export default function CalculadoraPage() {
     const almaCost = prices.almaSombria || 9500
     const totalCost = almaCost * 9990
     const avgRuna = prices.avgRuna || 15000000
+    const avgCaixaSomatologia = prices.avgCaixaSomatologia || 500000000 // Média dos itens da caixa
+    const auraMente = prices.auraMente || 5000000000
     
+    // 100% runa + 10% caixa + 1% aura
     let expectedValue = avgRuna
-    expectedValue += 0.10 * FIXED_PRICES.caixaSomatologia
-    expectedValue += 0.01 * FIXED_PRICES.auraMenteCorreompida
+    expectedValue += 0.10 * avgCaixaSomatologia
+    expectedValue += 0.01 * auraMente
 
     return {
       almaCost,
       totalCost,
       avgRuna,
+      avgCaixaSomatologia,
+      auraMente,
       expectedValue,
       profit: expectedValue - totalCost,
       profitPercent: totalCost > 0 ? ((expectedValue / totalCost) - 1) * 100 : 0,
@@ -378,9 +420,9 @@ export default function CalculadoraPage() {
       recommendation = 'Estatisticamente seguro. Com muitas tiradas, o resultado tende ao esperado.'
     }
     
-    // Cenários
+    // Cenários usando preços reais
     const worstCase = (result.avgRuna * count) - totalCost // Só runas, sem extras
-    const bestCase = (result.avgRuna * count) + (count * 0.10 * FIXED_PRICES.caixaSomatologia) + (count * 0.01 * FIXED_PRICES.auraMenteCorreompida) - totalCost
+    const bestCase = (result.avgRuna * count) + (count * 0.10 * result.avgCaixaSomatologia) + (count * 0.01 * result.auraMente) - totalCost
     
     return {
       count,
@@ -396,7 +438,9 @@ export default function CalculadoraPage() {
       recommendation,
       worstCase,
       bestCase,
-      isWorthIt: expectedProfit > 0
+      isWorthIt: expectedProfit > 0,
+      avgCaixaSomatologia: result.avgCaixaSomatologia,
+      auraMente: result.auraMente
     }
   }
 
@@ -534,7 +578,7 @@ export default function CalculadoraPage() {
             {/* Info */}
             <Card className="p-4 bg-slate-800/50 border-slate-700 text-sm text-slate-400">
               <p>• 999 Alma → 1 Condensada → 10 Condensadas → <span className="text-white">1 Runa</span></p>
-              <p>• Drops: 100% Runa + <span className="text-emerald-400">10% Caixa (~1B)</span> + <span className="text-yellow-400">1% Aura (~5B)</span></p>
+              <p>• Drops: 100% Runa + <span className="text-emerald-400">10% Caixa ({prices.avgCaixaSomatologia ? formatZeny(prices.avgCaixaSomatologia) : '~500M'})</span> + <span className="text-yellow-400">1% Aura ({prices.auraMente ? formatZeny(prices.auraMente) : '~5B'})</span></p>
             </Card>
 
             {/* Resultado base */}
@@ -609,14 +653,14 @@ export default function CalculadoraPage() {
                 {/* Chances */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="bg-slate-900/30 p-3 rounded-lg">
-                    <div className="text-slate-400">Chance de ≥1 Caixa</div>
+                    <div className="text-slate-400">Chance de ≥1 Caixa (10%)</div>
                     <div className="text-emerald-400 font-medium">{simulation.chanceCaixa.toFixed(1)}%</div>
-                    <div className="text-xs text-slate-500">~{simulation.expectedCaixas.toFixed(1)} caixas esperadas</div>
+                    <div className="text-xs text-slate-500">~{simulation.expectedCaixas.toFixed(1)} caixas • {formatZeny(simulation.avgCaixaSomatologia)} cada</div>
                   </div>
                   <div className="bg-slate-900/30 p-3 rounded-lg">
-                    <div className="text-slate-400">Chance de ≥1 Aura</div>
+                    <div className="text-slate-400">Chance de ≥1 Aura (1%)</div>
                     <div className="text-yellow-400 font-medium">{simulation.chanceAura.toFixed(1)}%</div>
-                    <div className="text-xs text-slate-500">~{simulation.expectedAuras.toFixed(2)} auras esperadas</div>
+                    <div className="text-xs text-slate-500">~{simulation.expectedAuras.toFixed(2)} auras • {formatZeny(simulation.auraMente)} cada</div>
                   </div>
                 </div>
 
