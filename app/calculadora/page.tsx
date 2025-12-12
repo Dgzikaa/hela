@@ -367,17 +367,22 @@ export default function CalculadoraPage() {
   }
 
   // Calcula somatologia
+  // Drops: 100% runa + (10% caixa OU 1% aura - mutuamente exclusivos)
+  // 89% = só runa | 10% = runa + caixa | 1% = runa + aura
   const calculateSomatologyResult = () => {
     const almaCost = prices.almaSombria || 9500
     const totalCost = almaCost * 9990
     const avgRuna = prices.avgRuna || 15000000
-    const avgCaixaSomatologia = prices.avgCaixaSomatologia || 500000000 // Média dos itens da caixa
+    const avgCaixaSomatologia = prices.avgCaixaSomatologia || 500000000
     const auraMente = prices.auraMente || 5000000000
     
-    // 100% runa + 10% caixa + 1% aura
+    // 100% runa sempre
+    // + 10% chance de caixa (exclusivo com aura)
+    // + 1% chance de aura (exclusivo com caixa)
+    // Total extra: 10% + 1% = 11%, mas são mutuamente exclusivos
     let expectedValue = avgRuna
-    expectedValue += 0.10 * avgCaixaSomatologia
-    expectedValue += 0.01 * auraMente
+    expectedValue += 0.10 * avgCaixaSomatologia // 10% caixa
+    expectedValue += 0.01 * auraMente // 1% aura (no lugar da caixa quando acontece)
 
     return {
       almaCost,
@@ -393,13 +398,16 @@ export default function CalculadoraPage() {
   }
 
   // SIMULADOR - Análise estatística de N tiradas
+  // Drops: 89% só runa | 10% runa+caixa | 1% runa+aura (mutuamente exclusivos)
   const calculateSimulation = (count: number) => {
     const result = calculateSomatologyResult()
     const totalCost = result.totalCost * count
     const expectedReturn = result.expectedValue * count
     const expectedProfit = expectedReturn - totalCost
     
-    // Chances de drops extras em N tiradas
+    // Chances de drops extras em N tiradas (mutuamente exclusivos)
+    // 89% nada extra, 10% caixa, 1% aura
+    const chanceAlgumExtra = 1 - Math.pow(0.89, count) // Chance de pelo menos 1 extra (caixa ou aura)
     const chanceCaixa = 1 - Math.pow(0.90, count) // Chance de pelo menos 1 caixa
     const chanceAura = 1 - Math.pow(0.99, count) // Chance de pelo menos 1 aura
     const expectedCaixas = count * 0.10 // Número esperado de caixas
@@ -411,18 +419,19 @@ export default function CalculadoraPage() {
     
     if (count < 10) {
       riskLevel = 'alto'
-      recommendation = 'Muito arriscado! Com poucas tiradas, você depende muito da sorte.'
+      recommendation = 'Muito arriscado! Com poucas tiradas, você depende muito da sorte. 89% de chance de não dropar nada extra.'
     } else if (count < 50) {
       riskLevel = 'medio'
-      recommendation = 'Risco moderado. Começando a ter uma amostra razoável.'
+      recommendation = 'Risco moderado. Boa chance de pelo menos 1 caixa, mas aura ainda é sorte.'
     } else {
       riskLevel = 'baixo'
-      recommendation = 'Estatisticamente seguro. Com muitas tiradas, o resultado tende ao esperado.'
+      recommendation = 'Estatisticamente seguro. Deve pegar ~' + expectedCaixas.toFixed(0) + ' caixas e talvez 1 aura.'
     }
     
-    // Cenários usando preços reais
-    const worstCase = (result.avgRuna * count) - totalCost // Só runas, sem extras
-    const bestCase = (result.avgRuna * count) + (count * 0.10 * result.avgCaixaSomatologia) + (count * 0.01 * result.auraMente) - totalCost
+    // Cenários
+    const worstCase = (result.avgRuna * count) - totalCost // Só runas, sem extras (89% das vezes)
+    const normalCase = (result.avgRuna * count) + (expectedCaixas * result.avgCaixaSomatologia) - totalCost // Com caixas esperadas
+    const bestCase = (result.avgRuna * count) + (expectedCaixas * result.avgCaixaSomatologia) + result.auraMente - totalCost // Com aura
     
     return {
       count,
@@ -430,6 +439,7 @@ export default function CalculadoraPage() {
       expectedReturn,
       expectedProfit,
       profitPercent: totalCost > 0 ? ((expectedReturn / totalCost) - 1) * 100 : 0,
+      chanceAlgumExtra: chanceAlgumExtra * 100,
       chanceCaixa: chanceCaixa * 100,
       chanceAura: chanceAura * 100,
       expectedCaixas,
@@ -437,6 +447,7 @@ export default function CalculadoraPage() {
       riskLevel,
       recommendation,
       worstCase,
+      normalCase,
       bestCase,
       isWorthIt: expectedProfit > 0,
       avgCaixaSomatologia: result.avgCaixaSomatologia,
@@ -578,7 +589,9 @@ export default function CalculadoraPage() {
             {/* Info */}
             <Card className="p-4 bg-slate-800/50 border-slate-700 text-sm text-slate-400">
               <p>• 999 Alma → 1 Condensada → 10 Condensadas → <span className="text-white">1 Runa</span></p>
-              <p>• Drops: 100% Runa + <span className="text-emerald-400">10% Caixa ({prices.avgCaixaSomatologia ? formatZeny(prices.avgCaixaSomatologia) : '~500M'})</span> + <span className="text-yellow-400">1% Aura ({prices.auraMente ? formatZeny(prices.auraMente) : '~5B'})</span></p>
+              <p>• <span className="text-white">100%</span> Runa (sempre)</p>
+              <p>• <span className="text-emerald-400">10%</span> Caixa ({prices.avgCaixaSomatologia ? formatZeny(prices.avgCaixaSomatologia) : '~500M'}) <span className="text-slate-500">OU</span> <span className="text-yellow-400">1%</span> Aura ({prices.auraMente ? formatZeny(prices.auraMente) : '~5B'})</p>
+              <p className="text-xs text-slate-500 mt-1">* Caixa e Aura são mutuamente exclusivos (não dropam juntos)</p>
             </Card>
 
             {/* Resultado base */}
@@ -670,14 +683,23 @@ export default function CalculadoraPage() {
                   simulation.riskLevel === 'medio' ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-red-500/10 border-red-500/30'
                 }`}>
                   <p className="text-white">{simulation.recommendation}</p>
-                  <div className="mt-2 text-sm text-slate-400">
-                    <span>Pior cenário: </span>
-                    <span className={simulation.worstCase >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                      {simulation.worstCase >= 0 ? '+' : ''}{formatZeny(simulation.worstCase)}
-                    </span>
-                    <span className="mx-2">|</span>
-                    <span>Melhor cenário: </span>
-                    <span className="text-emerald-400">+{formatZeny(simulation.bestCase)}</span>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
+                    <div className="text-center">
+                      <div className="text-slate-500 text-xs">Só runas (89%)</div>
+                      <div className={simulation.worstCase >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                        {simulation.worstCase >= 0 ? '+' : ''}{formatZeny(simulation.worstCase)}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-slate-500 text-xs">+ Caixas esperadas</div>
+                      <div className={simulation.normalCase >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                        {simulation.normalCase >= 0 ? '+' : ''}{formatZeny(simulation.normalCase)}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-slate-500 text-xs">+ Aura (sorte!)</div>
+                      <div className="text-emerald-400">+{formatZeny(simulation.bestCase)}</div>
+                    </div>
                   </div>
                 </div>
               </div>
