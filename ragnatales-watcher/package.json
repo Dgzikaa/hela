@@ -1,0 +1,21 @@
+{
+  "name": "ragnatales-watcher",
+  "version": "1.0.0",
+  "description": "Monitor de preços do Market RagnaTales",
+  "main": "watcher.js",
+  "scripts": {
+    "start": "node watcher.js",
+    "test": "node test-api.js",
+    "search": "node search-item.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-notifier": "^10.0.1",
+    "open": "^11.0.0",
+    "puppeteer": "^24.33.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "checkIntervalMinutes": 5,
+  "alertThresholdPercent": 10,
+  "skipFirst": 1,
+  "useTopNAverage": 3,
+  "items": [
+    {
+      "nameid": 25981,
+      "name": "Âmago Sombrio",
+      "referencePrice": 61623,
+      "enabled": true
+    },
+    {
+      "nameid": 25986,
+      "name": "Alma Sombria",
+      "referencePrice": 9495,
+      "enabled": true
+    },
+    {
+      "nameid": 1000401,
+      "name": "Pó de Meteorita Celeste",
+      "referencePrice": 198990,
+      "enabled": true
+    },
+    {
+      "nameid": 1000403,
+      "name": "Pó de Meteorita Crepuscular",
+      "referencePrice": 178299,
+      "enabled": true
+    },
+    {
+      "nameid": 1000398,
+      "name": "Pó de Meteorita Escarlate",
+      "referencePrice": 189644,
+      "enabled": true
+    },
+    {
+      "nameid": 1000402,
+      "name": "Pó de Meteorita Oceânica",
+      "referencePrice": 206011,
+      "enabled": true
+    },
+    {
+      "nameid": 1000399,
+      "name": "Pó de Meteorita Solar",
+      "referencePrice": 182726,
+      "enabled": true
+    },
+    {
+      "nameid": 1000400,
+      "name": "Pó de Meteorita Verdejante",
+      "referencePrice": 191728,
+      "enabled": true
+    },
+    {
+      "nameid": 25026,
+      "name": "Essência de Batalha Concentrada",
+      "referencePrice": 2304072,
+      "enabled": true
+    },
+    {
+      "nameid": 25006,
+      "name": "Sacola de Cash",
+      "referencePrice": 2473122,
+      "enabled": true
+    }
+  ],
+  "notifications": {
+    "windows": false,
+    "sound": false,
+    "discord": {
+      "enabled": true,
+      "webhookUrl": "https://discord.com/api/webhooks/1448868435261128714/qJL-u7g8MY129EOKsdz85lhA7I1QLHlTFRaiUXTCYrvdoyzNfL3Ilg8Ncptbfg12hPt7"
+    }
+  }
+}

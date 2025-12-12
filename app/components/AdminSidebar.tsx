@@ -12,7 +12,8 @@ import {
   X,
   Gamepad2,
   Trash2,
-  TrendingUp
+  TrendingUp,
+  Dices
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -29,6 +30,7 @@ const menuItems: MenuItem[] = [
   { name: 'Jogadores', href: '/admin/jogadores', icon: Gamepad2 },
   { name: 'Clientes VIP', href: '/admin/clientes', icon: Crown },
   { name: 'Usuários', href: '/admin/usuarios', icon: Users },
+  { name: '🎰 Tigrinho', href: '/calculadora', icon: Dices },
 ]
 
 export function AdminSidebar() {
