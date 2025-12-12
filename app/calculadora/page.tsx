@@ -1,186 +1,336 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { Card } from '../components/Card'
+import { ArrowLeft, Calculator, Gem, FlaskConical, RefreshCw, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import Link from 'next/link'
 
-// Dados dos Tesouros
+// IDs dos itens - TODOS buscados do market exceto >1B
+const ITEM_IDS = {
+  // Pós de Meteorita
+  poEscarlate: 1000398,
+  poSolar: 1000399,
+  poVerdejante: 1000400,
+  poCeleste: 1000401,
+  poOceanica: 1000402,
+  poCrepuscular: 1000403,
+  // Almas
+  almaSombria: 25986,
+  // Itens dos tesouros (buscáveis no market)
+  bencaoFerreiro: 6226,
+  bencaoMestreFerreiro: 6225,
+  desmembrador: 1000389,
+  // Runas Somatológicas - TODAS buscadas do market
+  runas: [
+    { id: 17917, name: 'Runa da Vitalidade' },
+    { id: 17918, name: 'Runa da Força' },
+    { id: 17919, name: 'Runa da Agilidade' },
+    { id: 17920, name: 'Runa da Inteligência' },
+    { id: 17921, name: 'Runa da Destreza' },
+    { id: 17922, name: 'Runa da Sorte' },
+    { id: 17923, name: 'Runa do Ataque' },
+    { id: 17924, name: 'Runa da Magia' },
+    { id: 17925, name: 'Runa da Defesa' },
+    { id: 17926, name: 'Runa da Def. Mágica' },
+    { id: 17927, name: 'Runa do HP' },
+    { id: 17928, name: 'Runa do SP' },
+    { id: 17929, name: 'Runa da Velocidade' },
+    { id: 17930, name: 'Runa do Crítico' },
+    { id: 17931, name: 'Runa da Esquiva' },
+    { id: 17932, name: 'Runa da Precisão' },
+    { id: 17933, name: 'Runa do Vampirismo' },
+    { id: 17934, name: 'Runa da Cura' },
+    { id: 17935, name: 'Runa do Silêncio' },
+    { id: 17936, name: 'Runa do Congelamento' },
+    { id: 17937, name: 'Runa do Atordoamento' },
+    { id: 17938, name: 'Runa da Maldição' },
+    { id: 17939, name: 'Runa do Sono' },
+    { id: 17940, name: 'Runa da Cegueira' },
+    { id: 17941, name: 'Runa do Caos' },
+    { id: 17942, name: 'Runa do Sangramento' },
+    { id: 17943, name: 'Runa do Veneno' },
+    { id: 17944, name: 'Runa da Petrificação' },
+    { id: 17945, name: 'Runa do Fogo' },
+    { id: 17946, name: 'Runa do Gelo' },
+  ]
+}
+
+// Itens >1B que NÃO podem ser vendidos no market (valores estimados)
+const FIXED_PRICES: Record<string, number> = {
+  espiritoPoderoso: 2200000000,
+  espiritoLigeiro: 2200000000,
+  espiritoAstuto: 2800000000,
+  talismaYinYang: 1000000000,
+  orbeYokai: 2000000000,
+  garraPrata: 2000000000,
+  caixaForcaExp: 3500000000,
+  auraMenteCorreompida: 5000000000,
+  caixaSomatologia: 1000000000, // média dos itens
+}
+
+// Dados dos Tesouros de Expedição
 const TREASURES = {
   escarlate: {
     name: "Tesouro Escarlate",
-    color: "#DC143C",
-    costItemId: 1000398,
+    costItemKey: 'poEscarlate',
     costAmount: 100,
     drops: [
-      { name: "Compêndio Aleatório", chance: 100, quantity: 3, avgPrice: 500000 },
-      { name: "Compêndio do Espelho Quebrado", chance: 100, quantity: 1, avgPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, avgPrice: 50000 },
-      { name: "Bênção do Ferreiro", chance: 10, quantity: 1, avgPrice: 5000000 },
-      { name: "Bênção do Mestre-Ferreiro", chance: 5, quantity: 1, avgPrice: 50000000 },
-      { name: "Espírito Poderoso [1]", chance: 2, quantity: 1, fixedPrice: 2200000000 },
-      { name: "Caixa da Força Expedicionária", chance: 1, quantity: 1, fixedPrice: 3500000000 }
+      { name: "Compêndio (3x)", chance: 100, quantity: 3, priceKey: 'compendio', fixedPrice: 500000 },
+      { name: "Compêndio Espelho", chance: 100, quantity: 1, priceKey: 'compendio', fixedPrice: 800000 },
+      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
+      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Espírito Poderoso [1]", chance: 2, quantity: 1, fixedKey: 'espiritoPoderoso' },
+      { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   },
   solar: {
     name: "Tesouro Solar",
-    color: "#FFD700",
-    costItemId: 1000399,
+    costItemKey: 'poSolar',
     costAmount: 100,
     drops: [
-      { name: "Compêndio Aleatório", chance: 100, quantity: 3, avgPrice: 500000 },
-      { name: "Compêndio do Espelho Fragmentado", chance: 100, quantity: 1, avgPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, avgPrice: 50000 },
-      { name: "Bênção do Ferreiro", chance: 10, quantity: 1, avgPrice: 5000000 },
-      { name: "Bênção do Mestre-Ferreiro", chance: 5, quantity: 1, avgPrice: 50000000 },
-      { name: "Talismã Yin Yang", chance: 2, quantity: 1, fixedPrice: 1000000000 },
-      { name: "Caixa da Força Expedicionária", chance: 1, quantity: 1, fixedPrice: 3500000000 }
+      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
+      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
+      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
+      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Talismã Yin Yang", chance: 2, quantity: 1, fixedKey: 'talismaYinYang' },
+      { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   },
   verdejante: {
     name: "Tesouro Verdejante",
-    color: "#228B22",
-    costItemId: 1000400,
+    costItemKey: 'poVerdejante',
     costAmount: 100,
     drops: [
-      { name: "Compêndio Aleatório", chance: 100, quantity: 3, avgPrice: 500000 },
-      { name: "Compêndio do Espelho Despedaçado", chance: 100, quantity: 1, avgPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, avgPrice: 50000 },
-      { name: "Bênção do Ferreiro", chance: 10, quantity: 1, avgPrice: 5000000 },
-      { name: "Bênção do Mestre-Ferreiro", chance: 5, quantity: 1, avgPrice: 50000000 },
-      { name: "Orbe de Yokai", chance: 2, quantity: 1, fixedPrice: 2000000000 },
-      { name: "Caixa da Força Expedicionária", chance: 1, quantity: 1, fixedPrice: 3500000000 }
+      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
+      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
+      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
+      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Orbe de Yokai", chance: 2, quantity: 1, fixedKey: 'orbeYokai' },
+      { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   },
   celeste: {
     name: "Tesouro Celeste",
-    color: "#87CEEB",
-    costItemId: 1000401,
+    costItemKey: 'poCeleste',
     costAmount: 100,
     drops: [
-      { name: "Compêndio Aleatório", chance: 100, quantity: 3, avgPrice: 500000 },
-      { name: "Compêndio da Resistência Elemental", chance: 100, quantity: 1, avgPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, avgPrice: 50000 },
-      { name: "Bênção do Ferreiro", chance: 10, quantity: 1, avgPrice: 5000000 },
-      { name: "Bênção do Mestre-Ferreiro", chance: 5, quantity: 1, avgPrice: 50000000 },
-      { name: "Garra de Prata", chance: 2, quantity: 1, fixedPrice: 2000000000 },
-      { name: "Caixa da Força Expedicionária", chance: 1, quantity: 1, fixedPrice: 3500000000 }
+      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
+      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
+      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
+      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Garra de Prata", chance: 2, quantity: 1, fixedKey: 'garraPrata' },
+      { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   },
   oceanico: {
     name: "Tesouro Oceânico",
-    color: "#0077BE",
-    costItemId: 1000402,
+    costItemKey: 'poOceanica',
     costAmount: 100,
     drops: [
-      { name: "Compêndio Aleatório", chance: 100, quantity: 3, avgPrice: 500000 },
-      { name: "Compêndio da Magia Absoluta", chance: 100, quantity: 1, avgPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, avgPrice: 50000 },
-      { name: "Bênção do Ferreiro", chance: 10, quantity: 1, avgPrice: 5000000 },
-      { name: "Bênção do Mestre-Ferreiro", chance: 5, quantity: 1, avgPrice: 50000000 },
-      { name: "Espírito Astuto [1]", chance: 2, quantity: 1, fixedPrice: 2800000000 }
+      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
+      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
+      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
+      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Espírito Astuto [1]", chance: 2, quantity: 1, fixedKey: 'espiritoAstuto' }
     ]
   },
   crepuscular: {
     name: "Tesouro Crepuscular",
-    color: "#9370DB",
-    costItemId: 1000403,
+    costItemKey: 'poCrepuscular',
     costAmount: 100,
     drops: [
-      { name: "Compêndio Aleatório", chance: 100, quantity: 3, avgPrice: 500000 },
-      { name: "Compêndio da Astúcia do Atirador", chance: 100, quantity: 1, avgPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, avgPrice: 50000 },
-      { name: "Bênção do Ferreiro", chance: 10, quantity: 1, avgPrice: 5000000 },
-      { name: "Bênção do Mestre-Ferreiro", chance: 5, quantity: 1, avgPrice: 50000000 },
-      { name: "Espírito Ligeiro [1]", chance: 2, quantity: 1, fixedPrice: 2200000000 },
-      { name: "Caixa da Força Expedicionária", chance: 1, quantity: 1, fixedPrice: 3500000000 }
+      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
+      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
+      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
+      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Espírito Ligeiro [1]", chance: 2, quantity: 1, fixedKey: 'espiritoLigeiro' },
+      { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   }
 }
 
-// Preços padrão dos Pós de Meteorita (editáveis)
-const DEFAULT_METEORITE_PRICES: Record<number, number> = {
-  1000398: 140000, // Escarlate
-  1000399: 140000, // Solar
-  1000400: 165000, // Verdejante
-  1000401: 145000, // Celeste
-  1000402: 210000, // Oceânica
-  1000403: 140000, // Crepuscular
-}
-
-// Dados da Runa Somatológica
-const SOMATOLOGY = {
-  name: "Runa Somatológica",
-  color: "#8B008B",
-  costPerCondensed: 999,
-  condensedPerRune: 10,
-  totalCost: 9990,
-  avgRunaPrice: 15000000, // Média das runas (editável)
-  drops: [
-    { name: "Runa Somatológica Aleatória", chance: 100, quantity: 1 },
-    { name: "Caixa de Somatologia", chance: 10, quantity: 1, fixedPrice: 1000000000 },
-    { name: "Aura da Mente Corrompida", chance: 1, quantity: 1, fixedPrice: 5000000000 }
-  ]
-}
-
 function formatZeny(value: number): string {
-  if (value >= 1000000000) {
-    return (value / 1000000000).toFixed(2) + 'B'
-  } else if (value >= 1000000) {
-    return (value / 1000000).toFixed(1) + 'M'
-  } else if (value >= 1000) {
-    return Math.round(value / 1000) + 'K'
-  }
+  if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
+  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
+  if (value >= 1000) return Math.round(value / 1000) + 'K'
   return value.toLocaleString('pt-BR')
 }
 
-interface TreasureResult {
+async function fetchItemPrice(nameid: number): Promise<number | null> {
+  try {
+    const response = await fetch(`https://api.ragnatales.com.br/market/item/shopping?nameid=${nameid}`)
+    if (!response.ok) return null
+    const data = await response.json()
+    if (!data || data.length === 0) return null
+    const prices = data.map((d: any) => d.price).sort((a: number, b: number) => a - b)
+    const top5 = prices.slice(0, Math.min(5, prices.length))
+    return Math.round(top5.reduce((a: number, b: number) => a + b, 0) / top5.length)
+  } catch {
+    return null
+  }
+}
+
+interface RunaPrice {
+  id: number
   name: string
-  color: string
-  totalCost: number
-  expectedValue: number
-  profit: number
-  profitPercent: number
-  isWorthIt: boolean
-  drops: Array<{
-    name: string
-    chance: number
-    quantity: number
-    price: number
-    expectedValue: number
-  }>
+  price: number
+  sellers: number
 }
 
 export default function CalculadoraPage() {
-  const [meteoritePrices, setMeteoritePrices] = useState(DEFAULT_METEORITE_PRICES)
-  const [almaPrice, setAlmaPrice] = useState(9500)
-  const [avgRunaPrice, setAvgRunaPrice] = useState(15000000)
-  const [results, setResults] = useState<Record<string, TreasureResult>>({})
-  const [somatologyResult, setSomatologyResult] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState<'tesouros' | 'runas'>('tesouros')
+  const [prices, setPrices] = useState<Record<string, number>>({})
+  const [runaPrices, setRunaPrices] = useState<RunaPrice[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [activeTab, setActiveTab] = useState<'expedicao' | 'somatologia'>('expedicao')
+  const [expandedCard, setExpandedCard] = useState<string | null>(null)
+  const [showRunas, setShowRunas] = useState(false)
+
+  // Busca preços do mercado - EXPEDIÇÃO
+  const fetchExpedicaoPrices = useCallback(async () => {
+    setLoading(true)
+    const newPrices: Record<string, number> = { ...prices }
+    
+    const items = [
+      { key: 'poEscarlate', id: ITEM_IDS.poEscarlate },
+      { key: 'poSolar', id: ITEM_IDS.poSolar },
+      { key: 'poVerdejante', id: ITEM_IDS.poVerdejante },
+      { key: 'poCeleste', id: ITEM_IDS.poCeleste },
+      { key: 'poOceanica', id: ITEM_IDS.poOceanica },
+      { key: 'poCrepuscular', id: ITEM_IDS.poCrepuscular },
+      { key: 'bencaoFerreiro', id: ITEM_IDS.bencaoFerreiro },
+      { key: 'bencaoMestreFerreiro', id: ITEM_IDS.bencaoMestreFerreiro },
+      { key: 'desmembrador', id: ITEM_IDS.desmembrador },
+    ]
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      setLoadingMessage(`Buscando ${item.key}... (${i + 1}/${items.length})`)
+      const price = await fetchItemPrice(item.id)
+      if (price) newPrices[item.key] = price
+      await new Promise(r => setTimeout(r, 300))
+    }
+
+    setPrices(newPrices)
+    setLastUpdate(new Date())
+    setLoading(false)
+    setLoadingMessage('')
+    localStorage.setItem('tigrinho-expedicao', JSON.stringify({ prices: newPrices, date: new Date().toISOString() }))
+  }, [prices])
+
+  // Busca preços do mercado - SOMATOLOGIA (Almas + Runas)
+  const fetchSomatologiaPrices = useCallback(async () => {
+    setLoading(true)
+    const newPrices: Record<string, number> = { ...prices }
+    
+    // Busca Alma Sombria
+    setLoadingMessage('Buscando Alma Sombria...')
+    const almaPrice = await fetchItemPrice(ITEM_IDS.almaSombria)
+    if (almaPrice) newPrices['almaSombria'] = almaPrice
+    
+    // Busca TODAS as runas
+    const newRunaPrices: RunaPrice[] = []
+    for (let i = 0; i < ITEM_IDS.runas.length; i++) {
+      const runa = ITEM_IDS.runas[i]
+      setLoadingMessage(`Buscando ${runa.name}... (${i + 1}/${ITEM_IDS.runas.length})`)
+      
+      try {
+        const response = await fetch(`https://api.ragnatales.com.br/market/item/shopping?nameid=${runa.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data && data.length > 0) {
+            const prices = data.map((d: any) => d.price).sort((a: number, b: number) => a - b)
+            const avgPrice = Math.round(prices.slice(0, 5).reduce((a: number, b: number) => a + b, 0) / Math.min(5, prices.length))
+            newRunaPrices.push({
+              id: runa.id,
+              name: runa.name,
+              price: avgPrice,
+              sellers: data.length
+            })
+          }
+        }
+      } catch {}
+      
+      await new Promise(r => setTimeout(r, 200))
+    }
+
+    // Calcula média das runas
+    if (newRunaPrices.length > 0) {
+      const avgRuna = Math.round(newRunaPrices.reduce((a, b) => a + b.price, 0) / newRunaPrices.length)
+      newPrices['avgRuna'] = avgRuna
+    }
+
+    setRunaPrices(newRunaPrices)
+    setPrices(newPrices)
+    setLastUpdate(new Date())
+    setLoading(false)
+    setLoadingMessage('')
+    localStorage.setItem('tigrinho-somatologia', JSON.stringify({ 
+      prices: newPrices, 
+      runas: newRunaPrices,
+      date: new Date().toISOString() 
+    }))
+  }, [prices])
+
+  // Carrega do localStorage
+  useEffect(() => {
+    const expedicao = localStorage.getItem('tigrinho-expedicao')
+    const somatologia = localStorage.getItem('tigrinho-somatologia')
+    
+    let loadedPrices: Record<string, number> = {}
+    
+    if (expedicao) {
+      try {
+        const { prices } = JSON.parse(expedicao)
+        loadedPrices = { ...loadedPrices, ...prices }
+      } catch {}
+    }
+    
+    if (somatologia) {
+      try {
+        const { prices, runas, date } = JSON.parse(somatologia)
+        loadedPrices = { ...loadedPrices, ...prices }
+        if (runas) setRunaPrices(runas)
+        if (date) setLastUpdate(new Date(date))
+      } catch {}
+    }
+    
+    setPrices(loadedPrices)
+  }, [])
 
   // Calcula resultados dos tesouros
-  useEffect(() => {
-    const newResults: Record<string, TreasureResult> = {}
+  const calculateTreasureResults = () => {
+    const results: Record<string, any> = {}
 
     for (const [key, treasure] of Object.entries(TREASURES)) {
-      const costPerUnit = meteoritePrices[treasure.costItemId] || 150000
+      const costPerUnit = prices[treasure.costItemKey] || 150000
       const totalCost = costPerUnit * treasure.costAmount
 
       let expectedValue = 0
       const dropDetails = treasure.drops.map(drop => {
-        const price = drop.fixedPrice || drop.avgPrice || 0
+        let price = 0
+        if (drop.fixedPrice) {
+          price = drop.fixedPrice
+        } else if (drop.fixedKey) {
+          price = FIXED_PRICES[drop.fixedKey] || 0
+        } else if (drop.priceKey) {
+          price = prices[drop.priceKey] || 0
+        }
+        
         const dropValue = (drop.chance / 100) * price * drop.quantity
         expectedValue += dropValue
-        return {
-          name: drop.name,
-          chance: drop.chance,
-          quantity: drop.quantity,
-          price: price,
-          expectedValue: dropValue
-        }
+        return { ...drop, price, expectedValue: dropValue }
       })
 
-      newResults[key] = {
+      results[key] = {
         name: treasure.name,
-        color: treasure.color,
         totalCost,
         expectedValue,
         profit: expectedValue - totalCost,
@@ -190,274 +340,312 @@ export default function CalculadoraPage() {
       }
     }
 
-    setResults(newResults)
-  }, [meteoritePrices])
+    return results
+  }
 
   // Calcula resultado das runas
-  useEffect(() => {
-    const totalCost = almaPrice * SOMATOLOGY.totalCost
+  const calculateSomatologyResult = () => {
+    const almaCost = prices.almaSombria || 9500
+    const totalCost = almaCost * 9990
+    const avgRuna = prices.avgRuna || 15000000
     
-    let expectedValue = avgRunaPrice // 100% de chance de uma runa
-    expectedValue += 0.10 * 1000000000 // 10% Caixa de Somatologia
-    expectedValue += 0.01 * 5000000000 // 1% Aura
+    let expectedValue = avgRuna // 100% runa
+    expectedValue += 0.10 * FIXED_PRICES.caixaSomatologia // 10% Caixa
+    expectedValue += 0.01 * FIXED_PRICES.auraMenteCorreompida // 1% Aura
 
-    setSomatologyResult({
+    return {
+      almaCost,
       totalCost,
+      avgRuna,
       expectedValue,
       profit: expectedValue - totalCost,
       profitPercent: totalCost > 0 ? ((expectedValue / totalCost) - 1) * 100 : 0,
       isWorthIt: expectedValue > totalCost
-    })
-  }, [almaPrice, avgRunaPrice])
+    }
+  }
+
+  const treasureResults = calculateTreasureResults()
+  const somatologyResult = calculateSomatologyResult()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-      {/* Header */}
-      <header className="border-b border-purple-500/30 bg-black/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
-            🎰 Calculadora Tigrinho
-          </h1>
-          <p className="text-gray-400 mt-2">Descubra se vale a pena abrir tesouros e runas</p>
-        </div>
-      </header>
-
-      {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-4 mb-8">
-          <button
-            onClick={() => setActiveTab('tesouros')}
-            className={`px-6 py-3 rounded-lg font-bold transition-all ${
-              activeTab === 'tesouros'
-                ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-black'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            💎 Tesouros de Meteorita
-          </button>
-          <button
-            onClick={() => setActiveTab('runas')}
-            className={`px-6 py-3 rounded-lg font-bold transition-all ${
-              activeTab === 'runas'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            🧬 Runas Somatológicas
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                <Calculator className="w-7 h-7" />
+                Calculadora Tigrinho
+              </h1>
+              <p className="text-slate-400 text-sm">Preços em tempo real do mercado RagnaTales</p>
+            </div>
+          </div>
         </div>
 
-        {/* Tesouros Tab */}
-        {activeTab === 'tesouros' && (
-          <div>
-            {/* Preços editáveis */}
-            <div className="bg-gray-800/50 rounded-xl p-6 mb-8 border border-gray-700">
-              <h3 className="text-xl font-bold text-yellow-400 mb-4">💰 Preços dos Pós de Meteorita</h3>
-              <p className="text-gray-400 text-sm mb-4">Edite os preços conforme o mercado atual</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {Object.entries({
-                  1000398: 'Escarlate',
-                  1000399: 'Solar',
-                  1000400: 'Verdejante',
-                  1000401: 'Celeste',
-                  1000402: 'Oceânica',
-                  1000403: 'Crepuscular'
-                }).map(([id, name]) => (
-                  <div key={id} className="flex flex-col">
-                    <label className="text-sm text-gray-400 mb-1">{name}</label>
-                    <input
-                      type="number"
-                      value={meteoritePrices[Number(id)]}
-                      onChange={(e) => setMeteoritePrices(prev => ({
-                        ...prev,
-                        [Number(id)]: Number(e.target.value) || 0
-                      }))}
-                      className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white"
-                    />
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('expedicao')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
+              activeTab === 'expedicao'
+                ? 'bg-white text-slate-900'
+                : 'bg-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Gem className="w-4 h-4" />
+            Expedição
+          </button>
+          <button
+            onClick={() => setActiveTab('somatologia')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
+              activeTab === 'somatologia'
+                ? 'bg-white text-slate-900'
+                : 'bg-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            <FlaskConical className="w-4 h-4" />
+            Alma Sombria
+          </button>
+        </div>
+
+        {/* EXPEDIÇÃO TAB */}
+        {activeTab === 'expedicao' && (
+          <div className="space-y-6">
+            {/* Header + Atualizar */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Tesouros de Expedição</h2>
+                <p className="text-sm text-slate-400">100 Pó de Meteorita = 1 Tesouro</p>
+              </div>
+              <button
+                onClick={fetchExpedicaoPrices}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                Atualizar
+              </button>
+            </div>
+
+            {loading && loadingMessage && (
+              <div className="text-sm text-slate-400 flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {loadingMessage}
+              </div>
+            )}
+
+            {/* Preços dos Pós */}
+            <Card className="p-4 bg-slate-800/50 border-slate-700">
+              <h3 className="text-sm font-medium text-slate-400 mb-3">Preços dos Pós de Meteorita</h3>
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
+                {[
+                  { key: 'poEscarlate', label: 'Escarlate' },
+                  { key: 'poSolar', label: 'Solar' },
+                  { key: 'poVerdejante', label: 'Verdejante' },
+                  { key: 'poCeleste', label: 'Celeste' },
+                  { key: 'poOceanica', label: 'Oceânica' },
+                  { key: 'poCrepuscular', label: 'Crepuscular' },
+                ].map(({ key, label }) => (
+                  <div key={key} className="text-center">
+                    <div className="text-slate-500 text-xs">{label}</div>
+                    <div className="text-white font-medium">
+                      {prices[key] ? formatZeny(prices[key]) : '-'}
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
 
-            {/* Info box */}
-            <div className="bg-gray-800/30 rounded-xl p-6 mb-8 border border-yellow-500/30">
-              <h3 className="text-lg font-bold text-yellow-400 mb-2">📊 Como funciona o cálculo?</h3>
-              <p className="text-gray-400">
-                <strong>Valor Esperado</strong> = Σ(chance × preço × quantidade)<br/>
-                Se <span className="text-green-400">Valor Esperado &gt; Custo</span> → Vale a pena!<br/>
-                Se <span className="text-red-400">Valor Esperado &lt; Custo</span> → Não vale!
-              </p>
-            </div>
-
-            {/* Grid de tesouros */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.entries(results).map(([key, treasure]) => (
-                <div
-                  key={key}
-                  className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700 hover:border-gray-500 transition-all"
-                >
-                  <div 
-                    className="p-4 flex justify-between items-center"
-                    style={{ background: `linear-gradient(135deg, ${treasure.color}22, transparent)` }}
-                  >
-                    <span className="font-bold text-lg" style={{ color: treasure.color }}>
-                      {treasure.name}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+            {/* Grid de Tesouros */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(treasureResults).map(([key, treasure]) => (
+                <Card key={key} className="bg-slate-800/50 border-slate-700 overflow-hidden">
+                  <div className="p-4 border-b border-slate-700 flex justify-between items-center">
+                    <h3 className="font-semibold text-white">{treasure.name}</h3>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
                       treasure.isWorthIt 
-                        ? 'bg-green-500/20 text-green-400' 
+                        ? 'bg-emerald-500/20 text-emerald-400' 
                         : 'bg-red-500/20 text-red-400'
                     }`}>
-                      {treasure.isWorthIt ? '✓ VALE' : '✗ NÃO VALE'}
+                      {treasure.isWorthIt ? '✓ Vale' : '✗ Não'}
                     </span>
                   </div>
                   
-                  <div className="p-4 space-y-4">
-                    <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="p-4 space-y-3">
+                    <div className="grid grid-cols-3 gap-2 text-center text-sm">
                       <div>
-                        <div className="text-xs text-gray-400">Custo</div>
-                        <div className="text-orange-400 font-bold">{formatZeny(treasure.totalCost)}z</div>
+                        <div className="text-slate-500 text-xs">Custo</div>
+                        <div className="text-white font-medium">{formatZeny(treasure.totalCost)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-400">Esperado</div>
-                        <div className="text-yellow-400 font-bold">{formatZeny(treasure.expectedValue)}z</div>
+                        <div className="text-slate-500 text-xs">Esperado</div>
+                        <div className="text-white font-medium">{formatZeny(treasure.expectedValue)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-400">Lucro</div>
-                        <div className={`font-bold ${treasure.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          {treasure.profit >= 0 ? '+' : ''}{formatZeny(treasure.profit)}z
+                        <div className="text-slate-500 text-xs">Lucro</div>
+                        <div className={`font-medium ${treasure.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {treasure.profit >= 0 ? '+' : ''}{formatZeny(treasure.profit)}
                         </div>
                       </div>
                     </div>
 
-                    <details className="text-sm">
-                      <summary className="text-gray-400 cursor-pointer hover:text-gray-300">
-                        📋 Ver drops
-                      </summary>
-                      <div className="mt-2 space-y-1">
-                        {treasure.drops.map((drop, i) => (
-                          <div key={i} className="flex justify-between text-gray-500">
+                    <button
+                      onClick={() => setExpandedCard(expandedCard === key ? null : key)}
+                      className="w-full text-left text-xs text-slate-400 hover:text-slate-300"
+                    >
+                      {expandedCard === key ? '▼ Ocultar' : '▶ Ver drops'}
+                    </button>
+
+                    {expandedCard === key && (
+                      <div className="space-y-1 pt-2 border-t border-slate-700 text-xs">
+                        {treasure.drops.map((drop: any, i: number) => (
+                          <div key={i} className="flex justify-between text-slate-400">
                             <span>{drop.quantity}x {drop.name}</span>
-                            <span>{drop.chance}%</span>
+                            <span>{drop.chance}% • {formatZeny(drop.price)}</span>
                           </div>
                         ))}
                       </div>
-                    </details>
+                    )}
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           </div>
         )}
 
-        {/* Runas Tab */}
-        {activeTab === 'runas' && (
-          <div>
-            {/* Preços editáveis */}
-            <div className="bg-gray-800/50 rounded-xl p-6 mb-8 border border-purple-500/30">
-              <h3 className="text-xl font-bold text-purple-400 mb-4">💰 Preços (Edite conforme mercado)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Preço da Alma Sombria</label>
-                  <input
-                    type="number"
-                    value={almaPrice}
-                    onChange={(e) => setAlmaPrice(Number(e.target.value) || 0)}
-                    className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white w-full"
-                  />
-                  <span className="text-xs text-gray-500">Total: {(9990).toLocaleString()} almas = {formatZeny(almaPrice * 9990)}z</span>
+        {/* SOMATOLOGIA TAB */}
+        {activeTab === 'somatologia' && (
+          <div className="space-y-6">
+            {/* Header + Atualizar */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Runa Somatológica</h2>
+                <p className="text-sm text-slate-400">9.990 Almas Sombrias = 1 Runa</p>
+              </div>
+              <button
+                onClick={fetchSomatologiaPrices}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                Atualizar
+              </button>
+            </div>
+
+            {loading && loadingMessage && (
+              <div className="text-sm text-slate-400 flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {loadingMessage}
+              </div>
+            )}
+
+            {/* Info */}
+            <Card className="p-4 bg-slate-800/50 border-slate-700">
+              <div className="text-sm text-slate-400 space-y-1">
+                <p>• 999 Alma Sombria → 1 Condensada</p>
+                <p>• 10 Condensadas → 1 Runa Somatológica</p>
+                <p>• <span className="text-white">Drops:</span> 100% Runa + 10% Caixa (~1B) + 1% Aura (~5B)</p>
+              </div>
+            </Card>
+
+            {/* Resultado Principal */}
+            <Card className="bg-slate-800/50 border-slate-700 overflow-hidden">
+              <div className="p-4 border-b border-slate-700 flex justify-between items-center">
+                <h3 className="font-semibold text-white">Resultado</h3>
+                <span className={`px-3 py-1 rounded text-sm font-medium ${
+                  somatologyResult.isWorthIt 
+                    ? 'bg-emerald-500/20 text-emerald-400' 
+                    : 'bg-red-500/20 text-red-400'
+                }`}>
+                  {somatologyResult.isWorthIt ? '✓ Vale a pena' : '✗ Não vale'}
+                </span>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                {/* Preços base */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-900/50 rounded-lg p-3">
+                    <div className="text-xs text-slate-500">Alma Sombria</div>
+                    <div className="text-lg text-white font-semibold">
+                      {prices.almaSombria ? formatZeny(prices.almaSombria) : '-'}
+                    </div>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-3">
+                    <div className="text-xs text-slate-500">Média das Runas ({runaPrices.length})</div>
+                    <div className="text-lg text-white font-semibold">
+                      {prices.avgRuna ? formatZeny(prices.avgRuna) : '-'}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Média das Runas</label>
-                  <input
-                    type="number"
-                    value={avgRunaPrice}
-                    onChange={(e) => setAvgRunaPrice(Number(e.target.value) || 0)}
-                    className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white w-full"
-                  />
-                  <span className="text-xs text-gray-500">Consulte no market as 30 runas</span>
+
+                {/* Cálculo */}
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <div className="text-sm text-slate-500 mb-1">Custo (9.990 almas)</div>
+                    <div className="text-xl text-white font-semibold">{formatZeny(somatologyResult.totalCost)}</div>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <div className="text-sm text-slate-500 mb-1">Valor Esperado</div>
+                    <div className="text-xl text-white font-semibold">{formatZeny(somatologyResult.expectedValue)}</div>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-4">
+                    <div className="text-sm text-slate-500 mb-1">Lucro/Prejuízo</div>
+                    <div className={`text-xl font-semibold ${somatologyResult.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {somatologyResult.profit >= 0 ? '+' : ''}{formatZeny(somatologyResult.profit)}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      ({somatologyResult.profitPercent >= 0 ? '+' : ''}{somatologyResult.profitPercent.toFixed(1)}%)
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Card>
 
-            {/* Info box */}
-            <div className="bg-gray-800/30 rounded-xl p-6 mb-8 border border-purple-500/30">
-              <h3 className="text-lg font-bold text-purple-400 mb-2">🧬 Como funciona?</h3>
-              <p className="text-gray-400">
-                <strong>999 Alma Sombria</strong> → 1 Alma Condensada<br/>
-                <strong>10 Almas Condensadas</strong> → 1 Runa Somatológica<br/>
-                <strong>Total:</strong> 9.990 Almas Sombrias por abertura<br/><br/>
-                <strong>Drops:</strong> 100% Runa aleatória + 10% Caixa + 1% Aura
-              </p>
-            </div>
-
-            {/* Resultado */}
-            {somatologyResult && (
-              <div className="bg-gray-800/50 rounded-xl overflow-hidden border border-purple-500/30 max-w-2xl mx-auto">
-                <div className="p-6 bg-gradient-to-r from-purple-900/50 to-pink-900/50 flex justify-between items-center">
-                  <span className="font-bold text-2xl text-purple-300">🧬 Runa Somatológica</span>
-                  <span className={`px-4 py-2 rounded-full font-bold ${
-                    somatologyResult.isWorthIt 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : 'bg-red-500/20 text-red-400'
-                  }`}>
-                    {somatologyResult.isWorthIt ? '✓ VALE A PENA' : '✗ NÃO VALE'}
+            {/* Lista de Runas */}
+            {runaPrices.length > 0 && (
+              <Card className="bg-slate-800/50 border-slate-700 overflow-hidden">
+                <button
+                  onClick={() => setShowRunas(!showRunas)}
+                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-700/30 transition-colors"
+                >
+                  <span className="font-medium text-white">
+                    Preços das Runas ({runaPrices.length} encontradas)
                   </span>
-                </div>
+                  {showRunas ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                </button>
                 
-                <div className="p-6">
-                  <div className="grid grid-cols-3 gap-4 text-center mb-6">
-                    <div className="bg-gray-900/50 rounded-lg p-4">
-                      <div className="text-sm text-gray-400">Custo (9.990 Almas)</div>
-                      <div className="text-2xl text-orange-400 font-bold">{formatZeny(somatologyResult.totalCost)}z</div>
-                    </div>
-                    <div className="bg-gray-900/50 rounded-lg p-4">
-                      <div className="text-sm text-gray-400">Valor Esperado</div>
-                      <div className="text-2xl text-yellow-400 font-bold">{formatZeny(somatologyResult.expectedValue)}z</div>
-                    </div>
-                    <div className="bg-gray-900/50 rounded-lg p-4">
-                      <div className="text-sm text-gray-400">Lucro/Prejuízo</div>
-                      <div className={`text-2xl font-bold ${somatologyResult.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {somatologyResult.profit >= 0 ? '+' : ''}{formatZeny(somatologyResult.profit)}z
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        ({somatologyResult.profitPercent >= 0 ? '+' : ''}{somatologyResult.profitPercent.toFixed(1)}%)
-                      </div>
+                {showRunas && (
+                  <div className="border-t border-slate-700 p-4 max-h-80 overflow-y-auto">
+                    <div className="space-y-2">
+                      {runaPrices.sort((a, b) => b.price - a.price).map(runa => (
+                        <div key={runa.id} className="flex justify-between items-center text-sm">
+                          <span className="text-slate-300">{runa.name}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-slate-500 text-xs">{runa.sellers} vendas</span>
+                            <span className="text-white font-medium">{formatZeny(runa.price)}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  <div className="bg-gray-900/50 rounded-lg p-4">
-                    <h4 className="text-purple-400 font-bold mb-3">📊 Composição do Valor Esperado:</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">100% - Runa aleatória</span>
-                        <span className="text-white">{formatZeny(avgRunaPrice)}z</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">10% - Caixa de Somatologia (~1B)</span>
-                        <span className="text-white">+{formatZeny(0.10 * 1000000000)}z</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">1% - Aura da Mente Corrompida (~5B)</span>
-                        <span className="text-white">+{formatZeny(0.01 * 5000000000)}z</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                )}
+              </Card>
             )}
           </div>
         )}
 
         {/* Footer */}
-        <div className="mt-12 text-center text-gray-500 text-sm">
-          <p>⚠️ Valores são estatísticos. Você pode ter azar ou sorte!</p>
-          <p className="mt-2">
-            <a href="/" className="text-purple-400 hover:text-purple-300">← Voltar para Hela Carrys</a>
-          </p>
+        <div className="mt-8 text-center text-slate-500 text-sm space-y-1">
+          {lastUpdate && (
+            <p>Última atualização: {lastUpdate.toLocaleString('pt-BR')}</p>
+          )}
+          <p>⚠️ Valores estatísticos. Resultados podem variar!</p>
         </div>
       </div>
     </div>
   )
 }
-
