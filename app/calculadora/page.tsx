@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Card } from '../components/Card'
-import { ArrowLeft, Calculator, Gem, FlaskConical, RefreshCw, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Calculator, Gem, FlaskConical, RefreshCw, Loader2, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
-// IDs dos itens - TODOS buscados do market exceto >1B
+// IDs dos itens do mercado
 const ITEM_IDS = {
   // Pós de Meteorita
   poEscarlate: 1000398,
@@ -16,46 +16,47 @@ const ITEM_IDS = {
   poCrepuscular: 1000403,
   // Almas
   almaSombria: 25986,
-  // Itens dos tesouros (buscáveis no market)
+  // Itens dos tesouros
   bencaoFerreiro: 6226,
   bencaoMestreFerreiro: 6225,
   desmembrador: 1000389,
-  // Runas Somatológicas - TODAS buscadas do market
-  runas: [
-    { id: 17917, name: 'Runa da Vitalidade' },
-    { id: 17918, name: 'Runa da Força' },
-    { id: 17919, name: 'Runa da Agilidade' },
-    { id: 17920, name: 'Runa da Inteligência' },
-    { id: 17921, name: 'Runa da Destreza' },
-    { id: 17922, name: 'Runa da Sorte' },
-    { id: 17923, name: 'Runa do Ataque' },
-    { id: 17924, name: 'Runa da Magia' },
-    { id: 17925, name: 'Runa da Defesa' },
-    { id: 17926, name: 'Runa da Def. Mágica' },
-    { id: 17927, name: 'Runa do HP' },
-    { id: 17928, name: 'Runa do SP' },
-    { id: 17929, name: 'Runa da Velocidade' },
-    { id: 17930, name: 'Runa do Crítico' },
-    { id: 17931, name: 'Runa da Esquiva' },
-    { id: 17932, name: 'Runa da Precisão' },
-    { id: 17933, name: 'Runa do Vampirismo' },
-    { id: 17934, name: 'Runa da Cura' },
-    { id: 17935, name: 'Runa do Silêncio' },
-    { id: 17936, name: 'Runa do Congelamento' },
-    { id: 17937, name: 'Runa do Atordoamento' },
-    { id: 17938, name: 'Runa da Maldição' },
-    { id: 17939, name: 'Runa do Sono' },
-    { id: 17940, name: 'Runa da Cegueira' },
-    { id: 17941, name: 'Runa do Caos' },
-    { id: 17942, name: 'Runa do Sangramento' },
-    { id: 17943, name: 'Runa do Veneno' },
-    { id: 17944, name: 'Runa da Petrificação' },
-    { id: 17945, name: 'Runa do Fogo' },
-    { id: 17946, name: 'Runa do Gelo' },
-  ]
 }
 
-// Itens >1B que NÃO podem ser vendidos no market (valores estimados)
+// RUNAS SOMATOLÓGICAS - IDs corretos conforme passados
+const RUNAS = [
+  { id: 17917, name: 'Runa Ruby da Celia' },
+  { id: 17918, name: 'Runa Topazio da Celia' },
+  { id: 17919, name: 'Runa Ametista da Celia' },
+  { id: 17920, name: 'Runa Esmeralda da Celia' },
+  { id: 17921, name: 'Runa Safira da Celia' },
+  { id: 17922, name: 'Runa Turmalina da Celia' },
+  { id: 17923, name: 'Runa Ruby de Alphonse' },
+  { id: 17924, name: 'Runa Topazio de Alphonse' },
+  { id: 17925, name: 'Runa Ametista de Alphonse' },
+  { id: 17926, name: 'Runa Esmeralda de Alphonse' },
+  { id: 17927, name: 'Runa Safira de Alphonse' },
+  { id: 17928, name: 'Runa Turmalina de Alphonse' },
+  { id: 17929, name: 'Runa Ruby de Edan' },
+  { id: 17930, name: 'Runa Topazio de Edan' },
+  { id: 17931, name: 'Runa Ametista de Edan' },
+  { id: 17932, name: 'Runa Esmeralda de Edan' },
+  { id: 17933, name: 'Runa Safira de Edan' },
+  { id: 17934, name: 'Runa Turmalina de Edan' },
+  { id: 17935, name: 'Runa Ruby de Skia' },
+  { id: 17936, name: 'Runa Topazio de Skia' },
+  { id: 17937, name: 'Runa Ametista de Skia' },
+  { id: 17938, name: 'Runa Esmeralda de Skia' },
+  { id: 17939, name: 'Runa Safira de Skia' },
+  { id: 17940, name: 'Runa Turmalina de Skia' },
+  { id: 17941, name: 'Runa Ruby de Loki' },
+  { id: 17942, name: 'Runa Topazio de Loki' },
+  { id: 17943, name: 'Runa Ametista de Loki' },
+  { id: 17944, name: 'Runa Esmeralda de Loki' },
+  { id: 17945, name: 'Runa Safira de Loki' },
+  { id: 17946, name: 'Runa Turmalina de Loki' },
+]
+
+// Itens >1B (valores estimados - não vendem no market)
 const FIXED_PRICES: Record<string, number> = {
   espiritoPoderoso: 2200000000,
   espiritoLigeiro: 2200000000,
@@ -65,22 +66,21 @@ const FIXED_PRICES: Record<string, number> = {
   garraPrata: 2000000000,
   caixaForcaExp: 3500000000,
   auraMenteCorreompida: 5000000000,
-  caixaSomatologia: 1000000000, // média dos itens
+  caixaSomatologia: 1000000000,
 }
 
-// Dados dos Tesouros de Expedição
+// Dados dos Tesouros
 const TREASURES = {
   escarlate: {
     name: "Tesouro Escarlate",
     costItemKey: 'poEscarlate',
     costAmount: 100,
     drops: [
-      { name: "Compêndio (3x)", chance: 100, quantity: 3, priceKey: 'compendio', fixedPrice: 500000 },
-      { name: "Compêndio Espelho", chance: 100, quantity: 1, priceKey: 'compendio', fixedPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+      { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
-      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
-      { name: "Espírito Poderoso [1]", chance: 2, quantity: 1, fixedKey: 'espiritoPoderoso' },
+      { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Espírito Poderoso", chance: 2, quantity: 1, fixedKey: 'espiritoPoderoso' },
       { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   },
@@ -89,11 +89,10 @@ const TREASURES = {
     costItemKey: 'poSolar',
     costAmount: 100,
     drops: [
-      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
-      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+      { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
-      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
       { name: "Talismã Yin Yang", chance: 2, quantity: 1, fixedKey: 'talismaYinYang' },
       { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
@@ -103,11 +102,10 @@ const TREASURES = {
     costItemKey: 'poVerdejante',
     costAmount: 100,
     drops: [
-      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
-      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+      { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
-      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
       { name: "Orbe de Yokai", chance: 2, quantity: 1, fixedKey: 'orbeYokai' },
       { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
@@ -117,11 +115,10 @@ const TREASURES = {
     costItemKey: 'poCeleste',
     costAmount: 100,
     drops: [
-      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
-      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+      { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
-      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
       { name: "Garra de Prata", chance: 2, quantity: 1, fixedKey: 'garraPrata' },
       { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
@@ -131,12 +128,11 @@ const TREASURES = {
     costItemKey: 'poOceanica',
     costAmount: 100,
     drops: [
-      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
-      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+      { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
-      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
-      { name: "Espírito Astuto [1]", chance: 2, quantity: 1, fixedKey: 'espiritoAstuto' }
+      { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Espírito Astuto", chance: 2, quantity: 1, fixedKey: 'espiritoAstuto' }
     ]
   },
   crepuscular: {
@@ -144,12 +140,11 @@ const TREASURES = {
     costItemKey: 'poCrepuscular',
     costAmount: 100,
     drops: [
-      { name: "Compêndio (3x)", chance: 100, quantity: 3, fixedPrice: 500000 },
-      { name: "Compêndio Espelho", chance: 100, quantity: 1, fixedPrice: 800000 },
-      { name: "Desmembrador Químico", chance: 70, quantity: 1, priceKey: 'desmembrador' },
+      { name: "Compêndios (4x)", chance: 100, quantity: 4, fixedPrice: 500000 },
+      { name: "Desmembrador", chance: 70, quantity: 1, priceKey: 'desmembrador' },
       { name: "Bênção Ferreiro", chance: 10, quantity: 1, priceKey: 'bencaoFerreiro' },
-      { name: "Bênção Mestre-Ferreiro", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
-      { name: "Espírito Ligeiro [1]", chance: 2, quantity: 1, fixedKey: 'espiritoLigeiro' },
+      { name: "Bênção Mestre", chance: 5, quantity: 1, priceKey: 'bencaoMestreFerreiro' },
+      { name: "Espírito Ligeiro", chance: 2, quantity: 1, fixedKey: 'espiritoLigeiro' },
       { name: "Caixa Força Exp.", chance: 1, quantity: 1, fixedKey: 'caixaForcaExp' }
     ]
   }
@@ -162,7 +157,7 @@ function formatZeny(value: number): string {
   return value.toLocaleString('pt-BR')
 }
 
-async function fetchItemPrice(nameid: number): Promise<number | null> {
+async function fetchItemPrice(nameid: number): Promise<{ price: number, sellers: number } | null> {
   try {
     const response = await fetch(`https://api.ragnatales.com.br/market/item/shopping?nameid=${nameid}`)
     if (!response.ok) return null
@@ -170,7 +165,10 @@ async function fetchItemPrice(nameid: number): Promise<number | null> {
     if (!data || data.length === 0) return null
     const prices = data.map((d: any) => d.price).sort((a: number, b: number) => a - b)
     const top5 = prices.slice(0, Math.min(5, prices.length))
-    return Math.round(top5.reduce((a: number, b: number) => a + b, 0) / top5.length)
+    return {
+      price: Math.round(top5.reduce((a: number, b: number) => a + b, 0) / top5.length),
+      sellers: data.length
+    }
   } catch {
     return null
   }
@@ -192,8 +190,9 @@ export default function CalculadoraPage() {
   const [activeTab, setActiveTab] = useState<'expedicao' | 'somatologia'>('expedicao')
   const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const [showRunas, setShowRunas] = useState(false)
+  const [simCount, setSimCount] = useState(10)
 
-  // Busca preços do mercado - EXPEDIÇÃO
+  // Busca preços EXPEDIÇÃO
   const fetchExpedicaoPrices = useCallback(async () => {
     setLoading(true)
     const newPrices: Record<string, number> = { ...prices }
@@ -212,9 +211,9 @@ export default function CalculadoraPage() {
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
-      setLoadingMessage(`Buscando ${item.key}... (${i + 1}/${items.length})`)
-      const price = await fetchItemPrice(item.id)
-      if (price) newPrices[item.key] = price
+      setLoadingMessage(`${item.key} (${i + 1}/${items.length})`)
+      const result = await fetchItemPrice(item.id)
+      if (result) newPrices[item.key] = result.price
       await new Promise(r => setTimeout(r, 300))
     }
 
@@ -222,49 +221,41 @@ export default function CalculadoraPage() {
     setLastUpdate(new Date())
     setLoading(false)
     setLoadingMessage('')
-    localStorage.setItem('tigrinho-expedicao', JSON.stringify({ prices: newPrices, date: new Date().toISOString() }))
+    localStorage.setItem('tigrinho-prices', JSON.stringify({ prices: newPrices, date: new Date().toISOString() }))
   }, [prices])
 
-  // Busca preços do mercado - SOMATOLOGIA (Almas + Runas)
+  // Busca preços SOMATOLOGIA
   const fetchSomatologiaPrices = useCallback(async () => {
     setLoading(true)
     const newPrices: Record<string, number> = { ...prices }
     
-    // Busca Alma Sombria
-    setLoadingMessage('Buscando Alma Sombria...')
-    const almaPrice = await fetchItemPrice(ITEM_IDS.almaSombria)
-    if (almaPrice) newPrices['almaSombria'] = almaPrice
+    // Alma Sombria
+    setLoadingMessage('Alma Sombria...')
+    const almaResult = await fetchItemPrice(ITEM_IDS.almaSombria)
+    if (almaResult) newPrices['almaSombria'] = almaResult.price
     
-    // Busca TODAS as runas
+    // TODAS as runas
     const newRunaPrices: RunaPrice[] = []
-    for (let i = 0; i < ITEM_IDS.runas.length; i++) {
-      const runa = ITEM_IDS.runas[i]
-      setLoadingMessage(`Buscando ${runa.name}... (${i + 1}/${ITEM_IDS.runas.length})`)
+    for (let i = 0; i < RUNAS.length; i++) {
+      const runa = RUNAS[i]
+      setLoadingMessage(`${runa.name} (${i + 1}/${RUNAS.length})`)
       
-      try {
-        const response = await fetch(`https://api.ragnatales.com.br/market/item/shopping?nameid=${runa.id}`)
-        if (response.ok) {
-          const data = await response.json()
-          if (data && data.length > 0) {
-            const prices = data.map((d: any) => d.price).sort((a: number, b: number) => a - b)
-            const avgPrice = Math.round(prices.slice(0, 5).reduce((a: number, b: number) => a + b, 0) / Math.min(5, prices.length))
-            newRunaPrices.push({
-              id: runa.id,
-              name: runa.name,
-              price: avgPrice,
-              sellers: data.length
-            })
-          }
-        }
-      } catch {}
+      const result = await fetchItemPrice(runa.id)
+      if (result) {
+        newRunaPrices.push({
+          id: runa.id,
+          name: runa.name,
+          price: result.price,
+          sellers: result.sellers
+        })
+      }
       
       await new Promise(r => setTimeout(r, 200))
     }
 
-    // Calcula média das runas
+    // Média das runas
     if (newRunaPrices.length > 0) {
-      const avgRuna = Math.round(newRunaPrices.reduce((a, b) => a + b.price, 0) / newRunaPrices.length)
-      newPrices['avgRuna'] = avgRuna
+      newPrices['avgRuna'] = Math.round(newRunaPrices.reduce((a, b) => a + b.price, 0) / newRunaPrices.length)
     }
 
     setRunaPrices(newRunaPrices)
@@ -272,7 +263,7 @@ export default function CalculadoraPage() {
     setLastUpdate(new Date())
     setLoading(false)
     setLoadingMessage('')
-    localStorage.setItem('tigrinho-somatologia', JSON.stringify({ 
+    localStorage.setItem('tigrinho-runas', JSON.stringify({ 
       prices: newPrices, 
       runas: newRunaPrices,
       date: new Date().toISOString() 
@@ -281,21 +272,21 @@ export default function CalculadoraPage() {
 
   // Carrega do localStorage
   useEffect(() => {
-    const expedicao = localStorage.getItem('tigrinho-expedicao')
-    const somatologia = localStorage.getItem('tigrinho-somatologia')
+    const saved = localStorage.getItem('tigrinho-prices')
+    const savedRunas = localStorage.getItem('tigrinho-runas')
     
     let loadedPrices: Record<string, number> = {}
     
-    if (expedicao) {
+    if (saved) {
       try {
-        const { prices } = JSON.parse(expedicao)
+        const { prices } = JSON.parse(saved)
         loadedPrices = { ...loadedPrices, ...prices }
       } catch {}
     }
     
-    if (somatologia) {
+    if (savedRunas) {
       try {
-        const { prices, runas, date } = JSON.parse(somatologia)
+        const { prices, runas, date } = JSON.parse(savedRunas)
         loadedPrices = { ...loadedPrices, ...prices }
         if (runas) setRunaPrices(runas)
         if (date) setLastUpdate(new Date(date))
@@ -305,7 +296,7 @@ export default function CalculadoraPage() {
     setPrices(loadedPrices)
   }, [])
 
-  // Calcula resultados dos tesouros
+  // Calcula tesouros
   const calculateTreasureResults = () => {
     const results: Record<string, any> = {}
 
@@ -316,13 +307,9 @@ export default function CalculadoraPage() {
       let expectedValue = 0
       const dropDetails = treasure.drops.map(drop => {
         let price = 0
-        if (drop.fixedPrice) {
-          price = drop.fixedPrice
-        } else if (drop.fixedKey) {
-          price = FIXED_PRICES[drop.fixedKey] || 0
-        } else if (drop.priceKey) {
-          price = prices[drop.priceKey] || 0
-        }
+        if (drop.fixedPrice) price = drop.fixedPrice
+        else if (drop.fixedKey) price = FIXED_PRICES[drop.fixedKey] || 0
+        else if (drop.priceKey) price = prices[drop.priceKey] || 0
         
         const dropValue = (drop.chance / 100) * price * drop.quantity
         expectedValue += dropValue
@@ -334,7 +321,6 @@ export default function CalculadoraPage() {
         totalCost,
         expectedValue,
         profit: expectedValue - totalCost,
-        profitPercent: totalCost > 0 ? ((expectedValue / totalCost) - 1) * 100 : 0,
         isWorthIt: expectedValue > totalCost,
         drops: dropDetails
       }
@@ -343,15 +329,15 @@ export default function CalculadoraPage() {
     return results
   }
 
-  // Calcula resultado das runas
+  // Calcula somatologia
   const calculateSomatologyResult = () => {
     const almaCost = prices.almaSombria || 9500
     const totalCost = almaCost * 9990
     const avgRuna = prices.avgRuna || 15000000
     
-    let expectedValue = avgRuna // 100% runa
-    expectedValue += 0.10 * FIXED_PRICES.caixaSomatologia // 10% Caixa
-    expectedValue += 0.01 * FIXED_PRICES.auraMenteCorreompida // 1% Aura
+    let expectedValue = avgRuna
+    expectedValue += 0.10 * FIXED_PRICES.caixaSomatologia
+    expectedValue += 0.01 * FIXED_PRICES.auraMenteCorreompida
 
     return {
       almaCost,
@@ -364,25 +350,74 @@ export default function CalculadoraPage() {
     }
   }
 
+  // SIMULADOR - Análise estatística de N tiradas
+  const calculateSimulation = (count: number) => {
+    const result = calculateSomatologyResult()
+    const totalCost = result.totalCost * count
+    const expectedReturn = result.expectedValue * count
+    const expectedProfit = expectedReturn - totalCost
+    
+    // Chances de drops extras em N tiradas
+    const chanceCaixa = 1 - Math.pow(0.90, count) // Chance de pelo menos 1 caixa
+    const chanceAura = 1 - Math.pow(0.99, count) // Chance de pelo menos 1 aura
+    const expectedCaixas = count * 0.10 // Número esperado de caixas
+    const expectedAuras = count * 0.01 // Número esperado de auras
+    
+    // Análise de risco
+    let riskLevel: 'alto' | 'medio' | 'baixo'
+    let recommendation: string
+    
+    if (count < 10) {
+      riskLevel = 'alto'
+      recommendation = 'Muito arriscado! Com poucas tiradas, você depende muito da sorte.'
+    } else if (count < 50) {
+      riskLevel = 'medio'
+      recommendation = 'Risco moderado. Começando a ter uma amostra razoável.'
+    } else {
+      riskLevel = 'baixo'
+      recommendation = 'Estatisticamente seguro. Com muitas tiradas, o resultado tende ao esperado.'
+    }
+    
+    // Cenários
+    const worstCase = (result.avgRuna * count) - totalCost // Só runas, sem extras
+    const bestCase = (result.avgRuna * count) + (count * 0.10 * FIXED_PRICES.caixaSomatologia) + (count * 0.01 * FIXED_PRICES.auraMenteCorreompida) - totalCost
+    
+    return {
+      count,
+      totalCost,
+      expectedReturn,
+      expectedProfit,
+      profitPercent: totalCost > 0 ? ((expectedReturn / totalCost) - 1) * 100 : 0,
+      chanceCaixa: chanceCaixa * 100,
+      chanceAura: chanceAura * 100,
+      expectedCaixas,
+      expectedAuras,
+      riskLevel,
+      recommendation,
+      worstCase,
+      bestCase,
+      isWorthIt: expectedProfit > 0
+    }
+  }
+
   const treasureResults = calculateTreasureResults()
   const somatologyResult = calculateSomatologyResult()
+  const simulation = calculateSimulation(simCount)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-slate-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-6 h-6" />
-            </Link>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-                <Calculator className="w-7 h-7" />
-                Calculadora Tigrinho
-              </h1>
-              <p className="text-slate-400 text-sm">Preços em tempo real do mercado RagnaTales</p>
-            </div>
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+            <ArrowLeft className="w-6 h-6" />
+          </Link>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+              <Calculator className="w-7 h-7" />
+              Calculadora Tigrinho
+            </h1>
+            <p className="text-slate-400 text-sm">Preços do mercado RagnaTales em tempo real</p>
           </div>
         </div>
 
@@ -391,9 +426,7 @@ export default function CalculadoraPage() {
           <button
             onClick={() => setActiveTab('expedicao')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
-              activeTab === 'expedicao'
-                ? 'bg-white text-slate-900'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+              activeTab === 'expedicao' ? 'bg-white text-slate-900' : 'bg-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <Gem className="w-4 h-4" />
@@ -402,9 +435,7 @@ export default function CalculadoraPage() {
           <button
             onClick={() => setActiveTab('somatologia')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
-              activeTab === 'somatologia'
-                ? 'bg-white text-slate-900'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+              activeTab === 'somatologia' ? 'bg-white text-slate-900' : 'bg-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <FlaskConical className="w-4 h-4" />
@@ -412,10 +443,9 @@ export default function CalculadoraPage() {
           </button>
         </div>
 
-        {/* EXPEDIÇÃO TAB */}
+        {/* EXPEDIÇÃO */}
         {activeTab === 'expedicao' && (
           <div className="space-y-6">
-            {/* Header + Atualizar */}
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">Tesouros de Expedição</h2>
@@ -424,88 +454,52 @@ export default function CalculadoraPage() {
               <button
                 onClick={fetchExpedicaoPrices}
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 Atualizar
               </button>
             </div>
 
-            {loading && loadingMessage && (
-              <div className="text-sm text-slate-400 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {loadingMessage}
-              </div>
-            )}
+            {loading && <p className="text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
 
-            {/* Preços dos Pós */}
+            {/* Preços */}
             <Card className="p-4 bg-slate-800/50 border-slate-700">
-              <h3 className="text-sm font-medium text-slate-400 mb-3">Preços dos Pós de Meteorita</h3>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
-                {[
-                  { key: 'poEscarlate', label: 'Escarlate' },
-                  { key: 'poSolar', label: 'Solar' },
-                  { key: 'poVerdejante', label: 'Verdejante' },
-                  { key: 'poCeleste', label: 'Celeste' },
-                  { key: 'poOceanica', label: 'Oceânica' },
-                  { key: 'poCrepuscular', label: 'Crepuscular' },
-                ].map(({ key, label }) => (
+                {['poEscarlate', 'poSolar', 'poVerdejante', 'poCeleste', 'poOceanica', 'poCrepuscular'].map(key => (
                   <div key={key} className="text-center">
-                    <div className="text-slate-500 text-xs">{label}</div>
-                    <div className="text-white font-medium">
-                      {prices[key] ? formatZeny(prices[key]) : '-'}
-                    </div>
+                    <div className="text-slate-500 text-xs">{key.replace('po', '')}</div>
+                    <div className="text-white font-medium">{prices[key] ? formatZeny(prices[key]) : '-'}</div>
                   </div>
                 ))}
               </div>
             </Card>
 
-            {/* Grid de Tesouros */}
+            {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.entries(treasureResults).map(([key, treasure]) => (
-                <Card key={key} className="bg-slate-800/50 border-slate-700 overflow-hidden">
+              {Object.entries(treasureResults).map(([key, t]) => (
+                <Card key={key} className="bg-slate-800/50 border-slate-700">
                   <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-                    <h3 className="font-semibold text-white">{treasure.name}</h3>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      treasure.isWorthIt 
-                        ? 'bg-emerald-500/20 text-emerald-400' 
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {treasure.isWorthIt ? '✓ Vale' : '✗ Não'}
+                    <h3 className="font-semibold text-white">{t.name}</h3>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${t.isWorthIt ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {t.isWorthIt ? '✓ Vale' : '✗ Não'}
                     </span>
                   </div>
-                  
                   <div className="p-4 space-y-3">
                     <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                      <div>
-                        <div className="text-slate-500 text-xs">Custo</div>
-                        <div className="text-white font-medium">{formatZeny(treasure.totalCost)}</div>
-                      </div>
-                      <div>
-                        <div className="text-slate-500 text-xs">Esperado</div>
-                        <div className="text-white font-medium">{formatZeny(treasure.expectedValue)}</div>
-                      </div>
-                      <div>
-                        <div className="text-slate-500 text-xs">Lucro</div>
-                        <div className={`font-medium ${treasure.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {treasure.profit >= 0 ? '+' : ''}{formatZeny(treasure.profit)}
-                        </div>
-                      </div>
+                      <div><div className="text-slate-500 text-xs">Custo</div><div className="text-white">{formatZeny(t.totalCost)}</div></div>
+                      <div><div className="text-slate-500 text-xs">Esperado</div><div className="text-white">{formatZeny(t.expectedValue)}</div></div>
+                      <div><div className="text-slate-500 text-xs">Lucro</div><div className={t.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{t.profit >= 0 ? '+' : ''}{formatZeny(t.profit)}</div></div>
                     </div>
-
-                    <button
-                      onClick={() => setExpandedCard(expandedCard === key ? null : key)}
-                      className="w-full text-left text-xs text-slate-400 hover:text-slate-300"
-                    >
-                      {expandedCard === key ? '▼ Ocultar' : '▶ Ver drops'}
+                    <button onClick={() => setExpandedCard(expandedCard === key ? null : key)} className="text-xs text-slate-400 hover:text-slate-300">
+                      {expandedCard === key ? '▼ Ocultar' : '▶ Drops'}
                     </button>
-
                     {expandedCard === key && (
-                      <div className="space-y-1 pt-2 border-t border-slate-700 text-xs">
-                        {treasure.drops.map((drop: any, i: number) => (
+                      <div className="text-xs space-y-1 pt-2 border-t border-slate-700">
+                        {t.drops.map((d: any, i: number) => (
                           <div key={i} className="flex justify-between text-slate-400">
-                            <span>{drop.quantity}x {drop.name}</span>
-                            <span>{drop.chance}% • {formatZeny(drop.price)}</span>
+                            <span>{d.quantity}x {d.name}</span>
+                            <span>{d.chance}%</span>
                           </div>
                         ))}
                       </div>
@@ -517,89 +511,129 @@ export default function CalculadoraPage() {
           </div>
         )}
 
-        {/* SOMATOLOGIA TAB */}
+        {/* SOMATOLOGIA */}
         {activeTab === 'somatologia' && (
           <div className="space-y-6">
-            {/* Header + Atualizar */}
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">Runa Somatológica</h2>
-                <p className="text-sm text-slate-400">9.990 Almas Sombrias = 1 Runa</p>
+                <p className="text-sm text-slate-400">9.990 Almas = 1 Runa</p>
               </div>
               <button
                 onClick={fetchSomatologiaPrices}
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 Atualizar
               </button>
             </div>
 
-            {loading && loadingMessage && (
-              <div className="text-sm text-slate-400 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {loadingMessage}
-              </div>
-            )}
+            {loading && <p className="text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
 
             {/* Info */}
-            <Card className="p-4 bg-slate-800/50 border-slate-700">
-              <div className="text-sm text-slate-400 space-y-1">
-                <p>• 999 Alma Sombria → 1 Condensada</p>
-                <p>• 10 Condensadas → 1 Runa Somatológica</p>
-                <p>• <span className="text-white">Drops:</span> 100% Runa + 10% Caixa (~1B) + 1% Aura (~5B)</p>
+            <Card className="p-4 bg-slate-800/50 border-slate-700 text-sm text-slate-400">
+              <p>• 999 Alma → 1 Condensada → 10 Condensadas → <span className="text-white">1 Runa</span></p>
+              <p>• Drops: 100% Runa + <span className="text-emerald-400">10% Caixa (~1B)</span> + <span className="text-yellow-400">1% Aura (~5B)</span></p>
+            </Card>
+
+            {/* Resultado base */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <div className="p-4 border-b border-slate-700 flex justify-between items-center">
+                <span className="font-semibold text-white">Por Runa</span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${somatologyResult.isWorthIt ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                  {somatologyResult.isWorthIt ? '✓ Vale' : '✗ Não'}
+                </span>
+              </div>
+              <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div><div className="text-xs text-slate-500">Alma</div><div className="text-white">{formatZeny(somatologyResult.almaCost)}</div></div>
+                <div><div className="text-xs text-slate-500">Custo Total</div><div className="text-white">{formatZeny(somatologyResult.totalCost)}</div></div>
+                <div><div className="text-xs text-slate-500">Média Runas</div><div className="text-white">{formatZeny(somatologyResult.avgRuna)}</div></div>
+                <div><div className="text-xs text-slate-500">Lucro</div><div className={somatologyResult.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{somatologyResult.profit >= 0 ? '+' : ''}{formatZeny(somatologyResult.profit)}</div></div>
               </div>
             </Card>
 
-            {/* Resultado Principal */}
-            <Card className="bg-slate-800/50 border-slate-700 overflow-hidden">
-              <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-                <h3 className="font-semibold text-white">Resultado</h3>
-                <span className={`px-3 py-1 rounded text-sm font-medium ${
-                  somatologyResult.isWorthIt 
-                    ? 'bg-emerald-500/20 text-emerald-400' 
-                    : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {somatologyResult.isWorthIt ? '✓ Vale a pena' : '✗ Não vale'}
-                </span>
+            {/* SIMULADOR */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <div className="p-4 border-b border-slate-700">
+                <div className="flex items-center gap-2 text-white font-semibold">
+                  <TrendingUp className="w-5 h-5" />
+                  Simulador de Tiradas
+                </div>
               </div>
-              
-              <div className="p-6 space-y-6">
-                {/* Preços base */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-900/50 rounded-lg p-3">
-                    <div className="text-xs text-slate-500">Alma Sombria</div>
-                    <div className="text-lg text-white font-semibold">
-                      {prices.almaSombria ? formatZeny(prices.almaSombria) : '-'}
-                    </div>
+              <div className="p-4 space-y-4">
+                {/* Seletor */}
+                <div className="flex gap-2 flex-wrap">
+                  {[1, 10, 30, 50, 100].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => setSimCount(n)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        simCount === n ? 'bg-white text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      }`}
+                    >
+                      {n}x
+                    </button>
+                  ))}
+                </div>
+
+                {/* Resultado da simulação */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="bg-slate-900/50 p-3 rounded-lg">
+                    <div className="text-xs text-slate-500">Investimento</div>
+                    <div className="text-lg text-white font-semibold">{formatZeny(simulation.totalCost)}</div>
                   </div>
-                  <div className="bg-slate-900/50 rounded-lg p-3">
-                    <div className="text-xs text-slate-500">Média das Runas ({runaPrices.length})</div>
-                    <div className="text-lg text-white font-semibold">
-                      {prices.avgRuna ? formatZeny(prices.avgRuna) : '-'}
+                  <div className="bg-slate-900/50 p-3 rounded-lg">
+                    <div className="text-xs text-slate-500">Retorno Esperado</div>
+                    <div className="text-lg text-white font-semibold">{formatZeny(simulation.expectedReturn)}</div>
+                  </div>
+                  <div className="bg-slate-900/50 p-3 rounded-lg">
+                    <div className="text-xs text-slate-500">Lucro Esperado</div>
+                    <div className={`text-lg font-semibold ${simulation.expectedProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {simulation.expectedProfit >= 0 ? '+' : ''}{formatZeny(simulation.expectedProfit)}
+                    </div>
+                    <div className="text-xs text-slate-500">({simulation.profitPercent.toFixed(1)}%)</div>
+                  </div>
+                  <div className="bg-slate-900/50 p-3 rounded-lg">
+                    <div className="text-xs text-slate-500">Risco</div>
+                    <div className={`text-lg font-semibold ${
+                      simulation.riskLevel === 'baixo' ? 'text-emerald-400' :
+                      simulation.riskLevel === 'medio' ? 'text-yellow-400' : 'text-red-400'
+                    }`}>
+                      {simulation.riskLevel === 'baixo' ? '🟢 Baixo' :
+                       simulation.riskLevel === 'medio' ? '🟡 Médio' : '🔴 Alto'}
                     </div>
                   </div>
                 </div>
 
-                {/* Cálculo */}
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="bg-slate-900/50 rounded-lg p-4">
-                    <div className="text-sm text-slate-500 mb-1">Custo (9.990 almas)</div>
-                    <div className="text-xl text-white font-semibold">{formatZeny(somatologyResult.totalCost)}</div>
+                {/* Chances */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-slate-900/30 p-3 rounded-lg">
+                    <div className="text-slate-400">Chance de ≥1 Caixa</div>
+                    <div className="text-emerald-400 font-medium">{simulation.chanceCaixa.toFixed(1)}%</div>
+                    <div className="text-xs text-slate-500">~{simulation.expectedCaixas.toFixed(1)} caixas esperadas</div>
                   </div>
-                  <div className="bg-slate-900/50 rounded-lg p-4">
-                    <div className="text-sm text-slate-500 mb-1">Valor Esperado</div>
-                    <div className="text-xl text-white font-semibold">{formatZeny(somatologyResult.expectedValue)}</div>
+                  <div className="bg-slate-900/30 p-3 rounded-lg">
+                    <div className="text-slate-400">Chance de ≥1 Aura</div>
+                    <div className="text-yellow-400 font-medium">{simulation.chanceAura.toFixed(1)}%</div>
+                    <div className="text-xs text-slate-500">~{simulation.expectedAuras.toFixed(2)} auras esperadas</div>
                   </div>
-                  <div className="bg-slate-900/50 rounded-lg p-4">
-                    <div className="text-sm text-slate-500 mb-1">Lucro/Prejuízo</div>
-                    <div className={`text-xl font-semibold ${somatologyResult.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {somatologyResult.profit >= 0 ? '+' : ''}{formatZeny(somatologyResult.profit)}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      ({somatologyResult.profitPercent >= 0 ? '+' : ''}{somatologyResult.profitPercent.toFixed(1)}%)
-                    </div>
+                </div>
+
+                {/* Recomendação */}
+                <div className={`p-4 rounded-lg border ${
+                  simulation.riskLevel === 'baixo' ? 'bg-emerald-500/10 border-emerald-500/30' :
+                  simulation.riskLevel === 'medio' ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-red-500/10 border-red-500/30'
+                }`}>
+                  <p className="text-white">{simulation.recommendation}</p>
+                  <div className="mt-2 text-sm text-slate-400">
+                    <span>Pior cenário: </span>
+                    <span className={simulation.worstCase >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                      {simulation.worstCase >= 0 ? '+' : ''}{formatZeny(simulation.worstCase)}
+                    </span>
+                    <span className="mx-2">|</span>
+                    <span>Melhor cenário: </span>
+                    <span className="text-emerald-400">+{formatZeny(simulation.bestCase)}</span>
                   </div>
                 </div>
               </div>
@@ -607,30 +641,19 @@ export default function CalculadoraPage() {
 
             {/* Lista de Runas */}
             {runaPrices.length > 0 && (
-              <Card className="bg-slate-800/50 border-slate-700 overflow-hidden">
-                <button
-                  onClick={() => setShowRunas(!showRunas)}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-700/30 transition-colors"
-                >
-                  <span className="font-medium text-white">
-                    Preços das Runas ({runaPrices.length} encontradas)
-                  </span>
+              <Card className="bg-slate-800/50 border-slate-700">
+                <button onClick={() => setShowRunas(!showRunas)} className="w-full p-4 flex justify-between items-center hover:bg-slate-700/30">
+                  <span className="text-white font-medium">Runas ({runaPrices.length})</span>
                   {showRunas ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                 </button>
-                
                 {showRunas && (
-                  <div className="border-t border-slate-700 p-4 max-h-80 overflow-y-auto">
-                    <div className="space-y-2">
-                      {runaPrices.sort((a, b) => b.price - a.price).map(runa => (
-                        <div key={runa.id} className="flex justify-between items-center text-sm">
-                          <span className="text-slate-300">{runa.name}</span>
-                          <div className="flex items-center gap-3">
-                            <span className="text-slate-500 text-xs">{runa.sellers} vendas</span>
-                            <span className="text-white font-medium">{formatZeny(runa.price)}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="border-t border-slate-700 p-4 max-h-60 overflow-y-auto">
+                    {runaPrices.sort((a, b) => b.price - a.price).map(r => (
+                      <div key={r.id} className="flex justify-between py-1 text-sm">
+                        <span className="text-slate-300">{r.name}</span>
+                        <span className="text-white">{formatZeny(r.price)}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </Card>
@@ -639,11 +662,9 @@ export default function CalculadoraPage() {
         )}
 
         {/* Footer */}
-        <div className="mt-8 text-center text-slate-500 text-sm space-y-1">
-          {lastUpdate && (
-            <p>Última atualização: {lastUpdate.toLocaleString('pt-BR')}</p>
-          )}
-          <p>⚠️ Valores estatísticos. Resultados podem variar!</p>
+        <div className="mt-8 text-center text-slate-500 text-xs">
+          {lastUpdate && <p>Atualizado: {lastUpdate.toLocaleString('pt-BR')}</p>}
+          <p>⚠️ Valores estatísticos - resultados reais podem variar</p>
         </div>
       </div>
     </div>
