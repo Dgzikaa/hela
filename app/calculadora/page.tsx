@@ -174,9 +174,11 @@ const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3ZkZHNna3NieXVwdG5rZXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzU5NTksImV4cCI6MjA3ODk1MTk1OX0.wkx2__g4rFmEoiBiF-S85txtaQXK1RTDztgC3vSexp4'
 
 function formatZeny(value: number): string {
-  if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
-  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'kk'
-  if (value >= 1000) return Math.round(value / 1000) + 'k'
+  const abs = Math.abs(value)
+  const sign = value < 0 ? '-' : ''
+  if (abs >= 1000000000) return sign + (abs / 1000000000).toFixed(2) + 'B'
+  if (abs >= 1000000) return sign + (abs / 1000000).toFixed(1) + 'kk'
+  if (abs >= 1000) return sign + Math.round(abs / 1000) + 'k'
   return value.toLocaleString('pt-BR')
 }
 
