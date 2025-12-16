@@ -633,7 +633,7 @@ export default function AgendaPage() {
                 {/* Botões */}
                 <div className="flex gap-3 pt-4">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => setShowAddModal(false)}
                     className="flex-1"
                   >
