@@ -163,7 +163,9 @@ export default function CalculadoraDanoPage() {
     }
   }
   
-  const resultado = tipoDano === 'fisico' ? calcularDanoFisico() : calcularDanoMagico()
+  const resultadoFisico = calcularDanoFisico()
+  const resultadoMagico = calcularDanoMagico()
+  const resultado = tipoDano === 'fisico' ? resultadoFisico : resultadoMagico
   
   const formatNumber = (n: number) => n.toLocaleString('pt-BR')
 
@@ -430,7 +432,7 @@ export default function CalculadoraDanoPage() {
                   {tipoDano === 'fisico' ? 'ATK Base' : 'MATK Base'}
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {formatNumber(tipoDano === 'fisico' ? resultado.atkBase : resultado.matkBase)}
+                  {formatNumber(tipoDano === 'fisico' ? resultadoFisico.atkBase : resultadoMagico.matkBase)}
                 </p>
               </div>
               
@@ -446,7 +448,7 @@ export default function CalculadoraDanoPage() {
                   Redução por {tipoDano === 'fisico' ? 'DEF' : 'MDEF'}
                 </p>
                 <p className="text-lg font-bold text-red-400">
-                  -{tipoDano === 'fisico' ? resultado.reducaoDef : resultado.reducaoMdef}%
+                  -{tipoDano === 'fisico' ? resultadoFisico.reducaoDef : resultadoMagico.reducaoMdef}%
                 </p>
               </div>
               
@@ -463,7 +465,7 @@ export default function CalculadoraDanoPage() {
                 <div className="p-4 bg-amber-500/20 border border-amber-500/30 rounded-lg">
                   <p className="text-sm text-gray-600">Dano Crítico</p>
                   <p className="text-3xl font-bold text-amber-400">
-                    {formatNumber(resultado.danoCritico)}
+                    {formatNumber(resultadoFisico.danoCritico)}
                   </p>
                 </div>
               )}
