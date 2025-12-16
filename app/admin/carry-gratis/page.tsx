@@ -459,7 +459,7 @@ export default function AdminCarryGratisPage() {
         </div>
       </main>
       
-      {toastMsg && <Toast message={toastMsg.message} type={toastMsg.type} onClose={() => setToastMsg(null)} />}
+      {toastMsg && <Toast id="admin-toast" message={toastMsg.message} type={toastMsg.type} onClose={() => setToastMsg(null)} />}
     </div>
   )
 }
