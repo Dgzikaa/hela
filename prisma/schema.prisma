@@ -97,7 +97,7 @@ model Boss {
 }
 
 // =======================
-// CLIENTES (DISCORD)
+// CLIENTES (CRM COMPLETO)
 // =======================
 
 enum TierCliente {
@@ -108,15 +108,36 @@ enum TierCliente {
   DIAMANTE // 21+ compras
 }
 
+enum CategoriaCliente {
+  POTENCIAL    // Nunca comprou, só perguntou
+  AVENTUREIRO  // Pergunta muito, não fecha
+  COMPRADOR    // 1-2 compras
+  FIEL         // 3+ compras
+  VIP          // Alto valor, tratamento especial
+}
+
 model Cliente {
   id              Int          @id @default(autoincrement())
   discordUserId   String       @unique
   discordUsername String
   
+  // NOVOS: Dados pessoais para CRM
+  nome            String?      // Nome real
+  email           String?      // Email para contato
+  telefone        String?      // WhatsApp
+  nickIngame      String?      // Nick no RagnaTales
+  
+  // Classificação CRM
+  categoria       CategoriaCliente @default(POTENCIAL)
+  
   // Estatísticas
   totalCompras    Int          @default(0)
   totalGasto      Int          @default(0)
   tier            TierCliente  @default(BRONZE)
+  
+  // Métricas de engajamento
+  totalContatos   Int          @default(0)  // Quantas vezes entrou em contato
+  ultimoContato   DateTime?
   
   // Datas importantes
   primeiraCompra  DateTime?
@@ -130,14 +151,217 @@ model Cliente {
   aceitaOfertas   Boolean      @default(true)
   ultimaOferta    DateTime?
   
+  // Anotações dos admins
+  observacoes     String?      @db.Text
+  
+  // Origem do cliente
+  origem          String?      // "DISCORD", "INDICACAO", "SITE", etc
+  indicadoPor     String?      // Quem indicou (para sistema de afiliados)
+  
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
   // Relações
   pedidos         Pedido[]
   leads           Lead[]
+  inscricoesCarryGratis InscricaoCarryGratis[]
 
   @@map("Cliente")
+}
+
+// =======================
+// CARRY GRÁTIS SEMANAL
+// =======================
+
+enum StatusInscricao {
+  INSCRITO      // Aguardando sorteio
+  SORTEADO      // Foi sorteado
+  CONFIRMADO    // Confirmou presença
+  NAO_PODE      // Disse que não pode
+  SUBSTITUIDO   // Foi substituído por outro
+  PARTICIPOU    // Participou do carry
+  FALTOU        // Não apareceu
+}
+
+model InscricaoCarryGratis {
+  id          Int      @id @default(autoincrement())
+  
+  // Participante
+  discordId   String
+  discordName String
+  nickIngame  String
+  
+  // Cliente vinculado (se existir)
+  clienteId   Int?
+  cliente     Cliente? @relation(fields: [clienteId], references: [id])
+  
+  // Semana do sorteio (segunda-feira da semana)
+  semana      DateTime
+  
+  // Status
+  status      StatusInscricao @default(INSCRITO)
+  
+  // Posição no sorteio (1-4 = titulares, 5+ = reservas)
+  posicaoSorteio Int?
+  
+  // Motivo caso não possa
+  motivoAusencia String?
+  
+  // Data da confirmação/recusa
+  dataResposta   DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([discordId, semana]) // 1 inscrição por semana por pessoa
+  @@map("inscricoes_carry_gratis")
+}
+
+// Configuração do Carry Grátis
+model ConfiguracaoCarryGratis {
+  id                    Int      @id @default(autoincrement())
+  
+  // Dia e hora do sorteio
+  diaSorteio            Int      @default(0) // 0 = domingo, 1 = segunda, etc
+  horaSorteio           String   @default("20:00")
+  
+  // Dia e hora do carry
+  diaCarry              Int      @default(6) // 6 = sábado
+  horaCarry             String   @default("21:00")
+  
+  // Quantidade de vagas
+  vagasTitulares        Int      @default(4)
+  vagasReservas         Int      @default(2)
+  
+  // Bosses inclusos (1-6)
+  bossesInclusos        String   @default("1,2,3,4,5,6")
+  
+  // Horas para confirmar presença
+  horasParaConfirmar    Int      @default(24)
+  
+  // Mensagem personalizada
+  mensagemSorteio       String?  @db.Text
+  
+  // Ativo
+  ativo                 Boolean  @default(true)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("configuracao_carry_gratis")
+}
+
+// =======================
+// CONFIRMAÇÃO DE PRESENÇA (CARRYS PAGOS)
+// =======================
+
+enum StatusConfirmacao {
+  PENDENTE     // Aguardando resposta
+  CONFIRMADO   // Confirmou presença
+  NAO_PODE     // Não poderá participar
+  SUBSTITUIDO  // Foi substituído
+}
+
+model ConfirmacaoPresenca {
+  id              Int      @id @default(autoincrement())
+  
+  // Pedido relacionado
+  pedidoId        Int
+  
+  // Jogador (pode ser cadastrado ou não)
+  jogadorId       Int?
+  jogadorNome     String   // Nome do jogador (backup)
+  discordId       String?  // Para enviar mensagem
+  
+  // Status
+  status          StatusConfirmacao @default(PENDENTE)
+  
+  // Motivo caso não possa
+  motivo          String?
+  
+  // Datas
+  dataEnvio       DateTime @default(now())
+  dataResposta    DateTime?
+  
+  // Substituído por
+  substituidoPor  String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("confirmacoes_presenca")
+}
+
+// =======================
+// CALCULADORA DE FARM
+// =======================
+
+model ConteudoFarm {
+  id              Int      @id @default(autoincrement())
+  
+  nome            String   @unique // "Bio 5", "Verus", etc
+  descricao       String?
+  icone           String?  // URL do ícone
+  
+  // Limites
+  fadigaMaxima    Int?     // Quantidade máxima de mobs
+  limiteDiario    Int?     // Quantas vezes pode fazer por dia
+  
+  // Custos de entrada
+  custoEntrada    Int      @default(0) // Zeny
+  itemEntrada     String?  // Nome do item necessário
+  itemEntradaQtd  Int?     // Quantidade do item
+  
+  // Tempo estimado
+  tempoMinutos    Int      @default(60)
+  
+  // Ativo
+  ativo           Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relações
+  consumiveis     ConsumiveisFarm[]
+  drops           DropsFarm[]
+  
+  @@map("conteudos_farm")
+}
+
+model ConsumiveisFarm {
+  id              Int      @id @default(autoincrement())
+  
+  conteudoId      Int
+  conteudo        ConteudoFarm @relation(fields: [conteudoId], references: [id], onDelete: Cascade)
+  
+  nome            String   // "Blue Potion", "Yggdrasil Berry", etc
+  quantidade      Int      // Quantidade usada por run
+  precoUnitario   Int      // Preço no mercado
+  
+  createdAt       DateTime @default(now())
+  
+  @@map("consumiveis_farm")
+}
+
+model DropsFarm {
+  id              Int      @id @default(autoincrement())
+  
+  conteudoId      Int
+  conteudo        ConteudoFarm @relation(fields: [conteudoId], references: [id], onDelete: Cascade)
+  
+  nome            String   // Nome do item
+  itemId          Int?     // ID do item na API (para buscar preço)
+  
+  // Drop rate
+  dropRate        Float    // Taxa em % (ex: 0.5 = 0.5%)
+  quantidadeMedia Int      @default(1) // Média por run
+  
+  // Preço (pode ser fixo ou buscar da API)
+  precoFixo       Int?     // Se tiver preço fixo
+  
+  createdAt       DateTime @default(now())
+  
+  @@map("drops_farm")
 }
 
 // =======================

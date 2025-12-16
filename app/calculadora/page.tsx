@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card } from '../components/Card'
 import { ArrowLeft, Calculator, Gem, FlaskConical, RefreshCw, Loader2, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { ToolsLayout } from '../components/ToolsLayout'
 
 // IDs dos itens do mercado
 const ITEM_IDS = {
@@ -276,6 +277,29 @@ export default function CalculadoraPage() {
   const [simCount, setSimCount] = useState(10)
   const [expSimCount, setExpSimCount] = useState(10)
   const [selectedTreasure, setSelectedTreasure] = useState('escarlate')
+  const [syncing, setSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState('')
+
+  // Sincroniza preços com a API do RagnaTales
+  const syncPrices = async () => {
+    setSyncing(true)
+    setSyncMessage('')
+    try {
+      const response = await fetch('/api/sync-prices', { method: 'POST' })
+      const data = await response.json()
+      if (response.ok) {
+        setSyncMessage(`✓ ${data.message}`)
+        // Recarrega os preços
+        fetchAllPrices()
+      } else {
+        setSyncMessage('Erro ao sincronizar preços')
+      }
+    } catch {
+      setSyncMessage('Erro de conexão')
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   // Busca TODOS os preços do Supabase
   const fetchAllPrices = useCallback(async () => {
@@ -535,28 +559,24 @@ export default function CalculadoraPage() {
   const expSimulation = calculateExpeditionSimulation(selectedTreasure, expSimCount)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/" className="text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-              <Calculator className="w-7 h-7" />
+    <ToolsLayout>
+      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Calculator className="w-7 h-7 text-purple-600" />
               Calculadora Tigrinho
             </h1>
-            <p className="text-slate-400 text-sm">Preços do mercado RagnaTales em tempo real</p>
+            <p className="text-gray-500 text-sm">Preços do mercado RagnaTales em tempo real</p>
           </div>
-        </div>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab('expedicao')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
-              activeTab === 'expedicao' ? 'bg-white text-slate-900' : 'bg-slate-800 text-slate-400 hover:text-white'
+              activeTab === 'expedicao' ? 'bg-purple-600 text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <Gem className="w-4 h-4" />
@@ -565,7 +585,7 @@ export default function CalculadoraPage() {
           <button
             onClick={() => setActiveTab('somatologia')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
-              activeTab === 'somatologia' ? 'bg-white text-slate-900' : 'bg-slate-800 text-slate-400 hover:text-white'
+              activeTab === 'somatologia' ? 'bg-purple-600 text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <FlaskConical className="w-4 h-4" />
@@ -578,32 +598,33 @@ export default function CalculadoraPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">Tesouros de Expedição</h2>
-                <p className="text-sm text-slate-400">400 Pó de Meteorita = 1 Tesouro</p>
+                <h2 className="text-xl font-semibold text-gray-900">Tesouros de Expedição</h2>
+                <p className="text-sm text-gray-500">400 Pó de Meteorita = 1 Tesouro</p>
               </div>
               <button
-                onClick={fetchAllPrices}
-                disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg disabled:opacity-50"
+                onClick={syncPrices}
+                disabled={syncing}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-gray-900 rounded-lg disabled:opacity-50 transition-colors"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                Atualizar
+                {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                {syncing ? 'Atualizando...' : 'Atualizar'}
               </button>
             </div>
 
-            {loading && <p className="text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
+            {loading && <p className="text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
+            {syncMessage && <p className={`text-sm ${syncMessage.includes('Erro') ? 'text-red-600' : 'text-green-600'}`}>{syncMessage}</p>}
 
             {/* Preços */}
-            <Card className="p-4 bg-slate-800/50 border-slate-700">
+            <Card className="p-4 bg-white border-gray-200 shadow-sm">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-sm text-slate-400">Preços dos Pós de Meteorita (via Supabase)</span>
-                {!prices.poEscarlate && <span className="text-xs text-yellow-400">⚠️ Execute o sync-prices.js</span>}
+                <span className="text-sm text-gray-500">Preços dos Pós de Meteorita (via Supabase)</span>
+                {!prices.poEscarlate && <span className="text-xs text-amber-600">⚠️ Clique em Atualizar</span>}
               </div>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
                 {['poEscarlate', 'poSolar', 'poVerdejante', 'poCeleste', 'poOceanica', 'poCrepuscular'].map(key => (
                   <div key={key} className="text-center">
-                    <div className="text-slate-500 text-xs">{key.replace('po', '')}</div>
-                    <div className={`font-medium ${prices[key] ? 'text-white' : 'text-slate-600'}`}>
+                    <div className="text-gray-400 text-xs">{key.replace('po', '')}</div>
+                    <div className={`font-medium ${prices[key] ? 'text-gray-900' : 'text-gray-400'}`}>
                       {prices[key] ? formatZeny(prices[key]) : '---'}
                     </div>
                   </div>
@@ -612,8 +633,8 @@ export default function CalculadoraPage() {
             </Card>
 
             {/* Simulador de Expedição */}
-            <Card className="bg-slate-800/50 border-slate-700 p-4">
-              <h3 className="text-lg font-semibold text-white mb-4">📊 Simulação de Tiradas</h3>
+            <Card className="bg-white border-gray-200 shadow-sm p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Simulação de Tiradas</h3>
               
               {/* Seletor de tesouro */}
               <div className="flex flex-wrap gap-2 mb-4">
@@ -623,8 +644,8 @@ export default function CalculadoraPage() {
                     onClick={() => setSelectedTreasure(key)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                       selectedTreasure === key
-                        ? 'bg-white text-slate-900'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                        ? 'bg-purple-600 text-gray-900'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
                     {t.name.replace('Tesouro ', '')}
@@ -664,7 +685,7 @@ export default function CalculadoraPage() {
                       vale ? 'border-emerald-500/30' : 'border-red-500/30'
                     }`}>
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-xl font-bold text-white">{count}x Tiros</span>
+                        <span className="text-xl font-bold text-gray-900">{count}x Tiros</span>
                         <span className={`text-xs px-2 py-1 rounded font-medium ${
                           vale ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                         }`}>
@@ -673,34 +694,34 @@ export default function CalculadoraPage() {
                       </div>
                       
                       {/* Investimento */}
-                      <div className="bg-slate-800/50 rounded p-2 mb-3">
-                        <div className="text-xs text-slate-400">💰 Investimento</div>
-                        <div className="text-lg font-bold text-white">{formatZeny(sim.totalCost)}</div>
+                      <div className="bg-white border border-gray-200/50 rounded p-2 mb-3">
+                        <div className="text-xs text-gray-500">💰 Investimento</div>
+                        <div className="text-lg font-bold text-gray-900">{formatZeny(sim.totalCost)}</div>
                       </div>
 
                       {/* Retorno Garantido - detalhado */}
-                      <div className="text-xs text-slate-400 mb-2">📦 Retorno garantido pela %:</div>
+                      <div className="text-xs text-gray-500 mb-2">📦 Retorno garantido pela %:</div>
                       <div className="space-y-1.5 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-slate-300">{count * 4}x Compêndios</span>
-                          <span className="text-white">{formatZeny(sim.compendiosTotal)}</span>
+                          <span className="text-gray-600">{count * 4}x Compêndios</span>
+                          <span className="text-gray-900">{formatZeny(sim.compendiosTotal)}</span>
                         </div>
                         {garantidoDesmembradores > 0 && (
                           <div className="flex justify-between">
-                            <span className="text-slate-300">{garantidoDesmembradores}x Desmembrador</span>
-                            <span className="text-white">{formatZeny(valorDesmembradores)}</span>
+                            <span className="text-gray-600">{garantidoDesmembradores}x Desmembrador</span>
+                            <span className="text-gray-900">{formatZeny(valorDesmembradores)}</span>
                           </div>
                         )}
                         {garantidoBencaos > 0 && (
                           <div className="flex justify-between">
-                            <span className="text-slate-300">{garantidoBencaos}x Bênção</span>
-                            <span className="text-white">{formatZeny(valorBencaos)}</span>
+                            <span className="text-gray-600">{garantidoBencaos}x Bênção</span>
+                            <span className="text-gray-900">{formatZeny(valorBencaos)}</span>
                           </div>
                         )}
                         {garantidoMestres > 0 && (
                           <div className="flex justify-between">
-                            <span className="text-slate-300">{garantidoMestres}x Mestre</span>
-                            <span className="text-white">{formatZeny(valorMestres)}</span>
+                            <span className="text-gray-600">{garantidoMestres}x Mestre</span>
+                            <span className="text-gray-900">{formatZeny(valorMestres)}</span>
                           </div>
                         )}
                         {garantidoRaros > 0 && (
@@ -718,13 +739,13 @@ export default function CalculadoraPage() {
                       </div>
 
                       {/* Total e Lucro */}
-                      <div className="mt-3 pt-3 border-t border-slate-700">
+                      <div className="mt-3 pt-3 border-t border-gray-200">
                         <div className="flex justify-between text-sm">
-                          <span className="text-slate-400">Total retorno:</span>
-                          <span className="text-white font-medium">{formatZeny(retornoGarantido)}</span>
+                          <span className="text-gray-500">Total retorno:</span>
+                          <span className="text-gray-900 font-medium">{formatZeny(retornoGarantido)}</span>
                         </div>
                         <div className="flex justify-between text-lg mt-1">
-                          <span className="text-slate-400">Lucro:</span>
+                          <span className="text-gray-500">Lucro:</span>
                           <span className={`font-bold ${lucroGarantido >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                             {lucroGarantido >= 0 ? '+' : ''}{formatZeny(lucroGarantido)}
                           </span>
@@ -733,8 +754,8 @@ export default function CalculadoraPage() {
 
                       {/* Bônus se tiver sorte */}
                       {(garantidoRaros === 0 || garantidoCaixas === 0) && (
-                        <div className="mt-3 pt-3 border-t border-slate-700 text-xs text-slate-500">
-                          <div className="text-slate-400 mb-1">🍀 Se tiver sorte:</div>
+                        <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-400">
+                          <div className="text-gray-500 mb-1">🍀 Se tiver sorte:</div>
                           {garantidoRaros === 0 && (
                             <div className="flex justify-between">
                               <span>+1 {sim.raroName}</span>
@@ -754,7 +775,7 @@ export default function CalculadoraPage() {
                 })}
               </div>
 
-              <p className="text-xs text-slate-500 mt-4">
+              <p className="text-xs text-gray-400 mt-4">
                 * Drops extras (além dos compêndios): 12% nada, 70% desmembrador, 10% bênção, 5% mestre, 2% {treasureResults[selectedTreasure]?.extras?.find((e: any) => e.name?.includes('Espírito') || e.name?.includes('Orbe') || e.name?.includes('Garra') || e.name?.includes('Talismã'))?.name || 'raro'}, 1% caixa
               </p>
             </Card>
@@ -762,9 +783,9 @@ export default function CalculadoraPage() {
             {/* Grid resumido */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               {Object.entries(treasureResults).map(([key, t]) => (
-                <Card key={key} className={`bg-slate-800/50 border-slate-700 p-3 text-center cursor-pointer hover:border-slate-500 transition-all ${selectedTreasure === key ? 'ring-2 ring-white' : ''}`} onClick={() => setSelectedTreasure(key)}>
-                  <div className="text-xs text-slate-400 mb-1">{t.name.replace('Tesouro ', '')}</div>
-                  <div className="text-sm text-white">{formatZeny(t.totalCost)}</div>
+                <Card key={key} className={`bg-white border-gray-200 shadow-sm p-3 text-center cursor-pointer hover:border-slate-500 transition-all ${selectedTreasure === key ? 'ring-2 ring-white' : ''}`} onClick={() => setSelectedTreasure(key)}>
+                  <div className="text-xs text-gray-500 mb-1">{t.name.replace('Tesouro ', '')}</div>
+                  <div className="text-sm text-gray-900">{formatZeny(t.totalCost)}</div>
                   <div className={`text-xs ${t.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                     {t.profit >= 0 ? '+' : ''}{formatZeny(t.profit)}/tiro
                   </div>
@@ -779,49 +800,49 @@ export default function CalculadoraPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">Runa Somatológica</h2>
-                <p className="text-sm text-slate-400">9.990 Almas = 1 Runa</p>
+                <h2 className="text-xl font-semibold text-gray-900">Runa Somatológica</h2>
+                <p className="text-sm text-gray-500">9.990 Almas = 1 Runa</p>
               </div>
               <button
                 onClick={fetchAllPrices}
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 Atualizar
               </button>
             </div>
 
-            {loading && <p className="text-sm text-slate-400"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
+            {loading && <p className="text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
 
             {/* Info */}
-            <Card className="p-4 bg-slate-800/50 border-slate-700 text-sm text-slate-400">
-              <p>• 999 Alma → 1 Condensada → 10 Condensadas → <span className="text-white">1 Runa</span></p>
-              <p>• <span className="text-white">100%</span> Runa (sempre)</p>
-              <p>• <span className="text-emerald-400">10%</span> Caixa ({prices.avgCaixaSomatologia ? formatZeny(prices.avgCaixaSomatologia) : '~500M'}) <span className="text-slate-500">OU</span> <span className="text-yellow-400">1%</span> Aura ({prices.auraMente ? formatZeny(prices.auraMente) : '~5B'})</p>
-              <p className="text-xs text-slate-500 mt-1">* Caixa e Aura são mutuamente exclusivos (não dropam juntos)</p>
+            <Card className="p-4 bg-white border-gray-200 shadow-sm text-sm text-gray-500">
+              <p>• 999 Alma → 1 Condensada → 10 Condensadas → <span className="text-gray-900">1 Runa</span></p>
+              <p>• <span className="text-gray-900">100%</span> Runa (sempre)</p>
+              <p>• <span className="text-emerald-400">10%</span> Caixa ({prices.avgCaixaSomatologia ? formatZeny(prices.avgCaixaSomatologia) : '~500M'}) <span className="text-gray-400">OU</span> <span className="text-yellow-400">1%</span> Aura ({prices.auraMente ? formatZeny(prices.auraMente) : '~5B'})</p>
+              <p className="text-xs text-gray-400 mt-1">* Caixa e Aura são mutuamente exclusivos (não dropam juntos)</p>
             </Card>
 
             {/* Resultado base */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-                <span className="font-semibold text-white">Por Runa</span>
+            <Card className="bg-white border-gray-200 shadow-sm">
+              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                <span className="font-semibold text-gray-900">Por Runa</span>
                 <span className={`px-2 py-1 rounded text-xs font-medium ${somatologyResult.isWorthIt ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
                   {somatologyResult.isWorthIt ? '✓ Vale' : '✗ Não'}
                 </span>
               </div>
               <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div><div className="text-xs text-slate-500">Alma</div><div className="text-white">{formatZeny(somatologyResult.almaCost)}</div></div>
-                <div><div className="text-xs text-slate-500">Custo Total</div><div className="text-white">{formatZeny(somatologyResult.totalCost)}</div></div>
-                <div><div className="text-xs text-slate-500">Média Runas</div><div className="text-white">{formatZeny(somatologyResult.avgRuna)}</div></div>
-                <div><div className="text-xs text-slate-500">Lucro</div><div className={somatologyResult.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{somatologyResult.profit >= 0 ? '+' : ''}{formatZeny(somatologyResult.profit)}</div></div>
+                <div><div className="text-xs text-gray-400">Alma</div><div className="text-gray-900">{formatZeny(somatologyResult.almaCost)}</div></div>
+                <div><div className="text-xs text-gray-400">Custo Total</div><div className="text-gray-900">{formatZeny(somatologyResult.totalCost)}</div></div>
+                <div><div className="text-xs text-gray-400">Média Runas</div><div className="text-gray-900">{formatZeny(somatologyResult.avgRuna)}</div></div>
+                <div><div className="text-xs text-gray-400">Lucro</div><div className={somatologyResult.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{somatologyResult.profit >= 0 ? '+' : ''}{formatZeny(somatologyResult.profit)}</div></div>
               </div>
             </Card>
 
             {/* SIMULADOR - mesma lógica da Expedição */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <div className="p-4 border-b border-slate-700">
-                <div className="flex items-center gap-2 text-white font-semibold">
+            <Card className="bg-white border-gray-200 shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center gap-2 text-gray-900 font-semibold">
                   <TrendingUp className="w-5 h-5" />
                   Simulador de Tiradas
                 </div>
@@ -834,7 +855,7 @@ export default function CalculadoraPage() {
                       key={n}
                       onClick={() => setSimCount(n)}
                       className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                        simCount === n ? 'bg-white text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                        simCount === n ? 'bg-white text-slate-900' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
                       {n}x
@@ -847,7 +868,7 @@ export default function CalculadoraPage() {
                   simulation.vale ? 'border-emerald-500/30' : 'border-red-500/30'
                 }`}>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-xl font-bold text-white">{simulation.count}x Runas</span>
+                    <span className="text-xl font-bold text-gray-900">{simulation.count}x Runas</span>
                     <span className={`text-xs px-2 py-1 rounded font-medium ${
                       simulation.vale ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                     }`}>
@@ -856,17 +877,17 @@ export default function CalculadoraPage() {
                   </div>
                   
                   {/* Investimento */}
-                  <div className="bg-slate-800/50 rounded p-2 mb-4">
-                    <div className="text-xs text-slate-400">💰 Investimento ({simulation.count} × 9.990 almas)</div>
-                    <div className="text-lg font-bold text-white">{formatZeny(simulation.totalCost)}</div>
+                  <div className="bg-white border border-gray-200/50 rounded p-2 mb-4">
+                    <div className="text-xs text-gray-500">💰 Investimento ({simulation.count} × 9.990 almas)</div>
+                    <div className="text-lg font-bold text-gray-900">{formatZeny(simulation.totalCost)}</div>
                   </div>
 
                   {/* Retorno Garantido - detalhado */}
-                  <div className="text-xs text-slate-400 mb-2">📦 Retorno garantido pela %:</div>
+                  <div className="text-xs text-gray-500 mb-2">📦 Retorno garantido pela %:</div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-300">{simulation.garantidoRunas}x Runas (100%)</span>
-                      <span className="text-white">{formatZeny(simulation.valorRunas)}</span>
+                      <span className="text-gray-600">{simulation.garantidoRunas}x Runas (100%)</span>
+                      <span className="text-gray-900">{formatZeny(simulation.valorRunas)}</span>
                     </div>
                     {simulation.garantidoCaixas > 0 && (
                       <div className="flex justify-between text-emerald-400">
@@ -883,13 +904,13 @@ export default function CalculadoraPage() {
                   </div>
 
                   {/* Total e Lucro */}
-                  <div className="mt-4 pt-4 border-t border-slate-700">
+                  <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Total retorno:</span>
-                      <span className="text-white font-medium">{formatZeny(simulation.retornoGarantido)}</span>
+                      <span className="text-gray-500">Total retorno:</span>
+                      <span className="text-gray-900 font-medium">{formatZeny(simulation.retornoGarantido)}</span>
                     </div>
                     <div className="flex justify-between text-lg mt-1">
-                      <span className="text-slate-400">Lucro:</span>
+                      <span className="text-gray-500">Lucro:</span>
                       <span className={`font-bold ${simulation.lucroGarantido >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                         {simulation.lucroGarantido >= 0 ? '+' : ''}{formatZeny(simulation.lucroGarantido)}
                       </span>
@@ -898,8 +919,8 @@ export default function CalculadoraPage() {
 
                   {/* Bônus se tiver sorte */}
                   {(simulation.garantidoCaixas === 0 || simulation.garantidoAuras === 0) && (
-                    <div className="mt-4 pt-4 border-t border-slate-700 text-xs text-slate-500">
-                      <div className="text-slate-400 mb-1">🍀 Se tiver sorte:</div>
+                    <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-400">
+                      <div className="text-gray-500 mb-1">🍀 Se tiver sorte:</div>
                       {simulation.garantidoCaixas === 0 && (
                         <div className="flex justify-between">
                           <span>+1 Caixa Somatologia</span>
@@ -920,17 +941,17 @@ export default function CalculadoraPage() {
 
             {/* Lista de Runas */}
             {runaPrices.length > 0 && (
-              <Card className="bg-slate-800/50 border-slate-700">
-                <button onClick={() => setShowRunas(!showRunas)} className="w-full p-4 flex justify-between items-center hover:bg-slate-700/30">
-                  <span className="text-white font-medium">Runas ({runaPrices.length})</span>
-                  {showRunas ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+              <Card className="bg-white border-gray-200 shadow-sm">
+                <button onClick={() => setShowRunas(!showRunas)} className="w-full p-4 flex justify-between items-center hover:bg-gray-100/30">
+                  <span className="text-gray-900 font-medium">Runas ({runaPrices.length})</span>
+                  {showRunas ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
                 </button>
                 {showRunas && (
-                  <div className="border-t border-slate-700 p-4 max-h-60 overflow-y-auto">
+                  <div className="border-t border-gray-200 p-4 max-h-60 overflow-y-auto">
                     {runaPrices.sort((a, b) => b.price - a.price).map(r => (
                       <div key={r.id} className="flex justify-between py-1 text-sm">
-                        <span className="text-slate-300">{r.name}</span>
-                        <span className="text-white">{formatZeny(r.price)}</span>
+                        <span className="text-gray-600">{r.name}</span>
+                        <span className="text-gray-900">{formatZeny(r.price)}</span>
                       </div>
                     ))}
                   </div>
@@ -940,12 +961,13 @@ export default function CalculadoraPage() {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="mt-8 text-center text-slate-500 text-xs">
-          {lastUpdate && <p>Atualizado: {lastUpdate.toLocaleString('pt-BR')}</p>}
-          <p>⚠️ Valores estatísticos - resultados reais podem variar</p>
+          {/* Footer */}
+          <div className="mt-8 text-center text-gray-400 text-xs">
+            {lastUpdate && <p>Atualizado: {lastUpdate.toLocaleString('pt-BR')}</p>}
+            <p>⚠️ Valores estatísticos - resultados reais podem variar</p>
+          </div>
         </div>
       </div>
-    </div>
+    </ToolsLayout>
   )
 }
