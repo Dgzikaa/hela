@@ -284,7 +284,7 @@ export default function FarmCalculadoraPage() {
     
     // Receita dos drops (usa preço do market se disponível)
     const receitaDrops = conteudo.drops.reduce((acc, drop) => {
-      const preco = drop.isFixed ? drop.preco : (marketPrices[drop.itemKey] || drop.preco)
+      const preco = drop.isFixed ? drop.preco : (drop.itemKey ? (marketPrices[drop.itemKey] || drop.preco) : drop.preco)
       return acc + preco * drop.qtdMedia
     }, 0)
     
@@ -560,7 +560,7 @@ export default function FarmCalculadoraPage() {
                           </h4>
                           <div className="space-y-1 text-sm">
                             {conteudo.drops.map(d => {
-                              const preco = d.isFixed ? d.preco : (marketPrices[d.itemKey] || d.preco)
+                              const preco = d.isFixed ? d.preco : (d.itemKey ? (marketPrices[d.itemKey] || d.preco) : d.preco)
                               return (
                                 <div key={d.nome} className="flex justify-between text-gray-600">
                                   <span>{d.nome} x{d.qtdMedia}</span>
