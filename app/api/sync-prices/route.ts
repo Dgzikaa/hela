@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { exec } from 'child_process'
 import path from 'path'
 
-export async function POST() {
-  return new Promise((resolve) => {
+export async function POST(): Promise<Response> {
+  return new Promise<Response>((resolve) => {
     const scriptPath = path.join(process.cwd(), 'ragnatales-watcher', 'sync-prices.js')
     
     // Executa o script em background
