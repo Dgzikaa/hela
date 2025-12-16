@@ -5,7 +5,6 @@ import { AdminSidebar } from '../../components/AdminSidebar'
 import { Card } from '../../components/Card'
 import { Button } from '../../components/Button'
 import { Input } from '../../components/Input'
-import { useToast } from '../../hooks/useToast'
 import { Toast } from '../../components/Toast'
 import {
   Gift,
@@ -63,7 +62,12 @@ export default function AdminCarryGratisPage() {
   const [sorteando, setSorteando] = useState(false)
   const [editingConfig, setEditingConfig] = useState(false)
   const [configForm, setConfigForm] = useState<Partial<Config>>({})
-  const { toast, showToast, hideToast } = useToast()
+  const [toastMsg, setToastMsg] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToastMsg({ message, type })
+    setTimeout(() => setToastMsg(null), 3000)
+  }
   
   useEffect(() => {
     fetchDados()
@@ -455,7 +459,7 @@ export default function AdminCarryGratisPage() {
         </div>
       </main>
       
-      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
+      {toastMsg && <Toast message={toastMsg.message} type={toastMsg.type} onClose={() => setToastMsg(null)} />}
     </div>
   )
 }
