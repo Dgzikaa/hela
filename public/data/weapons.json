@@ -1,0 +1,2790 @@
+[
+  {
+    "id": "bastao",
+    "name": "BastÃ£o",
+    "slot": "Arma",
+    "cardSlots": 4,
+    "icon": "bastao.png",
+    "effects": [],
+    "weaponAttack": 15,
+    "level": 1,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "BastÃ£o"
+  },
+  {
+    "id": "bastÃ£o-da-aberracao",
+    "name": "BastÃ£o da AberraÃ§Ã£o",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "bastao_da_aberracao.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ],
+    "weaponAttack": 150,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_duas_maos",
+    "type": "Cajado"
+  },
+  {
+    "id": "cajado-da-bruxa",
+    "name": "Cajado da Bruxa",
+    "slot": "Arma",
+    "cardSlots": 1,
+    "icon": "cajado_da_bruxa.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 15
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ],
+    "weaponAttack": 20,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "BastÃ£o"
+  },
+  {
+    "id": "bazerald-ilusional",
+    "name": "Bazerald Ilusional",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "bazerald_ilusional.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 7
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 10
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 7,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 50
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 70,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Adaga"
+  },
+  {
+    "id": "shuriken-da-nevasca-ilusional",
+    "name": "Shuriken da Nevasca Ilusional",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "shuriken_da_nevasca_ilusional.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ],
+    "weaponAttack": 200,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Huuma Shuriken"
+  },
+  {
+    "id": "outono-venenoso",
+    "name": "Outono Venenoso",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "outono_venenoso.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 7
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "scaling",
+            "value": 2,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 20
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 35,
+            "skillName": "LanÃ§a Congelante"
+          },
+          {
+            "type": "skill",
+            "value": 35,
+            "skillName": "PÃ©talas Flamejantes"
+          },
+          {
+            "type": "skill",
+            "value": 35,
+            "skillName": "LÃ¢mina de Vento"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 100,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Adaga"
+  },
+  {
+    "id": "espada-da-asa-mistica",
+    "name": "Espada da Asa Mistica",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "espada_da_asa_mistica.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 8
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "maldito",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 7,
+            "target": "modifier",
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 20
+          },
+          {
+            "type": "skill",
+            "value": 25,
+            "skillName": "LanÃ§a Gateira"
+          },
+          {
+            "type": "skill",
+            "value": 25,
+            "skillName": "Crux Magnum"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "Pequeno",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "skill",
+            "value": 25,
+            "skillName": "Crux Magnum"
+          },
+          {
+            "type": "skill",
+            "value": 25,
+            "skillName": "LanÃ§a Gateira"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 100,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Espada"
+  },
+  {
+    "id": "arco-de-trepadeiras",
+    "name": "Arco de Trepadeiras",
+    "slot": "Arma",
+    "cardSlots": 4,
+    "icon": "arco_de_trepadeiras.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ],
+    "weaponAttack": 100,
+    "level": 4,
+    "category": "ranged",
+    "enchantCategory": "magico_duas_maos",
+    "type": "Arco"
+  },
+  {
+    "id": "arco-do-anjo-caido",
+    "name": "Arco do Anjo CaÃ­do",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "arco_do_anjo_caido.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 20
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "LanÃ§as de Fogo"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "LanÃ§as de Gelo"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "RelÃ¢mpago"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "Coluna de Pedra"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "EspÃ­ritos AnciÃµes"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "LanÃ§as de Fogo"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "LanÃ§as de Gelo"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "RelÃ¢mpago"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "Coluna de Pedra"
+          },
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "EspÃ­ritos AnciÃµes"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "LanÃ§as de Fogo"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "LanÃ§as de Gelo"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "RelÃ¢mpago"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "Coluna de Pedra"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "EspÃ­ritos AnciÃµes"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 15,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 150,
+    "level": 4,
+    "category": "ranged",
+    "enchantCategory": "magico_duas_maos",
+    "type": "Arco"
+  },
+  {
+    "id": "cruz-perversa",
+    "name": "Cruz Perversa",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "cruz_perversa.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "category": "physical",
+            "modifier": "physicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 30
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 75,
+            "skillName": "Gemini Lumen"
+          },
+          {
+            "type": "modifier",
+            "value": 75,
+            "subType": "Pequeno",
+            "category": "physical",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 75,
+            "subType": "MÃ©dio",
+            "category": "physical",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 75,
+            "subType": "Grande",
+            "category": "physical",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 15,
+            "skillName": "Gemini Lumen"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 15,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 300,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "fisico_uma_mao",
+    "type": "MaÃ§a"
+  },
+  {
+    "id": "adaga-das-cinzas",
+    "name": "Adaga das Cinzas",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "adaga_das_cinzas.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 8,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 160,
+    "level": 3,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Adaga"
+  },
+  {
+    "id": "bastao-de-cinzas",
+    "name": "BastÃ£o de Cinzas",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "bastao_de_cinzas.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "skill",
+            "value": 5,
+            "skillName": "Esma"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 8,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 2,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          },
+          {
+            "type": "skill",
+            "value": 5,
+            "skillName": "Esma"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 120,
+    "level": 3,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "BastÃ£o"
+  },
+  {
+    "id": "biblia-de-cinzas",
+    "name": "BÃ­blia de Cinzas",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "biblia_de_cinzas.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "skill",
+            "value": 65,
+            "skillName": "Luz Divina"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 8,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 2,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "skill",
+            "value": 65,
+            "skillName": "Luz Divina"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 120,
+    "level": 3,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Livro"
+  },
+  {
+    "id": "cajado-de-cinzas",
+    "name": "Cajado de Cinzas",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "cajado_de_cinzas.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "skill",
+            "value": 50,
+            "skillName": "Campo Gravitacional"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 8,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "skill",
+            "value": 50,
+            "skillName": "Campo Gravitacional"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 200,
+    "level": 3,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "BastÃ£o"
+  },
+  {
+    "id": "chicote-de-cinzas",
+    "name": "Chicote de Cinzas",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "chicote_de_cinzas.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "Pequeno",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "maldito",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 160,
+    "level": 3,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Chicote"
+  },
+  {
+    "id": "livro-de-cinzas",
+    "name": "Livro de Cinzas",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "livro_de_cinzas.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 13,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "skill",
+            "value": 110,
+            "skillName": "Onda PsÃ­quica"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 8,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "skill",
+            "value": 110,
+            "skillName": "Onda PsÃ­quica"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 180,
+    "level": 3,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Livro"
+  },
+  {
+    "id": "chicote-corrompido-da-trentini",
+    "name": "Chicote Corrompido da Trentini",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "chicote_corrompido_da_trentini.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "Pequeno",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "skill",
+            "skillName": "RessonÃ¢ncia",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 10
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "maldito",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "propertyDmg"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 170,
+    "level": 4,
+    "category": "ranged",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Chicote"
+  },
+  {
+    "id": "bastao-corrompido",
+    "name": "BastÃ£o Corrompido",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "bastao_corrompido.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 2,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 24,
+            "target": "skill",
+            "skillName": "Esma",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 10,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 30
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 150,
+    "level": 4,
+    "category": "ranged",
+    "enchantCategory": "magico_uma_mao",
+    "type": "BastÃ£o"
+  },
+  {
+    "id": "biblia-corrompida-da-margaretha",
+    "name": "BÃ­blia Corrompida da Margaretha",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "biblia_corrompida_da_margaretha.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 2,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 50
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "skill",
+            "value": 95,
+            "skillName": "Adoramus"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 150,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_livro",
+    "type": "Livro"
+  },
+  {
+    "id": "cajado-corrompido-da-kathryne",
+    "name": "Cajado Corrompido da Kathryne",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "cajado_corrompido_da_kathryne.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 3,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 10,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 30,
+            "target": "skill",
+            "skillName": "Campo Gravitacional",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "maldito",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 20
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "Pequeno",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 20,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "BastÃ£o"
+  },
+  {
+    "id": "livro-magico-corrompido-da-celia",
+    "name": "Livro MÃ¡gico Corrompido da Celia",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "livro_magico_corrompido_da_celia.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 90,
+            "target": "skill",
+            "skillName": "Onda PsÃ­quica",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 180,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_livro",
+    "type": "Livro"
+  },
+  {
+    "id": "adaga-corrompida-da-gertie",
+    "name": "Adaga Corrompida da Gertie",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "adaga_corrompida_da_gertie.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 10,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 6,
+            "target": "stat",
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 10
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 150,
+            "skillName": "Abalo SÃ­smico"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "activateBuff",
+            "buffId": "amplificacao-mistica"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 120,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_uma_mao",
+    "type": "Adaga"
+  },
+  {
+    "id": "bastÃ£o-ilusional",
+    "name": "BastÃ£o Ilusional",
+    "slot": "Arma",
+    "cardSlots": 2,
+    "icon": "bastao_ilusional.png",
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "skill",
+            "skillName": "Nevasca",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "skill",
+            "skillName": "Ira de Thor",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "skill",
+            "skillName": "Chuva de Meteoros",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "skill",
+            "skillName": "PÃ¢ntano de Nifflheim",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 10,
+            "target": "skill",
+            "skillName": "Campo Gravitacional",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 20
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 8,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "stat": "Tetra Vortex",
+            "type": "skill",
+            "value": 15
+          },
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 30
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "stat": "Tetra Vortex",
+            "type": "skill",
+            "value": 10
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 15,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ],
+    "weaponAttack": 20,
+    "level": 4,
+    "category": "melee",
+    "enchantCategory": "magico_duas_maos",
+    "type": "Cajado"
+  }
+]

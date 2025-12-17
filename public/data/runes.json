@@ -1,0 +1,2631 @@
+[
+  {
+    "id": "runa-da-fenrir",
+    "name": "Runa da Fenrir",
+    "type": "misc",
+    "icon": "runa_mvp",
+    "compatibleSlots": [
+      "Topo"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 20
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": -3
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": -20
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "fenrir",
+              "type": "combo",
+              "equipmentIds": [
+                "fenrir"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "runa-da-serpente-suprema",
+    "name": "Runa da Serpente Suprema",
+    "type": "misc",
+    "icon": "runa_mvp",
+    "compatibleSlots": [
+      "Topo"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": -3
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "serpente-suprema",
+              "type": "combo",
+              "equipmentIds": [
+                "serpente-suprema"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "runa-da-sombra-do-guardiao",
+    "name": "Runa da Sombra do GuardiÃ£o",
+    "type": "misc",
+    "icon": "runa_mvp",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": -3
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "sombra-do-guardiao|runa-da-sombra-do-guardiao",
+              "type": "combo",
+              "equipmentIds": [
+                "sombra-do-guardiao"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "ruby-da-celia",
+    "name": "Ruby da Celia",
+    "type": "misc",
+    "icon": "bio4-ruby",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ruby-da-gertie",
+    "name": "Ruby da Gertie",
+    "type": "misc",
+    "icon": "bio4-ruby",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 2,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "for"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ruby-do-alphoccio",
+    "name": "Ruby do Alphoccio",
+    "type": "misc",
+    "icon": "bio4-ruby",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "for"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ruby-da-trentini",
+    "name": "Ruby da Trentini",
+    "type": "misc",
+    "icon": "bio4-ruby",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ruby-do-randel",
+    "name": "Ruby do Randel",
+    "type": "misc",
+    "icon": "bio4-ruby",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "for"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "safira-da-celia",
+    "name": "Safira da Celia",
+    "type": "misc",
+    "icon": "bio4-safira",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": []
+  },
+  {
+    "id": "safira-da-gertie",
+    "name": "Safira da Gertie",
+    "type": "misc",
+    "icon": "bio4-safira",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 2,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "safira-do-alphoccio",
+    "name": "Safira do Alphoccio",
+    "type": "misc",
+    "icon": "bio4-safira",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 4,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "safira-da-trentini",
+    "name": "Safira da Trentini",
+    "type": "misc",
+    "icon": "bio4-safira",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "safira-do-flamel",
+    "name": "Safira do Flamel",
+    "type": "misc",
+    "icon": "bio4-safira",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          },
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "topazio-da-celia",
+    "name": "Topazio da Celia",
+    "type": "misc",
+    "icon": "bio4-topazio",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": []
+  },
+  {
+    "id": "topazio-da-gertie",
+    "name": "Topazio da Gertie",
+    "type": "misc",
+    "icon": "bio4-topazio",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 2,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "des"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "topazio-do-chen",
+    "name": "Topazio do Chen",
+    "type": "misc",
+    "icon": "bio4-topazio",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": []
+  },
+  {
+    "id": "topazio-da-trentini",
+    "name": "Topazio da Trentini",
+    "type": "misc",
+    "icon": "bio4-topazio",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          },
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "topazio-do-alphoccio",
+    "name": "Topazio do Alphoccio",
+    "type": "misc",
+    "icon": "bio4-topazio",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "des"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ametista-do-alphoccio",
+    "name": "Ametista do Alphoccio",
+    "type": "misc",
+    "icon": "bio4-ametista",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "agi"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ametista-do-randel",
+    "name": "Ametista do Randel",
+    "type": "misc",
+    "icon": "bio4-ametista",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ametista-do-chen",
+    "name": "Ametista do Chen",
+    "type": "misc",
+    "icon": "bio4-ametista",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipAttack",
+            "type": "scaling",
+            "value": 20,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "agi"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ametista-do-flamel",
+    "name": "Ametista do Flamel",
+    "type": "misc",
+    "icon": "bio4-ametista",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "defBypass",
+            "scalingFactor": 18,
+            "scalingSource": "agi"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "defBypass",
+            "scalingFactor": 18,
+            "scalingSource": "agi"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ametista-da-gertie",
+    "name": "Ametista da Gertie",
+    "type": "misc",
+    "icon": "bio4-ametista",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "agi"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jade-do-alphoccio",
+    "name": "Jade do Alphoccio",
+    "type": "misc",
+    "icon": "bio4-jade",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "vit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jade-da-trentini",
+    "name": "Jade da Trentini",
+    "type": "misc",
+    "icon": "bio4-jade",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": []
+  },
+  {
+    "id": "jade-do-chen",
+    "name": "Jade do Chen",
+    "type": "misc",
+    "icon": "bio4-jade",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipAttack",
+            "type": "scaling",
+            "value": 20,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "vit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jade-do-flamel",
+    "name": "Jade do Flamel",
+    "type": "misc",
+    "icon": "bio4-jade",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "defBypass",
+            "scalingFactor": 18,
+            "scalingSource": "vit"
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "modifier",
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "defBypass",
+            "scalingFactor": 18,
+            "scalingSource": "vit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jade-da-gertie",
+    "name": "Jade da Gertie",
+    "type": "misc",
+    "icon": "bio4-jade",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "vit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "citrina-do-alphoccio",
+    "name": "Citrina do Alphoccio",
+    "type": "misc",
+    "icon": "bio4-citrina",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "sor"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "citrina-do-randel",
+    "name": "Citrina do Randel",
+    "type": "misc",
+    "icon": "bio4-citrina",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": []
+  },
+  {
+    "id": "citrina-do-chen",
+    "name": "Citrina do Chen",
+    "type": "misc",
+    "icon": "bio4-citrina",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipAttack",
+            "type": "scaling",
+            "value": 20,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "sor"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "citrina-do-flamel",
+    "name": "Citrina do Flamel",
+    "type": "misc",
+    "icon": "bio4-citrina",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingFactor": 18,
+            "scalingSource": "sor"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "citrina-da-gertie",
+    "name": "Citrina da Gertie",
+    "type": "misc",
+    "icon": "bio4-citrina",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": []
+  },
+  {
+    "id": "geffen-mimir",
+    "name": "Runa de Mimir",
+    "type": "misc",
+    "icon": "geffen-mimir",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "geffen-thor",
+    "name": "Runa de Thor",
+    "type": "misc",
+    "icon": "geffen-thor",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipAttack",
+            "type": "stat",
+            "value": 20
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "geffen-frigg",
+    "name": "Runa de Frigg",
+    "type": "misc",
+    "icon": "geffen-frigg",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": 40
+          },
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "geffen-baldur",
+    "name": "Runa de Baldur",
+    "type": "misc",
+    "icon": "geffen-baldur",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "geffen-freya",
+    "name": "Runa de Freya",
+    "type": "misc",
+    "icon": "geffen-freya",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "geffen-loki",
+    "name": "Runa de Loki",
+    "type": "misc",
+    "icon": "geffen-loki",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alma-do-bioquimico-flamel",
+    "name": "Alma do BioquÃ­mico Flamel",
+    "type": "class",
+    "icon": "alma-mercador",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-mecanico-howard",
+    "name": "Alma do MecÃ¢nico Howard",
+    "type": "class",
+    "icon": "alma-mercador",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-trovador-alphoccio",
+    "name": "Alma do Trovador Alphoccio",
+    "type": "class",
+    "icon": "alma-arqueiro",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-da-musa-trentini",
+    "name": "Alma da Musa Trentini",
+    "type": "class",
+    "icon": "alma-arqueiro",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-da-sentinela-cecil",
+    "name": "Alma da Sentinela Cecil",
+    "type": "class",
+    "icon": "alma-arqueiro",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-da-arcebispa-margaretha",
+    "name": "Alma da Arcebispa Margaretha",
+    "type": "class",
+    "icon": "alma-novico",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-shura-chen",
+    "name": "Alma do Shura Chen",
+    "type": "class",
+    "icon": "alma-novico",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-da-arquimaga-katheryne",
+    "name": "Alma da Arquimaga Katheryne",
+    "type": "class",
+    "icon": "alma-mago",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-da-professora-celia",
+    "name": "Alma da Professora Celia",
+    "type": "class",
+    "icon": "alma-mago",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-guardiao-real-randel",
+    "name": "Alma do GuardiÃ£o Real Randel",
+    "type": "class",
+    "icon": "alma-espadachim",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-cavaleiro-runico-seyren",
+    "name": "Alma do Cavaleiro Runico Seyren",
+    "type": "class",
+    "icon": "alma-espadachim",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-sicario-eremes",
+    "name": "Alma do SicÃ¡rio Eremes",
+    "type": "class",
+    "icon": "alma-gatuno",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-da-renegada-gertie",
+    "name": "Alma da Renegada Gertie",
+    "type": "class",
+    "icon": "alma-gatuno",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": []
+  },
+  {
+    "id": "alma-do-doram-migato",
+    "name": "Alma do Doram Migato",
+    "type": "class",
+    "icon": "alma-expandido",
+    "compatibleSlots": [
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "activatePassive",
+            "level": 5,
+            "passiveId": "transcendencia"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "provocar-diamante",
+    "name": "Runa de Provocar Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "brandir-lanca-safira",
+    "name": "Runa de Brandir LanÃ§a Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "dedicacao-jade",
+    "name": "Runa de DedicaÃ§Ã£o Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "impacto-flamejante-rubi",
+    "name": "Runa de Impacto Flamejante Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "impacto-de-tyr-safira",
+    "name": "Runa de Impacto de Tyr Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "gloria-domini-ametista",
+    "name": "Runa de GlÃ³ria Domini Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "gloria-domini-safira",
+    "name": "Runa de GlÃ³ria Domini Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "divina-providencia-jade",
+    "name": "Runa de Divina ProvidÃªncia Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "divina-providencia-diamante",
+    "name": "Runa de Divina ProvidÃªncia Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "protecao-vanguarda-diamante",
+    "name": "Runa de ProteÃ§Ã£o Vanguarda Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "protecao-vanguarda-safira",
+    "name": "Runa de ProteÃ§Ã£o Vanguarda Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "crux-magnum-ametista",
+    "name": "Runa de Crux Magnum Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "supernova-citrina",
+    "name": "Runa de Supernova Citrina",
+    "type": "class",
+    "icon": "bio5-citrina",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "congelar-citrina",
+    "name": "Runa de Congelar Citrina",
+    "type": "class",
+    "icon": "bio5-citrina",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "chamas-hela-rubi",
+    "name": "Runa de Chamas de Hela Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "vulcao-napalm-rubi",
+    "name": "Runa de VulcÃ£o Napalm Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "tetra-vortex-rubi",
+    "name": "Runa de Tetra Vortex Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "distorcao-arcana-safira",
+    "name": "Runa de DistorÃ§Ã£o Arcana Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "supernova-safira",
+    "name": "Runa de Supernova Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "congelar-ametista",
+    "name": "Runa de Congelar Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "lancas-duplas-safira",
+    "name": "Runa de LanÃ§as Duplas Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "punho-arcano-safira",
+    "name": "Runa de Punho Arcano Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "enlouquecedor-diamante",
+    "name": "Runa de Enlouquecedor Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "pesquisa-toxinas-jade",
+    "name": "Runa de Pesquisa de Toxinas Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "nevoa-toxica-ametista",
+    "name": "Runa de NÃ©voa TÃ³xica Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "nevoa-toxica-safira",
+    "name": "Runa de NÃ©voa TÃ³xica Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "laminas-loki-safira",
+    "name": "Runa de LÃ¢minas de Loki Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "passo-sombrio-rubi",
+    "name": "Runa de Passo Sombrio Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "destruidor-de-almas-safira",
+    "name": "Runa de Destruidor de Almas Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "destruidor-de-almas-rubi",
+    "name": "Runa de Destruidor de Almas Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "acerto-contas-rubi",
+    "name": "Runa de Acerto de Contas Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "disparo-triplo-ametista",
+    "name": "Runa de Disparo Triplo Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "disparo-triplo-rubi",
+    "name": "Runa de Disparo Triplo Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "desejo-sombras-safira",
+    "name": "Runa de Desejo das Sombras Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "espreitar-safira",
+    "name": "Runa de Espreitar Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "preservar-diamante",
+    "name": "Runa de Preservar Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "arremesso-machado-rubi",
+    "name": "Runa de Arremesso de Machado Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "choque-carrinho-diamante",
+    "name": "Runa de Choque de Carrinho Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "choque-carrinho-safira",
+    "name": "Runa de Choque de Carrinho Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "amplificar-poder-safira",
+    "name": "Runa de Amplificar Poder Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "esporo-explosivo-citrina",
+    "name": "Runa de Esporo Explosivo Citrina",
+    "type": "class",
+    "icon": "bio5-citrina",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "tornado-carrinho-safira",
+    "name": "Runa de Tornado de Carrinho Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "tornado-carrinho-rubi",
+    "name": "Runa de Tornado de Carrinho Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "tornado-carrinho-ametista",
+    "name": "Runa de Tornado de Carrinho Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "terror-acido-ametista",
+    "name": "Runa de Terror Ãcido Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "impacto-psiquico-safira",
+    "name": "Runa de Impacto PsÃ­quico Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "dragao-ascendente-safira",
+    "name": "Runa de DragÃ£o Ascendente Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "dragao-ascendente-rubi",
+    "name": "Runa de DragÃ£o Ascendente Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "adoramus-safira",
+    "name": "Runa de Adoramus Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "adoramus-rubi",
+    "name": "Runa de Adoramus Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "basilica-diamante",
+    "name": "Runa de Basilica Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "gemini-lumen-safira",
+    "name": "Runa de Gemini Lumen Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "gemini-lumen-jade",
+    "name": "Runa de Gemini Lumen Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ilimitar-citrina",
+    "name": "Runa de Ilimitar Citrina",
+    "type": "class",
+    "icon": "bio5-citrina",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "tempestade-flechas-rubi",
+    "name": "Runa de Tempestade de Flechas Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "disparo-selvagem-safira",
+    "name": "Runa de Disparo Selvagem Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "assalto-falcao-safira",
+    "name": "Runa de Assalto de FalcÃ£o Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "assalto-falcao-ametista",
+    "name": "Runa de Assalto de FalcÃ£o Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "vulcao-flechas-rubi",
+    "name": "Runa de VulcÃ£o de Flechas Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "temporal-mil-flechas-citrina",
+    "name": "Runa de Temporal de Mil Flechas Citrina",
+    "type": "class",
+    "icon": "bio5-citrina",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "temporal-mil-flechas-ametista",
+    "name": "Runa de Temporal de Mil Flechas Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "estilingue-rubi",
+    "name": "Runa de Estilingue Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ressonancia-safira",
+    "name": "Runa de RessonÃ¢ncia Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ressonancia-jade",
+    "name": "Runa de RessonÃ¢ncia Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ruido-estridente-jade",
+    "name": "Runa de RuÃ­do Estridente Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "calor-solar-rubi",
+    "name": "Runa de Calor Solar Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "esma-safira",
+    "name": "Runa de Esma Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "esma-rubi",
+    "name": "Runa de Esma Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "eswoo-safira",
+    "name": "Runa de Eswoo Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "kaina-diamante",
+    "name": "Runa de Kaina Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "rastrear-alvo-diamante",
+    "name": "Runa de Rastrear o Alvo Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "rastrear-alvo-rubi",
+    "name": "Runa de Rastrear o Alvo Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "ataque-total-ametista",
+    "name": "Runa de Ataque Total Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "cara-ou-coroa-diamante",
+    "name": "Runa de Cara ou Coroa Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "furor-jade",
+    "name": "Runa de Furor Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "desperado-safira",
+    "name": "Runa de Desperado Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "kunai-explosiva-diamante",
+    "name": "Runa de Kunai Explosiva Diamante",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "kunai-explosiva-safira",
+    "name": "Runa de Kunai Explosiva Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "corte-nevoa-rubi",
+    "name": "Runa de Corte da NÃ©voa Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "corte-nevoa-ametista",
+    "name": "Runa de Corte da NÃ©voa Ametista",
+    "type": "class",
+    "icon": "bio5-ametista",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "implosao-toxica-safira",
+    "name": "Runa de ImplosÃ£o TÃ³xica Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "brisa-cortante-safira",
+    "name": "Runa de Brizas Cortantes Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "turbilhao-de-kunais-safira",
+    "name": "Runa de TurbilhÃ£o de Kunais Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "lanca-gateira-rubi",
+    "name": "Runa de LanÃ§a Gateira Rubi",
+    "type": "class",
+    "icon": "bio5-rubi",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "lanca-gateira-safira",
+    "name": "Runa de LanÃ§a Gateira Safira",
+    "type": "class",
+    "icon": "bio5-safira",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "anjo-da-guarda-jade",
+    "name": "Runa de Anjo da Guarda Jade",
+    "type": "class",
+    "icon": "bio5-jade",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Super Aprendiz"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "beijo-vampiro-diamante",
+    "name": "Runa de Beijo Vampiro",
+    "type": "class",
+    "icon": "bio5-diamante",
+    "compatibleSlots": [
+      "Capa",
+      "Escudo",
+      "Sapato",
+      "Armadura",
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "eden-escarlate",
+    "name": "Runa Selvagem Escarlate",
+    "type": "misc",
+    "icon": "eden-escarlate",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "physicalDamage",
+            "type": "modifier",
+            "value": 10,
+            "category": "physical"
+          },
+          {
+            "stat": "equipAttack",
+            "type": "stat",
+            "value": 20
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "defBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "defBypass"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "physicalDamage",
+            "type": "modifier",
+            "value": -10,
+            "category": "physical"
+          },
+          {
+            "stat": "equipAttack",
+            "type": "stat",
+            "value": -20
+          },
+          {
+            "type": "modifier",
+            "value": -5,
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "defBypass"
+          },
+          {
+            "type": "modifier",
+            "value": -5,
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "defBypass"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "eden-escarlate|geffen-all",
+              "type": "combo",
+              "equipmentIds": [
+                "eden-escarlate",
+                "geffen-thor",
+                "geffen-frigg",
+                "geffen-loki",
+                "geffen-baldur",
+                "geffen-freya",
+                "geffen-mimir"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "eden-celeste",
+    "name": "Runa Selvagem Celeste",
+    "type": "misc",
+    "icon": "eden-celeste",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": 40
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 15
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": -10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": -40
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": -15
+          },
+          {
+            "type": "modifier",
+            "value": -5,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": -5,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "eden-celeste|geffen-all",
+              "type": "combo",
+              "equipmentIds": [
+                "eden-celeste",
+                "geffen-thor",
+                "geffen-frigg",
+                "geffen-loki",
+                "geffen-baldur",
+                "geffen-freya",
+                "geffen-mimir"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "eden-crepuscular",
+    "name": "Runa Selvagem Crepuscular",
+    "type": "misc",
+    "icon": "eden-crepuscular",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": -15
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": -10
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "eden-crepuscular|geffen-all",
+              "type": "combo",
+              "equipmentIds": [
+                "eden-crepuscular",
+                "geffen-thor",
+                "geffen-frigg",
+                "geffen-loki",
+                "geffen-baldur",
+                "geffen-freya",
+                "geffen-mimir"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "eden-oceanica",
+    "name": "Runa Selvagem OceÃ¢nica",
+    "type": "misc",
+    "icon": "eden-oceanica",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "eden-verdejante",
+    "name": "Runa Selvagem Verdejante",
+    "type": "misc",
+    "icon": "eden-verdejante",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  },
+  {
+    "id": "eden-solar",
+    "name": "Runa Selvagem Solar",
+    "type": "misc",
+    "icon": "eden-solar",
+    "compatibleSlots": [
+      "AcessÃ³rio Esquerdo",
+      "AcessÃ³rio Direito"
+    ],
+    "effects": []
+  }
+]

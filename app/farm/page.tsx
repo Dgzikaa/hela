@@ -5,7 +5,6 @@ import { Card } from '../components/Card'
 import { Button } from '../components/Button'
 import { ToolsLayout } from '../components/ToolsLayout'
 import { 
-  Calculator,
   TrendingUp,
   Clock,
   Coins,
@@ -17,7 +16,7 @@ import {
   ChevronUp,
   RefreshCw,
   ExternalLink,
-  ArrowRight
+  DollarSign
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -25,115 +24,79 @@ import Link from 'next/link'
 const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3ZkZHNna3NieXVwdG5rZXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzU5NTksImV4cCI6MjA3ODk1MTk1OX0.wkx2__g4rFmEoiBiF-S85txtaQXK1RTDztgC3vSexp4'
 
-// Dados dos conteúdos de farm
-const CONTEUDOS_FARM = [
+// Taxa de conversão: 1kk = R$ 0,32
+const TAXA_REAIS_POR_KK = 0.32
+
+// Interfaces
+interface Consumivel {
+  nome: string
+  qtd: number
+  preco: number
+  itemKey?: string
+  duracao?: string
+  nota?: string
+  isFixed?: boolean
+}
+
+interface Drop {
+  nome: string
+  preco: number
+  qtdMedia: number
+  itemKey?: string
+  isFixed?: boolean
+  nota?: string
+}
+
+interface ConteudoFarm {
+  id: string
+  nome: string
+  icone: string
+  cor: string
+  fadigaMaxima: number | null
+  tempoMinutos: number
+  custoEntrada: number
+  consumiveis: Consumivel[]
+  drops: Drop[]
+  dicas: string
+}
+
+// Dados dos conteúdos de farm com valores REAIS
+const CONTEUDOS_FARM: ConteudoFarm[] = [
   {
     id: 'bio5',
     nome: 'Bio 5',
     icone: '🧬',
     cor: 'emerald',
     fadigaMaxima: 4500,
-    tempoMinutos: 45,
-    custoEntrada: 0,
+    tempoMinutos: 150, // 2h30
+    custoEntrada: 0, // 2 alma condensada = 20k alma sombria (calcular depois)
     consumiveis: [
-      { nome: 'Blue Potion', qtd: 50, preco: 5000, itemKey: 'blue_potion' },
-      { nome: 'Yggdrasil Berry', qtd: 10, preco: 50000, itemKey: 'yggdrasil_berry' },
+      // Buffs de tempo (para 2h30 = 150min)
+      { nome: 'Poção de Furor Físico', qtd: 30, preco: 50000, itemKey: 'pocao_furor_fisico', duracao: '5min' },
+      { nome: 'Poção Grande de HP', qtd: 18, preco: 30000, itemKey: 'pocao_grande_hp', duracao: '500s' },
+      { nome: 'Poção Grande de SP', qtd: 18, preco: 30000, itemKey: 'pocao_grande_sp', duracao: '500s' },
+      { nome: 'Salada de Frutas Tropicais', qtd: 30, preco: 80000, itemKey: 'salada_frutas', duracao: '5min' },
+      { nome: 'Biscoito Natalino', qtd: 15, preco: 100000, itemKey: 'biscoito_natalino', duracao: '10min' },
+      { nome: 'Suco de Gato', qtd: 15, preco: 50000, itemKey: 'suco_gato', duracao: '10min' },
+      { nome: 'Cozido Imortal', qtd: 30, preco: 150000, itemKey: 'cozido_imortal', duracao: '5min' },
+      { nome: 'Benção de Tyr', qtd: 30, preco: 200000, itemKey: 'bencao_tyr', duracao: '5min' },
+      { nome: 'Suco Celular Enriquecido', qtd: 15, preco: 100000, itemKey: 'suco_celular', duracao: '10min' },
+      { nome: 'Ativador de Erva Vermelha', qtd: 15, preco: 80000, itemKey: 'ativador_erva', duracao: '10min' },
+      // Consumíveis por uso
+      { nome: 'Poção Dourada Concentrada', qtd: 200, preco: 15000, itemKey: 'pocao_dourada' },
+      { nome: 'Poção Branca', qtd: 500, preco: 5000, itemKey: 'pocao_branca' },
+      { nome: 'Poção Azul Concentrada', qtd: 300, preco: 8000, itemKey: 'pocao_azul_conc' },
+      { nome: 'Amuleto de Ziegfried', qtd: 30, preco: 100000, itemKey: 'amuleto_ziegfried' },
+      // Gomas (5x gomas de 30min = 1/3 caixa)
+      { nome: 'Gomas (5x 30min)', qtd: 1, preco: 15000000, itemKey: 'goma_30min', nota: '1/3 caixa 20k cash' },
+      // Skill temporada (2 pós)
+      { nome: 'Pó Skill Temporada', qtd: 2, preco: 500000, itemKey: 'po_skill_temp' },
     ],
     drops: [
-      { nome: 'Âmago (média)', preco: 2000000, qtdMedia: 15, itemKey: 'amago' },
+      { nome: 'Âmagos (média 15)', preco: 2000000, qtdMedia: 15, itemKey: 'amago' },
       { nome: 'Loot NPC', preco: 1500000, qtdMedia: 1, isFixed: true },
     ],
-    dicas: 'Melhor conteúdo para farm consistente. 4.500 mobs de fadiga.'
-  },
-  {
-    id: 'verus',
-    nome: 'Verus',
-    icone: '⚔️',
-    cor: 'purple',
-    fadigaMaxima: null,
-    tempoMinutos: 60,
-    custoEntrada: 500000,
-    consumiveis: [
-      { nome: 'Blue Potion', qtd: 200, preco: 5000, itemKey: 'blue_potion' },
-      { nome: 'Yggdrasil Berry', qtd: 30, preco: 50000, itemKey: 'yggdrasil_berry' },
-    ],
-    drops: [
-      { nome: 'Fragmento Verus', preco: 500000, qtdMedia: 10, itemKey: 'fragmento_verus' },
-      { nome: 'Loot NPC', preco: 3000000, qtdMedia: 1, isFixed: true },
-    ],
-    dicas: 'Entry limitado. Bom profit por hora.'
-  },
-  {
-    id: 'torres',
-    nome: 'Torres',
-    icone: '🗼',
-    cor: 'amber',
-    fadigaMaxima: null,
-    tempoMinutos: 90,
-    custoEntrada: 200000,
-    consumiveis: [
-      { nome: 'Blue Potion', qtd: 100, preco: 5000, itemKey: 'blue_potion' },
-      { nome: 'Speed Potion', qtd: 20, preco: 10000, itemKey: 'speed_potion' },
-    ],
-    drops: [
-      { nome: 'Token Torre', preco: 200000, qtdMedia: 25, itemKey: 'token_torre' },
-      { nome: 'Loot NPC', preco: 2000000, qtdMedia: 1, isFixed: true },
-    ],
-    dicas: 'Demora um pouco. Equipamento necessário.'
-  },
-  {
-    id: 'thanatos',
-    nome: 'Thanatos Tower',
-    icone: '💀',
-    cor: 'red',
-    fadigaMaxima: null,
-    tempoMinutos: 120,
-    custoEntrada: 300000,
-    consumiveis: [
-      { nome: 'Blue Potion', qtd: 150, preco: 5000, itemKey: 'blue_potion' },
-      { nome: 'Yggdrasil Berry', qtd: 20, preco: 50000, itemKey: 'yggdrasil_berry' },
-    ],
-    drops: [
-      { nome: 'Fragmento Thanatos', preco: 800000, qtdMedia: 15, itemKey: 'fragmento_thanatos' },
-      { nome: 'Loot NPC', preco: 5000000, qtdMedia: 1, isFixed: true },
-    ],
-    dicas: 'Endgame content. Alto investimento, alto retorno.'
-  },
-  {
-    id: 'cheffenia',
-    nome: 'Cheffenia',
-    icone: '👼',
-    cor: 'sky',
-    fadigaMaxima: null,
-    tempoMinutos: 30,
-    custoEntrada: 0,
-    consumiveis: [
-      { nome: 'Blue Potion', qtd: 80, preco: 5000, itemKey: 'blue_potion' },
-      { nome: 'Elemental Converter', qtd: 5, preco: 30000, itemKey: 'elemental_converter' },
-    ],
-    drops: [
-      { nome: 'Oridecon', preco: 15000, qtdMedia: 80, itemKey: 'oridecon' },
-      { nome: 'Elunium', preco: 20000, qtdMedia: 60, itemKey: 'elunium' },
-      { nome: 'Loot NPC', preco: 800000, qtdMedia: 1, isFixed: true },
-    ],
-    dicas: 'Rápido e sem custo de entrada. Bom para iniciar.'
-  },
-  {
-    id: 'geffenia',
-    nome: 'Geffenia',
-    icone: '😈',
-    cor: 'pink',
-    fadigaMaxima: null,
-    tempoMinutos: 30,
-    custoEntrada: 0,
-    consumiveis: [
-      { nome: 'Blue Potion', qtd: 100, preco: 5000, itemKey: 'blue_potion' },
-    ],
-    drops: [
-      { nome: 'Loot Geral', preco: 150000, qtdMedia: 30, itemKey: 'loot_geffenia' },
-      { nome: 'Loot NPC', preco: 500000, qtdMedia: 1, isFixed: true },
-    ],
-    dicas: 'Clássico do RO. Consistente e sem entry.'
+    dicas: 'Farm principal. 2h30 por run, 4.500 mobs de fadiga.'
   },
   {
     id: 'expedicao',
@@ -141,41 +104,110 @@ const CONTEUDOS_FARM = [
     icone: '🎯',
     cor: 'cyan',
     fadigaMaxima: null,
-    tempoMinutos: 20,
-    custoEntrada: 0,
+    tempoMinutos: 90, // 1h30 máximo
+    custoEntrada: 0, // 250x âmagos sombrios
     consumiveis: [
-      { nome: 'Blue Potion', qtd: 30, preco: 5000, itemKey: 'blue_potion' },
+      // Compêndios (3x cada)
+      { nome: 'Compêndio Magia Absoluta', qtd: 3, preco: 0, itemKey: 'compendio_magia', nota: '12x Pó Oceânica cada' },
+      { nome: 'Compêndio Espelho Quebrado', qtd: 3, preco: 0, itemKey: 'compendio_espelho', nota: '12x Pó Escarlate cada' },
+      { nome: 'Compêndio Isomorfo', qtd: 3, preco: 0, itemKey: 'compendio_isomorfo', nota: '4x Pó Solar cada' },
+      { nome: 'Compêndio Rei do Deserto', qtd: 3, preco: 0, itemKey: 'compendio_deserto', nota: '12x Pó Celes cada' },
+      // Pós de Meteorita (custo real dos compêndios)
+      { nome: 'Pó de Meteorita Oceânica', qtd: 36, preco: 800000, itemKey: 'po_meteorita_oceanica' },
+      { nome: 'Pó de Meteorita Escarlate', qtd: 36, preco: 500000, itemKey: 'po_meteorita_escarlate' },
+      { nome: 'Pó de Meteorita Solar', qtd: 12, preco: 1200000, itemKey: 'po_meteorita_solar' },
+      { nome: 'Pó de Meteorita Celes', qtd: 36, preco: 600000, itemKey: 'po_meteorita_celes' },
+      // Entrada
+      { nome: 'Âmagos Sombrios (entrada)', qtd: 250, preco: 10000, itemKey: 'amago_sombrio' },
+      // Mesmos consumíveis da Bio5
+      { nome: 'Poção Dourada Concentrada', qtd: 200, preco: 15000, itemKey: 'pocao_dourada' },
+      { nome: 'Poção Branca', qtd: 500, preco: 5000, itemKey: 'pocao_branca' },
+      { nome: 'Poção Azul Concentrada', qtd: 300, preco: 8000, itemKey: 'pocao_azul_conc' },
     ],
     drops: [
-      { nome: 'Pó de Meteorita', preco: 500000, qtdMedia: 3, itemKey: 'po_meteorita' },
-      { nome: 'Loot NPC', preco: 200000, qtdMedia: 1, isFixed: true },
+      { nome: 'Pó de Meteorita (variado)', preco: 700000, qtdMedia: 20, itemKey: 'po_meteorita' },
+      { nome: 'Loot NPC', preco: 500000, qtdMedia: 1, isFixed: true },
     ],
-    dicas: 'Rápido, diário. Boa fonte de Pó de Meteorita.'
+    dicas: 'Entrada: 250 Âmagos Sombrios. Usa compêndios (pós).'
   },
   {
-    id: 'somatologia',
-    nome: 'Somatologia',
-    icone: '🔬',
-    cor: 'indigo',
-    fadigaMaxima: null,
-    tempoMinutos: 15,
+    id: 'verus',
+    nome: 'Verus',
+    icone: '⚔️',
+    cor: 'purple',
+    fadigaMaxima: 4500,
+    tempoMinutos: 30,
     custoEntrada: 0,
     consumiveis: [
-      { nome: 'Blue Potion', qtd: 20, preco: 5000, itemKey: 'blue_potion' },
+      { nome: 'Suco de Gato', qtd: 3, preco: 50000, itemKey: 'suco_gato', duracao: '10min' },
+      { nome: 'Pergaminho do Éden', qtd: 1, preco: 50000, itemKey: 'pergaminho_eden' },
+      { nome: 'Poção Branca', qtd: 30, preco: 5000, itemKey: 'pocao_branca' },
+      { nome: 'Poção Dourada Concentrada', qtd: 2, preco: 15000, itemKey: 'pocao_dourada' },
+      { nome: 'Poção Azul Concentrada', qtd: 20, preco: 8000, itemKey: 'pocao_azul_conc' },
     ],
     drops: [
-      { nome: 'Material Soma', preco: 300000, qtdMedia: 5, itemKey: 'material_soma' },
-      { nome: 'Loot NPC', preco: 150000, qtdMedia: 1, isFixed: true },
+      // ~1.130 itens x 9k cada = ~10.17M
+      { nome: 'Loot NPC (~1.130 drops)', preco: 9000, qtdMedia: 1130, isFixed: true },
     ],
-    dicas: 'Super rápido. Complementa a rotina.'
+    dicas: 'Rápido e barato. 4.500 mobs de fadiga, ~30 min.'
+  },
+  {
+    id: 'cheffenia',
+    nome: 'Cheffenia',
+    icone: '👼',
+    cor: 'sky',
+    fadigaMaxima: 1000,
+    tempoMinutos: 40,
+    custoEntrada: 0,
+    consumiveis: [
+      { nome: 'Suco de Gato', qtd: 4, preco: 50000, itemKey: 'suco_gato', duracao: '10min' },
+      { nome: 'Pergaminho do Éden', qtd: 1, preco: 50000, itemKey: 'pergaminho_eden' },
+      { nome: 'Poção Branca', qtd: 200, preco: 5000, itemKey: 'pocao_branca' },
+      { nome: 'Poção Dourada Concentrada', qtd: 10, preco: 15000, itemKey: 'pocao_dourada' },
+      { nome: 'Poção Azul Concentrada', qtd: 80, preco: 8000, itemKey: 'pocao_azul_conc' },
+      { nome: 'Gomas (2x 30min)', qtd: 1, preco: 6000000, itemKey: 'goma_30min', nota: '2 gomas max' },
+    ],
+    drops: [
+      // ~120 itens x 150k cada = ~18M
+      { nome: 'Fragment of Rossata Stone (~120)', preco: 150000, qtdMedia: 120, isFixed: true },
+    ],
+    dicas: '1.000 mobs de fadiga. Usa 2 gomas. ~40 min.'
+  },
+  {
+    id: 'thanatos',
+    nome: 'Maldição de Thanatos',
+    icone: '💀',
+    cor: 'red',
+    fadigaMaxima: null,
+    tempoMinutos: 60,
+    custoEntrada: 0,
+    consumiveis: [
+      { nome: 'Goma Fracionada', qtd: 1, preco: 0, isFixed: true, nota: 'Só custo do char' },
+      { nome: 'Poção Árvore Envenenada Diluída', qtd: 1, preco: 5000000, itemKey: 'pocao_arvore', nota: '1 item = 2 poções' },
+      { nome: 'Poção Branca', qtd: 500, preco: 5000, itemKey: 'pocao_branca' },
+      { nome: 'Poção Dourada Concentrada', qtd: 150, preco: 15000, itemKey: 'pocao_dourada' },
+      { nome: 'Poção Azul Concentrada', qtd: 200, preco: 8000, itemKey: 'pocao_azul_conc' },
+    ],
+    drops: [
+      // ~150 fragmentos líquidos (220 - 50 craft)
+      { nome: 'Fragmento Maldição (~150)', preco: 500000, qtdMedia: 150, itemKey: 'fragmento_maldicao' },
+      // ~10% chance do item raro
+      { nome: 'Essência Thanatos (10%)', preco: 200000000, qtdMedia: 0.1, itemKey: 'essencia_thanatos', nota: 'Drop raro!' },
+    ],
+    dicas: 'Principal farm! Usa 50 frags pra craft. Chance de Essência.'
   },
 ]
 
 const formatZeny = (value: number): string => {
-  if (value >= 1000000000) return (value / 1000000000).toFixed(1) + 'B'
+  if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
   if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
   if (value >= 1000) return (value / 1000).toFixed(0) + 'K'
   return value.toLocaleString('pt-BR')
+}
+
+const formatReais = (zeny: number): string => {
+  const reais = (zeny / 1000000) * TAXA_REAIS_POR_KK
+  return `R$ ${reais.toFixed(2)}`
 }
 
 const getCorClasse = (cor: string) => {
@@ -276,7 +308,8 @@ export default function FarmCalculadoraPage() {
     // Custo total dos consumíveis (usa preço do market se disponível)
     const custoConsumiveis = conteudo.consumiveis.reduce(
       (acc, c) => {
-        const preco = marketPrices[c.itemKey] || c.preco
+        if (c.isFixed) return acc + (c.preco * c.qtd)
+        const preco = c.itemKey ? (marketPrices[c.itemKey] || c.preco) : c.preco
         return acc + c.qtd * preco
       }, 0
     )
@@ -365,7 +398,16 @@ export default function FarmCalculadoraPage() {
       }
     })
     
-    return { tempoTotal, lucroTotal, custoTotal }
+    return { 
+      tempoTotal, 
+      lucroTotal, 
+      custoTotal,
+      lucroSemanal: lucroTotal * 7,
+      lucroMensal: lucroTotal * 30,
+      reaisDia: (lucroTotal / 1000000) * TAXA_REAIS_POR_KK,
+      reaisSemana: (lucroTotal * 7 / 1000000) * TAXA_REAIS_POR_KK,
+      reaisMes: (lucroTotal * 30 / 1000000) * TAXA_REAIS_POR_KK
+    }
   }, [rotina, marketPrices])
 
   return (
@@ -392,31 +434,47 @@ export default function FarmCalculadoraPage() {
             </div>
           </div>
 
-          {/* Info de preços */}
-          <Card className="p-4 bg-white border-gray-200 shadow-sm mb-6">
-            <div className="flex items-center justify-between">
+          {/* Info de preços e conversão */}
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <Card className="p-4 bg-white border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Preços do Mercado</p>
+                    <p className="text-xs text-gray-500">
+                      {loadingPrices ? 'Carregando...' : lastUpdate 
+                        ? `Atualizado em ${lastUpdate.toLocaleString('pt-BR')}`
+                        : 'Usando valores padrão'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={fetchMarketPrices}
+                  disabled={loadingPrices}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <RefreshCw className={`w-5 h-5 text-gray-500 ${loadingPrices ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-purple-600" />
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Preços do Mercado</p>
-                  <p className="text-xs text-gray-500">
-                    {loadingPrices ? 'Carregando...' : lastUpdate 
-                      ? `Atualizado em ${lastUpdate.toLocaleString('pt-BR')}`
-                      : 'Usando valores padrão'}
+                  <p className="text-sm font-medium text-gray-900">Taxa de Conversão</p>
+                  <p className="text-xs text-gray-600">
+                    1 KK = R$ {TAXA_REAIS_POR_KK.toFixed(2)}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={fetchMarketPrices}
-                disabled={loadingPrices}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <RefreshCw className={`w-5 h-5 text-gray-500 ${loadingPrices ? 'animate-spin' : ''}`} />
-              </button>
-            </div>
-          </Card>
+            </Card>
+          </div>
         
           {/* Top 3 Ranking */}
           <h2 className="text-lg font-semibold text-gray-900 mb-3">🏆 Top 3 Lucro/Hora</h2>
@@ -445,21 +503,28 @@ export default function FarmCalculadoraPage() {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-500">Lucro/hora</p>
-                    <p className={`text-lg font-bold ${conteudo.lucroPorHora >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                <div className="space-y-1 mb-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Lucro/hora</span>
+                    <span className={`text-lg font-bold ${conteudo.lucroPorHora >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                       {formatZeny(conteudo.lucroPorHora)}
-                    </p>
+                    </span>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={() => adicionarRotina(conteudo.id)}
-                    className={`${getCorBg(conteudo.cor)} text-white hover:opacity-90`}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">≈ R$/hora</span>
+                    <span className="text-sm font-medium text-green-600">
+                      {formatReais(conteudo.lucroPorHora)}
+                    </span>
+                  </div>
                 </div>
+                
+                <Button
+                  size="sm"
+                  onClick={() => adicionarRotina(conteudo.id)}
+                  className={`w-full ${getCorBg(conteudo.cor)} text-white hover:opacity-90`}
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Adicionar
+                </Button>
               </Card>
             ))}
           </div>
@@ -490,7 +555,7 @@ export default function FarmCalculadoraPage() {
                         <h3 className="font-bold text-gray-900">{conteudo.nome}</h3>
                         {conteudo.fadigaMaxima && (
                           <span className="text-xs px-2 py-0.5 bg-gray-100 rounded text-gray-600">
-                            {conteudo.fadigaMaxima.toLocaleString()} fadiga
+                            {conteudo.fadigaMaxima.toLocaleString()} mobs
                           </span>
                         )}
                       </div>
@@ -500,18 +565,19 @@ export default function FarmCalculadoraPage() {
                           <Clock className="w-3 h-3" />
                           {conteudo.tempoMinutos}min
                         </span>
-                        <span className="flex items-center gap-1 text-gray-500">
+                        <span className="flex items-center gap-1 text-red-500">
                           <Coins className="w-3 h-3" />
-                          {formatZeny(calc.custoTotal)}
+                          -{formatZeny(calc.custoTotal)}
                         </span>
                       </div>
                     </div>
                     
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-gray-500">Lucro/hora</p>
-                      <p className={`text-lg font-bold ${calc.lucroPorHora >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {formatZeny(calc.lucroPorHora)}
+                      <p className="text-xs text-gray-500">Lucro/run</p>
+                      <p className={`text-lg font-bold ${calc.lucroRun >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {calc.lucroRun >= 0 ? '+' : ''}{formatZeny(calc.lucroRun)}
                       </p>
+                      <p className="text-xs text-green-600">{formatReais(calc.lucroRun)}</p>
                     </div>
                     
                     <div className="text-gray-400">
@@ -529,7 +595,7 @@ export default function FarmCalculadoraPage() {
                             <Minus className="w-4 h-4 text-red-500" />
                             Custos
                           </h4>
-                          <div className="space-y-1 text-sm">
+                          <div className="space-y-1 text-xs max-h-48 overflow-y-auto">
                             {conteudo.custoEntrada > 0 && (
                               <div className="flex justify-between text-gray-600">
                                 <span>Entrada</span>
@@ -537,11 +603,13 @@ export default function FarmCalculadoraPage() {
                               </div>
                             )}
                             {conteudo.consumiveis.map(c => {
-                              const preco = marketPrices[c.itemKey] || c.preco
+                              const preco = c.isFixed ? c.preco : (c.itemKey ? (marketPrices[c.itemKey] || c.preco) : c.preco)
                               return (
                                 <div key={c.nome} className="flex justify-between text-gray-600">
-                                  <span>{c.nome} x{c.qtd}</span>
-                                  <span>{formatZeny(c.qtd * preco)}</span>
+                                  <span className="truncate pr-2" title={c.nota || c.nome}>
+                                    {c.nome} x{c.qtd}
+                                  </span>
+                                  <span className="shrink-0">{formatZeny(c.qtd * preco)}</span>
                                 </div>
                               )
                             })}
@@ -558,13 +626,13 @@ export default function FarmCalculadoraPage() {
                             <Plus className="w-4 h-4 text-emerald-500" />
                             Receita Estimada
                           </h4>
-                          <div className="space-y-1 text-sm">
+                          <div className="space-y-1 text-xs">
                             {conteudo.drops.map(d => {
                               const preco = d.isFixed ? d.preco : (d.itemKey ? (marketPrices[d.itemKey] || d.preco) : d.preco)
                               return (
                                 <div key={d.nome} className="flex justify-between text-gray-600">
-                                  <span>{d.nome} x{d.qtdMedia}</span>
-                                  <span>{formatZeny(preco * d.qtdMedia)}</span>
+                                  <span className="truncate pr-2" title={d.nota || d.nome}>{d.nome}</span>
+                                  <span className="shrink-0">{formatZeny(preco * d.qtdMedia)}</span>
                                 </div>
                               )
                             })}
@@ -576,17 +644,25 @@ export default function FarmCalculadoraPage() {
                         </div>
                       </div>
                       
-                      {/* Lucro por run */}
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">Lucro por Run</span>
-                        <span className={`text-lg font-bold ${calc.lucroRun >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                          {calc.lucroRun >= 0 ? '+' : ''}{formatZeny(calc.lucroRun)}
-                        </span>
+                      {/* Lucro e conversão */}
+                      <div className="mt-4 p-3 bg-gradient-to-r from-gray-50 to-green-50 rounded-lg grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-xs text-gray-500">Lucro por Run</span>
+                          <p className={`text-lg font-bold ${calc.lucroRun >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                            {calc.lucroRun >= 0 ? '+' : ''}{formatZeny(calc.lucroRun)}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-gray-500">≈ em Reais</span>
+                          <p className="text-lg font-bold text-green-600">
+                            {formatReais(calc.lucroRun)}
+                          </p>
+                        </div>
                       </div>
                       
                       {/* Dica */}
                       {conteudo.dicas && (
-                        <div className="mt-3 p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+                        <div className="mt-3 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
                           💡 {conteudo.dicas}
                         </div>
                       )}
@@ -683,31 +759,61 @@ export default function FarmCalculadoraPage() {
                             <p className="text-sm text-emerald-600 font-medium">
                               +{formatZeny(calc.lucroRun * r.quantidade)}
                             </p>
+                            <p className="text-xs text-green-600">
+                              {formatReais(calc.lucroRun * r.quantidade)}
+                            </p>
                           </div>
                         </div>
                       )
                     })}
                   </div>
                   
-                  {/* Totais */}
-                  <div className="grid grid-cols-3 gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg">
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500">Tempo Total</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        {Math.floor(rotinaTotal.tempoTotal / 60)}h {rotinaTotal.tempoTotal % 60}min
-                      </p>
+                  {/* Totais com projeção */}
+                  <div className="space-y-4">
+                    {/* Resumo diário */}
+                    <div className="grid grid-cols-3 gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500">Tempo Total</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          {Math.floor(rotinaTotal.tempoTotal / 60)}h {rotinaTotal.tempoTotal % 60}min
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500">Custo Total</p>
+                        <p className="text-lg font-bold text-red-600">
+                          -{formatZeny(rotinaTotal.custoTotal)}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500">Lucro/Dia</p>
+                        <p className={`text-xl font-bold ${rotinaTotal.lucroTotal >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                          {rotinaTotal.lucroTotal >= 0 ? '+' : ''}{formatZeny(rotinaTotal.lucroTotal)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500">Custo Total</p>
-                      <p className="text-lg font-bold text-red-600">
-                        -{formatZeny(rotinaTotal.custoTotal)}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500">Lucro Estimado</p>
-                      <p className={`text-xl font-bold ${rotinaTotal.lucroTotal >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {rotinaTotal.lucroTotal >= 0 ? '+' : ''}{formatZeny(rotinaTotal.lucroTotal)}
-                      </p>
+                    
+                    {/* Projeção em R$ */}
+                    <div className="grid grid-cols-3 gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500">Por Dia</p>
+                        <p className="text-lg font-bold text-green-600">
+                          R$ {rotinaTotal.reaisDia.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500">Por Semana</p>
+                        <p className="text-lg font-bold text-green-600">
+                          R$ {rotinaTotal.reaisSemana.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500">({formatZeny(rotinaTotal.lucroSemanal)})</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500">Por Mês</p>
+                        <p className="text-xl font-bold text-green-600">
+                          R$ {rotinaTotal.reaisMes.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500">({formatZeny(rotinaTotal.lucroMensal)})</p>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -718,7 +824,7 @@ export default function FarmCalculadoraPage() {
           {/* Disclaimer */}
           <div className="text-center text-gray-500 text-sm">
             <p>⚠️ Valores são estimativas baseadas em médias.</p>
-            <p>Resultados reais podem variar com lucky drops (cartas, etc).</p>
+            <p>Taxa: 1 KK = R$ {TAXA_REAIS_POR_KK.toFixed(2)} | Resultados reais podem variar.</p>
           </div>
         </div>
       </div>

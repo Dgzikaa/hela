@@ -1,0 +1,4492 @@
+[
+  {
+    "id": "espirito-da-terra",
+    "name": "EspÃ­rito da Terra",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "bruto",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "bruto",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "espirito-da-vento",
+    "name": "EspÃ­rito da Vento",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "inseto",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "inseto",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "kikimora",
+    "name": "Kikimora",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "demÃ´nio",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "demÃ´nio",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "allegro-e-minueto",
+    "name": "Allegro e Minueto",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          },
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "skill",
+            "skillName": "RuÃ­do Estridente",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "acolito-do-caos",
+    "name": "AcÃ³lito do Caos",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          },
+          {
+            "type": "scaling",
+            "value": 5,
+            "target": "skill",
+            "skillName": "Magnus Exorcismus",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kathryne",
+    "name": "Kathryne",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 2,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "celia",
+    "name": "Celia",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "arch-plasma",
+    "name": "Arch Plasma",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sanare",
+    "name": "Sanare",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "tikbalang",
+    "name": "Tikbalang",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "arvore-de-natal",
+    "name": "Ãrvore de Natal",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 3,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Arquimago",
+                "Professor"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "loli-luni",
+    "name": "Loli Luni",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 3,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Sumo Sacerdote",
+                "Mestre"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "provedora-de-oracoes",
+    "name": "Provedora de OraÃ§Ãµes",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 12,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "banshee",
+    "name": "Banshee",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 20,
+            "skillName": "Ataque Espiritual"
+          },
+          {
+            "type": "skill",
+            "value": 20,
+            "skillName": "EspÃ­rito dos AnÃ§iÃµes"
+          },
+          {
+            "type": "skill",
+            "value": 20,
+            "skillName": "VulcÃ£o Napalm"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "serpente-suprema",
+    "name": "Serpente Suprema",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fenrir",
+    "name": "Fenrir",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 20
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fenrir-selada",
+    "name": "Fenrir Selada",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 1
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 15
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kiel-d-01",
+    "name": "Kiel D-01",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kiel-selada",
+    "name": "Kiel Selada",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 15
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "stat": "afterCast",
+            "type": "stat",
+            "value": 5
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "vesper",
+    "name": "Vesper",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 2
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vesper-selada",
+    "name": "Vesper Selada",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 2
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "ursinho-brilhante",
+    "name": "Ursinho Brilhante",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Paladino"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "OR",
+          "conditions": [
+            {
+              "name": "sumo-margaretha|ursinho-brilhante",
+              "type": "combo",
+              "equipmentIds": [
+                "sumo-margaretha"
+              ]
+            },
+            {
+              "name": "sumo-margaretha-selada|ursinho-brilhante",
+              "type": "combo",
+              "equipmentIds": [
+                "sumo-margaretha-selada"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "orc-heroi-selvagem",
+    "name": "Orc HerÃ³i Selvagem",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vesper-selvagem",
+    "name": "Vesper Selvagem",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          },
+          {
+            "type": "modifier",
+            "value": 70,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "mdefBypass"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "belzebu-selvagem",
+    "name": "Belzebu Selvagem",
+    "compatibleSlots": [
+      "Topo",
+      "Meio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 100
+          },
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "agav",
+    "name": "Agav",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "byorgue",
+    "name": "Byorgue",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Algoz",
+                "Desordeiro"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "modulo-4md-rz",
+    "name": "MÃ³dulo 4MD-RZ",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 9,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 9,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sombra-do-guardiao",
+    "name": "Sombra do GuardiÃ£o",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "entweihen-crothen",
+    "name": "Entweihen Crothen",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": 100
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "naght-sieger",
+    "name": "Naght Sieger",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 40,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "naght-sieger-selada",
+    "name": "Naght Sieger Selada",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "amdarais",
+    "name": "Amdarais",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "amdarais-selada",
+    "name": "Amdarais Selada",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "amdarais-corrompido",
+    "name": "Amdarais Corrompido",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "amdarais-corrompido-selada",
+    "name": "Amdarais Corrompido Selada",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 12,
+            "subType": "chefe",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 12,
+            "subType": "normal",
+            "category": "physical",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 12,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 12,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sumo-margaretha",
+    "name": "Sumo Margaretha",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Sumo Sacerdote",
+                "Mestre"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "sumo-margaretha-selada",
+    "name": "Sumo Margaretha Selada",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "ktullanux-ilusional",
+    "name": "Ktullanux Ilusional",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "scaling",
+            "value": 3,
+            "target": "modifier",
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "serpente-suprema-selvagem",
+    "name": "Serpente Suprema Selvagem",
+    "compatibleSlots": [
+      "Armadura"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 12,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "frus-sagrado",
+    "name": "Frus Sagrado",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plasma-espectral",
+    "name": "Plasma Espectral",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cavaleiro-corrompido",
+    "name": "Cavaleiro Corrompido",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipMAttack",
+            "type": "stat",
+            "value": 30
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "name": "cavaleiro-corrompido|khalitzburg-corrompida",
+              "type": "combo",
+              "equipmentIds": [
+                "khalitzburg-corrompida"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "ursinhos-coloridos",
+    "name": "Ursinhos Coloridos",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "celine-kimi",
+    "name": "Celine Kimi",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "celine-kimi-selada",
+    "name": "Celine Kimi Selada",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "maya-selvagem",
+    "name": "Maya Selvagem",
+    "compatibleSlots": [
+      "Arma"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "Pequeno",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "Pequeno",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "MÃ©dio",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "Grande",
+            "category": "magic",
+            "modifier": "sizeDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 12,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "khalitzburg-corrompida",
+    "name": "Khalitzburg Corrompida",
+    "compatibleSlots": [
+      "Escudo"
+    ],
+    "effects": []
+  },
+  {
+    "id": "despero-de-thanatos",
+    "name": "Despero de Thanatos",
+    "compatibleSlots": [
+      "Escudo"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": -6
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "obsidiana-sinistra",
+    "name": "Obsidiana Sinistra",
+    "compatibleSlots": [
+      "Escudo"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "maldito",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "aliot",
+    "name": "Aliot",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 2
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Arquimago",
+                "Professor"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "antigo-livro",
+    "name": "Antigo Livro",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingFactor": 18,
+            "scalingSource": "int"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "caca-coracao",
+    "name": "Caca CoraÃ§Ã£o",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 2,
+            "target": "stat",
+            "scalingFactor": 10,
+            "scalingSource": "agi"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "modulo-b1-04m",
+    "name": "MÃ³dulo B1-04M",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 3
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 3
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 3
+          },
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rancor-de-thanatos",
+    "name": "Rancor de Thanatos",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "gioia",
+    "name": "Gioia",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 100,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 100,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gioia-selada",
+    "name": "Gioia Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cigana-trentini",
+    "name": "Cigana Trentini",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Super Aprendiz",
+                "Ninja",
+                "Justiceiro",
+                "Taekwon",
+                "Mestre Taekwon",
+                "Espiritualista"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "cigana-trentini-selada",
+    "name": "Cigana Trentini Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Super Aprendiz",
+                "Ninja",
+                "Justiceiro",
+                "Taekwon",
+                "Mestre Taekwon",
+                "Espiritualista"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "criador-flamel",
+    "name": "Criador Flamel",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipAttack",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Criador",
+                "Mestre-Ferreiro"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "criador-flamel-selada",
+    "name": "Criador Flamel Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "equipAttack",
+            "type": "scaling",
+            "value": 5,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Criador",
+                "Mestre-Ferreiro"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "desordeira-gertie",
+    "name": "Desordeira Gertie",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Algoz",
+                "Desordeiro"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "desordeira-gertie-selada",
+    "name": "Desordeira Gertie Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "afterCast",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Algoz",
+                "Desordeiro"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "menestrel-alphoccio",
+    "name": "Menestrel Alphoccio",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Atirador de Elite",
+                "Menestrel",
+                "Cigana"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "menestrel-alphoccio-selada",
+    "name": "Menestrel Alphoccio Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Atirador de Elite",
+                "Menestrel",
+                "Cigana"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "mestre-chen",
+    "name": "Mestre Chen",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "physical",
+            "modifier": "physicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Mestre",
+                "Sumo Sacerdote"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "mestre-chen-selada",
+    "name": "Mestre Chen Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "magic",
+            "modifier": "magicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "type": "scaling",
+            "value": 1,
+            "target": "modifier",
+            "category": "physical",
+            "modifier": "physicalDamage",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Mestre",
+                "Sumo Sacerdote"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "paladino-randel",
+    "name": "Paladino Randel",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Lorde",
+                "Paladino"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "paladino-randel-selada",
+    "name": "Paladino Randel Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Lorde",
+                "Paladino"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "professora-celia",
+    "name": "Professora Celia",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 1,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Arquimago",
+                "Professor"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "professora-celia-selada",
+    "name": "Professora Celia Selada",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "agi",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "vit",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "int",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "des",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "sor",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          },
+          {
+            "stat": "aspdPercent",
+            "type": "scaling",
+            "value": 1,
+            "target": "stat",
+            "scalingLimit": 10,
+            "scalingFactor": 2,
+            "scalingSource": "refine"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "class",
+              "class": [
+                "Arquimago",
+                "Professor"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "amon-ra-selvagem",
+    "name": "Amon Ra Selvagem",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "agi",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "vit",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "des",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "stat": "sor",
+            "type": "stat",
+            "value": 10
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "farao-selvagem",
+    "name": "FaraÃ³ Selvagem",
+    "compatibleSlots": [
+      "Capa"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 60,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sombrio",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "espirito-da-agua",
+    "name": "EspÃ­rito da Ãgua",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "peixe",
+            "category": "magic",
+            "modifier": "raceDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "peixe",
+            "category": "physical",
+            "modifier": "raceDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "peixe",
+            "category": "magic",
+            "modifier": "raceDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 5,
+            "subType": "peixe",
+            "category": "physical",
+            "modifier": "raceDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 9,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "dio-anemos",
+    "name": "Dio Anemos",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ordre",
+    "name": "Ordre",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kuro-akuma",
+    "name": "Kuro Akuma",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "PÃ©talas Flamejantes"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "LanÃ§a Congelante"
+          },
+          {
+            "type": "skill",
+            "value": 10,
+            "skillName": "LÃ¢mina de Vento"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "modulo-tr33-4",
+    "name": "MÃ³dulo TR33-4",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 9,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 9,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 9,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 9,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "venomorfo-perfeito",
+    "name": "Venomorfo Perfeito",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "veneno",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bispo-decadente-selvagem",
+    "name": "Bispo Decadente Selvagem",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 25,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 60,
+            "subType": "humanoide",
+            "category": "magic",
+            "modifier": "raceDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 60,
+            "subType": "anjo",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bispo-decadente",
+    "name": "Bispo Decadente",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "humanoide",
+            "category": "magic",
+            "modifier": "raceDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "anjo",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bispo-decadente-selada",
+    "name": "Bispo Decadente Selada",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 5,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "subType": "humanoide",
+            "category": "magic",
+            "modifier": "raceDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 25,
+            "subType": "anjo",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ]
+      },
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 3,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 8,
+            "subType": "humanoide",
+            "category": "magic",
+            "modifier": "raceDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 8,
+            "subType": "anjo",
+            "category": "magic",
+            "modifier": "raceDmg"
+          }
+        ],
+        "condition": {
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "refine",
+              "value": 10,
+              "operator": ">="
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "outono-ancestral",
+    "name": "Outono Ancestral",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "vento",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "inverno-ancestral",
+    "name": "Inverno Ancestral",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "Ã¡gua",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "primavera-ancestral",
+    "name": "Primavera Ancestral",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "terra",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "verao-ancestral",
+    "name": "VerÃ£o Ancestral",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fogo",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jack-wolf",
+    "name": "Jack Wolf",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "int",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "stat": "for",
+            "type": "stat",
+            "value": 5
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sombrio",
+            "category": "physical",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lady-tanee-selvagem",
+    "name": "Lady Tanee Selvagem",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "chefe",
+            "category": "magic",
+            "modifier": "typeDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 15,
+            "subType": "normal",
+            "category": "magic",
+            "modifier": "typeDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flor-do-luar-selvagem",
+    "name": "Flor do Luar Selvagem",
+    "compatibleSlots": [
+      "Sapato"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 50,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "condor-flamejante",
+    "name": "Condor Flamejante",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "skill",
+            "value": 50,
+            "skillName": "Bolas de Fogo"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lude-assombrado",
+    "name": "Lude Assombrado",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "elvira",
+    "name": "Elvira",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mavka",
+    "name": "Mavka",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mula-sem-cabeca",
+    "name": "Mula Sem CabeÃ§a",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "senhora-da-empatia",
+    "name": "Senhora da Empatia",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 20,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "belzebu",
+    "name": "Belzebu",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "belzebu-selada",
+    "name": "Belzebu Selada",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "equipmentCast",
+            "type": "stat",
+            "value": 15
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "doppelganger-selvagem",
+    "name": "Doppelganger Selvagem",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "stat": "aspdPercent",
+            "type": "stat",
+            "value": 10
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "physical",
+            "modifier": "physicalDamage"
+          },
+          {
+            "type": "modifier",
+            "value": 10,
+            "category": "magic",
+            "modifier": "magicalDamage"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "abelha-rainha-selvagem",
+    "name": "Abelha Rainha Selvagem",
+    "compatibleSlots": [
+      "AcessÃ³rio"
+    ],
+    "effects": [
+      {
+        "effects": [
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "neutro",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fogo",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "Ã¡gua",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "vento",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "terra",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sagrado",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "maldito",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "fantasma",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "sombrio",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          },
+          {
+            "type": "modifier",
+            "value": 30,
+            "subType": "veneno",
+            "category": "magic",
+            "modifier": "elementalDmg"
+          }
+        ]
+      }
+    ]
+  }
+]

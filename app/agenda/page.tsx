@@ -13,15 +13,13 @@ import {
   TrendingUp,
   ChevronLeft,
   ChevronRight,
-  Check,
   X,
-  Edit2,
-  Save
+  DollarSign,
+  BarChart3
 } from 'lucide-react'
 
-// Supabase config
-const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3ZkZHNna3NieXVwdG5rZXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzU5NTksImV4cCI6MjA3ODk1MTk1OX0.wkx2__g4rFmEoiBiF-S85txtaQXK1RTDztgC3vSexp4'
+// Taxa de conversão: 1kk = R$ 0,32
+const TAXA_REAIS_POR_KK = 0.32
 
 const formatZeny = (value: number): string => {
   if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
@@ -30,16 +28,22 @@ const formatZeny = (value: number): string => {
   return value.toLocaleString('pt-BR')
 }
 
-// Conteúdos disponíveis
+const formatReais = (zeny: number): string => {
+  const reais = (zeny / 1000000) * TAXA_REAIS_POR_KK
+  if (reais >= 1000) return `R$ ${(reais/1000).toFixed(1)}K`
+  return `R$ ${reais.toFixed(2)}`
+}
+
+// Conteúdos com valores padrão de profit
 const CONTEUDOS = [
-  { id: 'bio5', nome: 'Bio 5', cor: 'purple', tempoBase: 45 },
-  { id: 'verus', nome: 'Verus', cor: 'blue', tempoBase: 60 },
-  { id: 'cheffenia', nome: 'Cheffenia', cor: 'amber', tempoBase: 30 },
-  { id: 'torres', nome: 'Torres', cor: 'cyan', tempoBase: 90 },
-  { id: 'thanatos', nome: 'Thanatos', cor: 'red', tempoBase: 120 },
-  { id: 'expedicao', nome: 'Expedição', cor: 'green', tempoBase: 20 },
-  { id: 'somatologia', nome: 'Somatologia', cor: 'pink', tempoBase: 15 },
-  { id: 'geffenia', nome: 'Geffenia', cor: 'indigo', tempoBase: 30 },
+  { id: 'bio5', nome: 'Bio 5', cor: 'emerald', tempoBase: 150, profitBase: 30000000, custoBase: 25000000 },
+  { id: 'expedicao', nome: 'Expedição', cor: 'cyan', tempoBase: 90, profitBase: 20000000, custoBase: 15000000 },
+  { id: 'verus', nome: 'Verus', cor: 'purple', tempoBase: 30, profitBase: 10000000, custoBase: 500000 },
+  { id: 'cheffenia', nome: 'Cheffenia', cor: 'sky', tempoBase: 40, profitBase: 18000000, custoBase: 8000000 },
+  { id: 'thanatos', nome: 'Thanatos', cor: 'red', tempoBase: 60, profitBase: 100000000, custoBase: 12000000 },
+  { id: 'geffenia', nome: 'Geffenia', cor: 'pink', tempoBase: 30, profitBase: 5000000, custoBase: 1000000 },
+  { id: 'torres', nome: 'Torres', cor: 'amber', tempoBase: 90, profitBase: 8000000, custoBase: 3000000 },
+  { id: 'custom', nome: 'Personalizado', cor: 'gray', tempoBase: 60, profitBase: 0, custoBase: 0 },
 ]
 
 interface Registro {
@@ -62,36 +66,21 @@ interface Agenda {
   registros: Registro[]
 }
 
-interface ConfigConsumiveis {
-  conteudo: string
-  item_name: string
-  quantidade: number
-  preco_fixo: number
-}
-
-interface ConfigDrops {
-  conteudo: string
-  item_name: string
-  quantidade_media: number
-  preco_npc: number
-  is_raw_zeny: boolean
-}
-
 export default function AgendaPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [agendas, setAgendas] = useState<Agenda[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [configConsumiveis, setConfigConsumiveis] = useState<ConfigConsumiveis[]>([])
-  const [configDrops, setConfigDrops] = useState<ConfigDrops[]>([])
   
   // Estado do novo registro
   const [novoRegistro, setNovoRegistro] = useState({
     conteudo: '',
     porcentagem_drop: 100,
     tempo_minutos: 60,
-    profit_real: ''
+    profit_real: '',
+    custo_manual: '',
+    nome_custom: ''
   })
   
   // Estatísticas do período
@@ -99,30 +88,17 @@ export default function AgendaPage() {
     totalProfit: 0,
     totalCusto: 0,
     totalTempo: 0,
+    diasFarmados: 0,
     conteudosMaisFeitos: [] as { nome: string; count: number }[]
   })
 
   useEffect(() => {
     fetchAgendas()
-    fetchConfigs()
   }, [])
 
   useEffect(() => {
     calcularEstatisticas()
   }, [agendas])
-
-  const fetchConfigs = async () => {
-    try {
-      const response = await fetch('/api/config-farm')
-      if (response.ok) {
-        const data = await response.json()
-        setConfigConsumiveis(data.consumiveis || [])
-        setConfigDrops(data.drops || [])
-      }
-    } catch (err) {
-      console.error('Erro ao buscar configs:', err)
-    }
-  }
 
   const fetchAgendas = async () => {
     setLoading(true)
@@ -152,8 +128,10 @@ export default function AgendaPage() {
     let totalCusto = 0
     let totalTempo = 0
     const conteudoCount: Record<string, number> = {}
+    const diasSet = new Set<string>()
     
     agendas.forEach(agenda => {
+      diasSet.add(agenda.data)
       agenda.registros?.forEach(reg => {
         totalProfit += reg.profit_real || reg.profit_estimado || 0
         totalCusto += reg.custo_total || 0
@@ -171,18 +149,9 @@ export default function AgendaPage() {
       totalProfit,
       totalCusto,
       totalTempo,
+      diasFarmados: diasSet.size,
       conteudosMaisFeitos
     })
-  }
-
-  const calcularCustoConsumiveis = (conteudo: string): number => {
-    const consumiveis = configConsumiveis.filter(c => c.conteudo === conteudo)
-    return consumiveis.reduce((acc, c) => acc + (c.quantidade * c.preco_fixo), 0)
-  }
-
-  const calcularProfitEstimado = (conteudo: string): number => {
-    const drops = configDrops.filter(d => d.conteudo === conteudo && d.is_raw_zeny)
-    return drops.reduce((acc, d) => acc + (d.preco_npc || 0), 0)
   }
 
   const adicionarRegistro = async () => {
@@ -191,9 +160,20 @@ export default function AgendaPage() {
     setSaving(true)
     try {
       const conteudoInfo = CONTEUDOS.find(c => c.id === novoRegistro.conteudo)
-      const custoConsumivel = calcularCustoConsumiveis(novoRegistro.conteudo)
-      const profitBase = calcularProfitEstimado(novoRegistro.conteudo)
-      const profitAjustado = Math.round(profitBase * (novoRegistro.porcentagem_drop / 100))
+      
+      let profitEstimado = conteudoInfo?.profitBase || 0
+      let custoEstimado = conteudoInfo?.custoBase || 0
+      let nomeConteudo = conteudoInfo?.nome || novoRegistro.conteudo
+      
+      // Se for custom, usar valores manuais
+      if (novoRegistro.conteudo === 'custom') {
+        profitEstimado = novoRegistro.profit_real ? parseInt(novoRegistro.profit_real) : 0
+        custoEstimado = novoRegistro.custo_manual ? parseInt(novoRegistro.custo_manual) : 0
+        nomeConteudo = novoRegistro.nome_custom || 'Personalizado'
+      }
+      
+      // Ajustar por porcentagem de drop
+      profitEstimado = Math.round(profitEstimado * (novoRegistro.porcentagem_drop / 100))
       
       const response = await fetch('/api/agenda-farm', {
         method: 'POST',
@@ -203,12 +183,12 @@ export default function AgendaPage() {
           data: selectedDate,
           registro: {
             conteudo: novoRegistro.conteudo,
-            nome_conteudo: conteudoInfo?.nome || novoRegistro.conteudo,
+            nome_conteudo: nomeConteudo,
             porcentagem_drop: novoRegistro.porcentagem_drop,
             tempo_minutos: novoRegistro.tempo_minutos || conteudoInfo?.tempoBase || 60,
             custo_entrada: 0,
-            custo_consumiveis: custoConsumivel,
-            profit_estimado: profitAjustado,
+            custo_consumiveis: custoEstimado,
+            profit_estimado: profitEstimado,
             profit_real: novoRegistro.profit_real ? parseInt(novoRegistro.profit_real) : null
           }
         })
@@ -221,7 +201,9 @@ export default function AgendaPage() {
           conteudo: '',
           porcentagem_drop: 100,
           tempo_minutos: 60,
-          profit_real: ''
+          profit_real: '',
+          custo_manual: '',
+          nome_custom: ''
         })
       }
     } catch (err) {
@@ -262,16 +244,20 @@ export default function AgendaPage() {
     tempo: acc.tempo + (r.tempo_minutos || 0)
   }), { profit: 0, custo: 0, tempo: 0 })
 
+  const lucroLiquidoDia = totalDia.profit - totalDia.custo
+  const lucroLiquido30Dias = estatisticas.totalProfit - estatisticas.totalCusto
+
   const getCorClasse = (cor: string) => {
     const cores: Record<string, string> = {
+      emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
       purple: 'bg-purple-100 text-purple-700 border-purple-200',
-      blue: 'bg-blue-100 text-blue-700 border-blue-200',
       amber: 'bg-amber-100 text-amber-700 border-amber-200',
       cyan: 'bg-cyan-100 text-cyan-700 border-cyan-200',
       red: 'bg-red-100 text-red-700 border-red-200',
       green: 'bg-green-100 text-green-700 border-green-200',
       pink: 'bg-pink-100 text-pink-700 border-pink-200',
-      indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+      sky: 'bg-sky-100 text-sky-700 border-sky-200',
+      gray: 'bg-gray-100 text-gray-700 border-gray-200',
     }
     return cores[cor] || 'bg-gray-100 text-gray-700 border-gray-200'
   }
@@ -286,18 +272,18 @@ export default function AgendaPage() {
               <Calendar className="w-8 h-8 text-blue-600" />
               Agenda de Farm
             </h1>
-            <p className="text-gray-500 mt-1">Registre e acompanhe seu farm diário</p>
+            <p className="text-gray-500 mt-1">Registre e acompanhe seu farm diário • 1 KK = R$ {TAXA_REAIS_POR_KK.toFixed(2)}</p>
           </div>
 
           {/* Estatísticas do período */}
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
+          <div className="grid md:grid-cols-5 gap-4 mb-8">
             <Card className="p-4 bg-white border-gray-200 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <TrendingUp className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Profit (30 dias)</p>
+                  <p className="text-xs text-gray-500">Profit (30d)</p>
                   <p className="font-bold text-green-600">{formatZeny(estatisticas.totalProfit)}</p>
                 </div>
               </div>
@@ -309,22 +295,34 @@ export default function AgendaPage() {
                   <Coins className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Custo (30 dias)</p>
+                  <p className="text-xs text-gray-500">Custo (30d)</p>
                   <p className="font-bold text-red-600">{formatZeny(estatisticas.totalCusto)}</p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-4 bg-white border-gray-200 shadow-sm">
+            <Card className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Lucro Líquido</p>
-                  <p className={`font-bold ${estatisticas.totalProfit - estatisticas.totalCusto >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatZeny(estatisticas.totalProfit - estatisticas.totalCusto)}
+                  <p className={`font-bold ${lucroLiquido30Dias >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                    {formatZeny(lucroLiquido30Dias)}
                   </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Em Reais (30d)</p>
+                  <p className="font-bold text-green-600">{formatReais(lucroLiquido30Dias)}</p>
                 </div>
               </div>
             </Card>
@@ -335,12 +333,43 @@ export default function AgendaPage() {
                   <Clock className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Tempo Total</p>
-                  <p className="font-bold text-purple-600">{Math.round(estatisticas.totalTempo / 60)}h {estatisticas.totalTempo % 60}m</p>
+                  <p className="text-xs text-gray-500">Dias Farmados</p>
+                  <p className="font-bold text-purple-600">{estatisticas.diasFarmados} dias</p>
                 </div>
               </div>
             </Card>
           </div>
+
+          {/* Projeção mensal */}
+          {estatisticas.diasFarmados > 0 && (
+            <Card className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 shadow-sm mb-8">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                📊 Projeção (baseado nos últimos {estatisticas.diasFarmados} dias)
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-3 bg-white/50 rounded-lg">
+                  <p className="text-xs text-gray-500">Média/Dia</p>
+                  <p className="font-bold text-emerald-600">{formatZeny(lucroLiquido30Dias / estatisticas.diasFarmados)}</p>
+                  <p className="text-xs text-green-600">{formatReais(lucroLiquido30Dias / estatisticas.diasFarmados)}</p>
+                </div>
+                <div className="text-center p-3 bg-white/50 rounded-lg">
+                  <p className="text-xs text-gray-500">Projeção Semanal</p>
+                  <p className="font-bold text-emerald-600">{formatZeny((lucroLiquido30Dias / estatisticas.diasFarmados) * 7)}</p>
+                  <p className="text-xs text-green-600">{formatReais((lucroLiquido30Dias / estatisticas.diasFarmados) * 7)}</p>
+                </div>
+                <div className="text-center p-3 bg-white/50 rounded-lg">
+                  <p className="text-xs text-gray-500">Projeção Mensal</p>
+                  <p className="font-bold text-emerald-600">{formatZeny((lucroLiquido30Dias / estatisticas.diasFarmados) * 30)}</p>
+                  <p className="text-xs text-green-600">{formatReais((lucroLiquido30Dias / estatisticas.diasFarmados) * 30)}</p>
+                </div>
+                <div className="text-center p-3 bg-white/50 rounded-lg">
+                  <p className="text-xs text-gray-500">Tempo Total</p>
+                  <p className="font-bold text-purple-600">{Math.floor(estatisticas.totalTempo / 60)}h {estatisticas.totalTempo % 60}m</p>
+                  <p className="text-xs text-gray-500">~{Math.round(estatisticas.totalTempo / estatisticas.diasFarmados)} min/dia</p>
+                </div>
+              </div>
+            </Card>
+          )}
 
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Coluna principal - Registros do dia */}
@@ -382,7 +411,7 @@ export default function AgendaPage() {
               {/* Resumo do dia */}
               {registrosDoDia.length > 0 && (
                 <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-100 shadow-sm">
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="grid grid-cols-4 gap-4 text-center">
                     <div>
                       <p className="text-xs text-gray-500">Profit</p>
                       <p className="font-bold text-green-600">{formatZeny(totalDia.profit)}</p>
@@ -392,8 +421,14 @@ export default function AgendaPage() {
                       <p className="font-bold text-red-600">{formatZeny(totalDia.custo)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Tempo</p>
-                      <p className="font-bold text-purple-600">{totalDia.tempo}min</p>
+                      <p className="text-xs text-gray-500">Lucro</p>
+                      <p className={`font-bold ${lucroLiquidoDia >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {formatZeny(lucroLiquidoDia)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">≈ Reais</p>
+                      <p className="font-bold text-green-600">{formatReais(lucroLiquidoDia)}</p>
                     </div>
                   </div>
                 </Card>
@@ -419,6 +454,7 @@ export default function AgendaPage() {
                 ) : (
                   registrosDoDia.map((registro) => {
                     const conteudoInfo = CONTEUDOS.find(c => c.id === registro.conteudo)
+                    const lucroRegistro = (registro.profit_real || registro.profit_estimado || 0) - (registro.custo_total || 0)
                     return (
                       <Card key={registro.id} className="p-4 bg-white border-gray-200 shadow-sm">
                         <div className="flex items-center justify-between">
@@ -435,11 +471,11 @@ export default function AgendaPage() {
                           
                           <div className="flex items-center gap-4">
                             <div className="text-right">
-                              <p className="text-sm font-semibold text-green-600">
-                                +{formatZeny(registro.profit_real || registro.profit_estimado)}
+                              <p className={`text-sm font-semibold ${lucroRegistro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {lucroRegistro >= 0 ? '+' : ''}{formatZeny(lucroRegistro)}
                               </p>
-                              <p className="text-xs text-red-500">
-                                -{formatZeny(registro.custo_total)}
+                              <p className="text-xs text-green-600">
+                                {formatReais(lucroRegistro)}
                               </p>
                             </div>
                             
@@ -457,9 +493,12 @@ export default function AgendaPage() {
                             <Clock className="w-3 h-3" />
                             {registro.tempo_minutos}min
                           </span>
-                          {registro.observacoes && (
-                            <span className="truncate">{registro.observacoes}</span>
-                          )}
+                          <span className="text-green-600">
+                            +{formatZeny(registro.profit_real || registro.profit_estimado)}
+                          </span>
+                          <span className="text-red-600">
+                            -{formatZeny(registro.custo_total)}
+                          </span>
                         </div>
                       </Card>
                     )
@@ -479,10 +518,11 @@ export default function AgendaPage() {
               )}
             </div>
 
-            {/* Coluna lateral - Conteúdos mais feitos */}
+            {/* Coluna lateral */}
             <div className="space-y-4">
+              {/* Conteúdos mais feitos */}
               <Card className="p-4 bg-white border-gray-200 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-4">Conteúdos mais feitos</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">📊 Conteúdos mais feitos</h3>
                 {estatisticas.conteudosMaisFeitos.length === 0 ? (
                   <p className="text-sm text-gray-500">Nenhum dado ainda</p>
                 ) : (
@@ -504,14 +544,19 @@ export default function AgendaPage() {
                 )}
               </Card>
 
+              {/* Atalhos */}
               <Card className="p-4 bg-white border-gray-200 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-4">Atalhos</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">⚡ Atalhos</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {CONTEUDOS.slice(0, 6).map(conteudo => (
+                  {CONTEUDOS.filter(c => c.id !== 'custom').slice(0, 6).map(conteudo => (
                     <button
                       key={conteudo.id}
                       onClick={() => {
-                        setNovoRegistro(prev => ({ ...prev, conteudo: conteudo.id }))
+                        setNovoRegistro(prev => ({ 
+                          ...prev, 
+                          conteudo: conteudo.id,
+                          tempo_minutos: conteudo.tempoBase
+                        }))
                         setShowAddModal(true)
                       }}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 ${getCorClasse(conteudo.cor)}`}
@@ -521,6 +566,23 @@ export default function AgendaPage() {
                   ))}
                 </div>
               </Card>
+
+              {/* Adicionar personalizado */}
+              <Card className="p-4 bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200 shadow-sm">
+                <h3 className="font-semibold text-gray-900 mb-2">✏️ Personalizado</h3>
+                <p className="text-xs text-gray-500 mb-3">Para farms não listados</p>
+                <Button
+                  onClick={() => {
+                    setNovoRegistro(prev => ({ ...prev, conteudo: 'custom' }))
+                    setShowAddModal(true)
+                  }}
+                  variant="secondary"
+                  className="w-full"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Adicionar Farm
+                </Button>
+              </Card>
             </div>
           </div>
         </div>
@@ -528,7 +590,7 @@ export default function AgendaPage() {
         {/* Modal adicionar */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md bg-white border-gray-200 shadow-xl p-6">
+            <Card className="w-full max-w-md bg-white border-gray-200 shadow-xl p-6 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Adicionar Conteúdo</h2>
                 <button 
@@ -563,6 +625,36 @@ export default function AgendaPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Campos para personalizado */}
+                {novoRegistro.conteudo === 'custom' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Nome do Farm
+                      </label>
+                      <input
+                        type="text"
+                        value={novoRegistro.nome_custom}
+                        onChange={(e) => setNovoRegistro(prev => ({ ...prev, nome_custom: e.target.value }))}
+                        placeholder="Ex: Instance XYZ"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Custo Total (zeny)
+                      </label>
+                      <input
+                        type="text"
+                        value={novoRegistro.custo_manual}
+                        onChange={(e) => setNovoRegistro(prev => ({ ...prev, custo_manual: e.target.value }))}
+                        placeholder="Ex: 5000000"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+                  </>
+                )}
 
                 {/* Porcentagem de drop */}
                 <div>
@@ -608,25 +700,39 @@ export default function AgendaPage() {
                     type="text"
                     value={novoRegistro.profit_real}
                     onChange={(e) => setNovoRegistro(prev => ({ ...prev, profit_real: e.target.value }))}
-                    placeholder="Ex: 5000000"
+                    placeholder="Ex: 50000000"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                   <p className="text-xs text-gray-500 mt-1">Se souber o valor exato que ganhou</p>
                 </div>
 
                 {/* Preview */}
-                {novoRegistro.conteudo && (
+                {novoRegistro.conteudo && novoRegistro.conteudo !== 'custom' && (
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">Custo estimado:</span>{' '}
-                      <span className="text-red-600">{formatZeny(calcularCustoConsumiveis(novoRegistro.conteudo))}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">Profit estimado:</span>{' '}
-                      <span className="text-green-600">
-                        {formatZeny(Math.round(calcularProfitEstimado(novoRegistro.conteudo) * (novoRegistro.porcentagem_drop / 100)))}
-                      </span>
-                    </p>
+                    {(() => {
+                      const c = CONTEUDOS.find(x => x.id === novoRegistro.conteudo)
+                      const profit = Math.round((c?.profitBase || 0) * (novoRegistro.porcentagem_drop / 100))
+                      const custo = c?.custoBase || 0
+                      const lucro = profit - custo
+                      return (
+                        <>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Profit estimado:</span>
+                            <span className="text-green-600 font-medium">{formatZeny(profit)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Custo estimado:</span>
+                            <span className="text-red-600 font-medium">{formatZeny(custo)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm pt-1 border-t border-gray-200 mt-1">
+                            <span className="text-gray-700 font-medium">Lucro:</span>
+                            <span className={`font-bold ${lucro >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                              {formatZeny(lucro)} ({formatReais(lucro)})
+                            </span>
+                          </div>
+                        </>
+                      )
+                    })()}
                   </div>
                 )}
 
@@ -655,4 +761,3 @@ export default function AgendaPage() {
     </ToolsLayout>
   )
 }
-
