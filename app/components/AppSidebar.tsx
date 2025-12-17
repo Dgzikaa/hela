@@ -21,7 +21,8 @@ import {
   ChevronRight,
   Sword,
   LineChart,
-  Settings
+  Settings,
+  Target
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -42,6 +43,7 @@ const menuItems: MenuItem[] = [
   { name: 'Preços', href: '/precos', icon: LineChart },
   { name: 'Config Preços', href: '/config-farm', icon: Settings },
   { name: 'Dano', href: '/dano', icon: Sword },
+  { name: 'Calc. Física', href: '/calculadora-fisica', icon: Target },
   { name: 'Carry Grátis', href: '/carry-gratis', icon: Gift },
   
   // Admin (só aparece logado)

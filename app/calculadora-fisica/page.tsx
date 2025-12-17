@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { ChevronDown, ChevronUp, Swords, Info, X, Search, Plus } from 'lucide-react'
+import { ToolsLayout } from '../components/ToolsLayout'
 
 // ============================================
 // TIPOS
@@ -23,16 +24,24 @@ interface Monster {
 }
 
 interface Equipment {
-  id: string
+  id: string | number
+  nameid?: number
   name: string
   slot: string
   cardSlots: number
-  icon: string
-  effects: EffectGroup[]
+  icon?: string
+  image?: string
+  effects: EffectGroup[] | any[]
   weaponAttack?: number
   level?: number
+  weaponLevel?: number
   category?: string
   type?: string
+  attack?: number
+  slots?: number
+  description?: string
+  defense?: number
+  requiredLevel?: number
 }
 
 interface Card {
@@ -40,6 +49,8 @@ interface Card {
   name: string
   compatibleSlots: string[]
   effects: EffectGroup[]
+  icon?: string
+  image?: string
 }
 
 interface EffectGroup {
@@ -88,6 +99,7 @@ interface EquippedItem {
 // ============================================
 
 const PHYSICAL_CLASSES = [
+  // Classes Transclasse
   { id: 'lorde', name: 'Lorde', sprite: 'Lordessprite.png' },
   { id: 'paladino', name: 'Paladino', sprite: 'Paladinossprite.png' },
   { id: 'algoz', name: 'Algoz', sprite: 'Algoz.png' },
@@ -102,6 +114,12 @@ const PHYSICAL_CLASSES = [
   { id: 'ninja', name: 'Ninja', sprite: 'Ninjassprite.png' },
   { id: 'justiceiro', name: 'Justiceiro', sprite: 'Justiceirossprite.png' },
   { id: 'super-aprendiz', name: 'Super Aprendiz', sprite: 'Superaprendizessprite.png' },
+  // Classes 3rd Job
+  { id: 'rune-knight', name: 'Rune Knight', sprite: 'Rune_Knight.png' },
+  { id: 'royal-guard', name: 'Royal Guard', sprite: 'Royal_Guard.png' },
+  { id: 'ranger', name: 'Ranger', sprite: 'Ranger.png' },
+  { id: 'mecanico', name: 'Mecânico', sprite: 'Mechanic.png' },
+  { id: 'doram', name: 'Doram', sprite: 'Doram.png' },
 ]
 
 // ============================================
@@ -119,12 +137,12 @@ const PHYSICAL_SKILLS = [
   { id: 'shield-boomerang', name: 'Escudo Bumerangue', classes: ['paladino'], element: 'weapon', hits: 1, multiplier: 350, formula: 'atk' },
   { id: 'gloria-domini', name: 'Glória Domini', classes: ['paladino'], element: 'sagrado', hits: 1, multiplier: 600, formula: 'atk' },
   // Algoz / Desordeiro
-  { id: 'sonic-blow', name: 'Golpe Sônico', classes: ['algoz'], element: 'weapon', hits: 8, multiplier: 700, formula: 'atk' },
-  { id: 'meteor-assault', name: 'Ataque Meteoro', classes: ['algoz'], element: 'weapon', hits: 1, multiplier: 400, formula: 'atk' },
-  { id: 'soul-destroyer', name: 'Destruidor de Almas', classes: ['algoz'], element: 'weapon', hits: 1, multiplier: 1000, formula: 'atk+matk' },
-  { id: 'cross-impact', name: 'Impacto Cruzado', classes: ['desordeiro'], element: 'weapon', hits: 7, multiplier: 1500, formula: 'atk' },
-  { id: 'rolling-cutter', name: 'Corte Giratório', classes: ['desordeiro'], element: 'weapon', hits: 1, multiplier: 300, formula: 'atk' },
-  { id: 'cross-ripper', name: 'Dilacerador Cruzado', classes: ['desordeiro'], element: 'weapon', hits: 1, multiplier: 1800, formula: 'atk' },
+  { id: 'sonic-blow', name: 'Golpe Sônico', classes: ['algoz'], element: 'weapon', hits: 8, multiplier: 700, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 200, 260, 320, 380, 440, 500, 560, 620, 680, 700], canCrit: false },
+  { id: 'meteor-assault', name: 'Ataque Meteoro', classes: ['algoz'], element: 'weapon', hits: 1, multiplier: 400, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 80, 120, 160, 200, 240, 280, 320, 360, 400, 400] },
+  { id: 'soul-destroyer', name: 'Destruidor de Almas', classes: ['algoz'], element: 'weapon', hits: 1, multiplier: 1000, formula: 'atk+matk', maxLevel: 10, levelMultipliers: [0, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1000] },
+  { id: 'rolling-cutter', name: 'Lâminas de Loki', classes: ['algoz', 'desordeiro'], element: 'weapon', hits: 1, multiplier: 235, formula: 'atk*baselv', maxLevel: 5, levelMultipliers: [0, 120, 140, 160, 200, 235], canCrit: true, note: 'Fórmula: ATK × BaseLv / 100' },
+  { id: 'cross-ripper', name: 'Dilacerador Cruzado', classes: ['algoz', 'desordeiro'], element: 'weapon', hits: 1, multiplier: 1400, formula: 'atk*rotation', maxLevel: 5, levelMultipliers: [0, 600, 800, 1000, 1200, 1400], note: 'Dano aumenta com pontos de rotação' },
+  { id: 'cross-impact', name: 'Impacto Cruzado', classes: ['desordeiro'], element: 'weapon', hits: 7, multiplier: 1900, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 1100, 1300, 1500, 1700, 1900] },
   // Atirador / Menestrel / Cigana
   { id: 'double-strafe', name: 'Disparo Duplo', classes: ['atirador', 'menestrel', 'cigana'], element: 'weapon', hits: 2, multiplier: 380, formula: 'atk' },
   { id: 'arrow-shower', name: 'Chuva de Flechas', classes: ['atirador', 'menestrel', 'cigana'], element: 'weapon', hits: 1, multiplier: 200, formula: 'atk' },
@@ -134,22 +152,51 @@ const PHYSICAL_SKILLS = [
   { id: 'arrow-vulcan', name: 'Vulcão de Flechas', classes: ['menestrel', 'cigana'], element: 'weapon', hits: 9, multiplier: 1200, formula: 'atk' },
   { id: 'reverberation', name: 'Ressonância', classes: ['menestrel', 'cigana'], element: 'weapon', hits: 1, multiplier: 900, formula: 'atk+matk' },
   // Mestre-Ferreiro / Criador
-  { id: 'cart-revolution', name: 'Golpe de Carrinho', classes: ['mestre-ferreiro', 'criador'], element: 'weapon', hits: 1, multiplier: 250, formula: 'atk' },
-  { id: 'cart-termination', name: 'Choque de Carrinho', classes: ['mestre-ferreiro'], element: 'weapon', hits: 1, multiplier: 1500, formula: 'atk' },
-  { id: 'acid-demonstration', name: 'Terror Ácido', classes: ['criador'], element: 'weapon', hits: 1, multiplier: 0, formula: 'special' },
+  { id: 'cart-revolution', name: 'Golpe de Carrinho', classes: ['mestre-ferreiro', 'criador'], element: 'weapon', hits: 1, multiplier: 250, formula: 'atk', maxLevel: 1 },
+  { id: 'cart-termination', name: 'Choque de Carrinho', classes: ['mestre-ferreiro'], element: 'weapon', hits: 1, multiplier: 1500, formula: 'atk', maxLevel: 1 },
+  { id: 'cart-tornado', name: 'Tornado de Carrinho', classes: ['criador'], element: 'weapon', hits: 1, multiplier: 1250, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 110, 240, 365, 490, 620, 745, 870, 1000, 1130, 1250] },
+  { id: 'cart-cannon', name: 'Canhão de Carrinho', classes: ['criador'], element: 'weapon', hits: 1, multiplier: 1500, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 700, 850, 1000, 1200, 1500] },
+  { id: 'acid-demonstration', name: 'Terror Ácido', classes: ['criador'], element: 'weapon', hits: 10, multiplier: 700, formula: 'atk*vit', maxLevel: 10, levelMultipliers: [0, 70, 140, 210, 280, 350, 420, 490, 560, 630, 700] },
+  { id: 'spore-explosion', name: 'Esporo Explosivo', classes: ['criador'], element: 'weapon', hits: 1, multiplier: 900, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 300, 450, 600, 750, 900] },
+  { id: 'crazy-weed', name: 'Erva Daninha', classes: ['criador'], element: 'terra', hits: 1, multiplier: 1200, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200] },
   // Mestre / Mestre Taekwon
   { id: 'asura-strike', name: 'Punho Supremo', classes: ['mestre'], element: 'weapon', hits: 1, multiplier: 1500, formula: 'atk+sp' },
   { id: 'tiger-cannon', name: 'Impacto de Tigre', classes: ['mestre'], element: 'weapon', hits: 1, multiplier: 1800, formula: 'atk+hp' },
   { id: 'chain-combo', name: 'Combo de Corrente', classes: ['mestre'], element: 'weapon', hits: 4, multiplier: 600, formula: 'atk' },
   { id: 'flying-kick', name: 'Chute Voador', classes: ['mestre-taekwon'], element: 'weapon', hits: 1, multiplier: 500, formula: 'atk' },
-  // Ninja
-  { id: 'throw-kunai', name: 'Lançar Kunai', classes: ['ninja'], element: 'weapon', hits: 1, multiplier: 300, formula: 'atk' },
-  { id: 'throw-huuma', name: 'Lançar Huuma', classes: ['ninja'], element: 'weapon', hits: 5, multiplier: 500, formula: 'atk' },
-  { id: 'cross-slash', name: 'Corte Cruzado', classes: ['ninja'], element: 'weapon', hits: 1, multiplier: 700, formula: 'atk' },
-  // Justiceiro
-  { id: 'desperado', name: 'Desperado', classes: ['justiceiro'], element: 'weapon', hits: 10, multiplier: 400, formula: 'atk' },
-  { id: 'dust', name: 'Poeira', classes: ['justiceiro'], element: 'weapon', hits: 1, multiplier: 500, formula: 'atk' },
-  { id: 'round-trip', name: 'Viagem de Ida e Volta', classes: ['justiceiro'], element: 'weapon', hits: 1, multiplier: 800, formula: 'atk' },
+  // Ninja / Kagerou / Oboro
+  { id: 'throw-kunai', name: 'Lançar Kunai', classes: ['ninja'], element: 'weapon', hits: 1, multiplier: 300, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 140, 180, 220, 260, 300] },
+  { id: 'throw-huuma', name: 'Lançar Huuma', classes: ['ninja'], element: 'weapon', hits: 5, multiplier: 500, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 180, 260, 340, 420, 500] },
+  { id: 'cross-slash', name: 'Corte Cruzado', classes: ['ninja'], element: 'weapon', hits: 1, multiplier: 700, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700] },
+  { id: 'swirling-petal', name: 'Pétalas Rodopiantes', classes: ['ninja'], element: 'weapon', hits: 1, multiplier: 800, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 300, 350, 400, 450, 500, 550, 600, 650, 700, 800] },
+  // Justiceiro / Rebelde
+  { id: 'desperado', name: 'Desperado', classes: ['justiceiro'], element: 'weapon', hits: 1, multiplier: 6750, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 675, 1350, 2025, 2700, 3375, 4050, 4725, 5400, 6075, 6750], note: '1 hit único de dano massivo (RagnaTales)' },
+  { id: 'round-trip', name: 'Viagem de Ida e Volta', classes: ['justiceiro'], element: 'weapon', hits: 1, multiplier: 1000, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 400, 550, 700, 850, 1000] },
+  { id: 'quick-draw-shot', name: 'Disparo Rápido', classes: ['justiceiro'], element: 'weapon', hits: 1, multiplier: 600, formula: 'atk', maxLevel: 1 },
+  { id: 'fire-rain', name: 'Chuva de Balas', classes: ['justiceiro'], element: 'weapon', hits: 5, multiplier: 1500, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 600, 800, 1000, 1250, 1500] },
+  { id: 'slug-shot', name: 'Tiro de Carabina', classes: ['justiceiro'], element: 'weapon', hits: 1, multiplier: 1800, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 600, 900, 1200, 1500, 1800] },
+  // Super Aprendiz
+  { id: 'cart-boost', name: 'Aceleração de Carrinho', classes: ['super-aprendiz'], element: 'weapon', hits: 1, multiplier: 300, formula: 'atk' },
+  // Doram (Gato)
+  { id: 'picky-peck', name: 'Bicada Ágil', classes: ['doram'], element: 'weapon', hits: 5, multiplier: 600, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 200, 300, 400, 500, 600] },
+  { id: 'lunatic-carrot', name: 'Cenoura Lunática', classes: ['doram'], element: 'weapon', hits: 1, multiplier: 800, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 400, 500, 600, 700, 800] },
+  // Rune Knight
+  { id: 'ignition-break', name: 'Ruptura de Ignição', classes: ['rune-knight'], element: 'fogo', hits: 1, multiplier: 2000, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 800, 1100, 1400, 1700, 2000] },
+  { id: 'sonic-wave', name: 'Onda Sônica', classes: ['rune-knight'], element: 'weapon', hits: 1, multiplier: 1200, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 600, 750, 900, 1050, 1200] },
+  { id: 'hundred-spear', name: 'Lança das Cem Batalhas', classes: ['rune-knight'], element: 'weapon', hits: 5, multiplier: 1500, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 400, 550, 700, 850, 1000, 1100, 1200, 1300, 1400, 1500] },
+  { id: 'dragon-breath', name: 'Sopro de Dragão', classes: ['rune-knight'], element: 'fogo', hits: 1, multiplier: 1800, formula: 'atk+hp', maxLevel: 10, levelMultipliers: [0, 600, 750, 900, 1050, 1200, 1350, 1500, 1600, 1700, 1800] },
+  // Royal Guard
+  { id: 'overbrand', name: 'Marca Suprema', classes: ['royal-guard'], element: 'weapon', hits: 2, multiplier: 1400, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 600, 800, 1000, 1200, 1400] },
+  { id: 'banishing-point', name: 'Ponto de Banimento', classes: ['royal-guard'], element: 'weapon', hits: 1, multiplier: 1100, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1100] },
+  { id: 'cannon-spear', name: 'Lança Canhão', classes: ['royal-guard'], element: 'weapon', hits: 1, multiplier: 1300, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 500, 700, 900, 1100, 1300] },
+  // Ranger
+  { id: 'aimed-bolt', name: 'Flecha Certeira', classes: ['ranger'], element: 'weapon', hits: 5, multiplier: 1200, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 300, 420, 540, 660, 780, 900, 1000, 1050, 1100, 1200] },
+  { id: 'arrow-storm', name: 'Tempestade de Flechas', classes: ['ranger', 'atirador'], element: 'weapon', hits: 1, multiplier: 2000, formula: 'atk', maxLevel: 10, levelMultipliers: [0, 600, 800, 1000, 1200, 1400, 1550, 1700, 1850, 1950, 2000] },
+  { id: 'cluster-bomb', name: 'Bomba de Fragmentação', classes: ['ranger'], element: 'weapon', hits: 1, multiplier: 900, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 300, 450, 600, 750, 900] },
+  // Mechanic
+  { id: 'arm-cannon', name: 'Canhão de Braço', classes: ['mecanico'], element: 'weapon', hits: 1, multiplier: 2000, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 800, 1100, 1400, 1700, 2000] },
+  { id: 'knuckle-boost', name: 'Soco Propulsor', classes: ['mecanico'], element: 'weapon', hits: 1, multiplier: 1000, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 400, 550, 700, 850, 1000] },
+  { id: 'axe-tornado', name: 'Tornado de Machado', classes: ['mecanico'], element: 'weapon', hits: 1, multiplier: 1400, formula: 'atk', maxLevel: 5, levelMultipliers: [0, 600, 800, 1000, 1200, 1400] },
 ]
 
 // ============================================
@@ -253,9 +300,9 @@ function EquipmentSlotComponent({
   const cardSlots = equipped.equipment?.cardSlots || 0
 
   return (
-    <div className={`flex flex-col items-center ${position}`}>
+    <div className={`flex flex-col items-center ${position} pb-2`}>
       <span className="text-[10px] text-gray-500 mb-0.5">{slot.name}</span>
-      <div className="relative">
+      <div className="relative overflow-visible">
         <button
           onClick={onClick}
           className={`w-11 h-11 rounded-lg border-2 transition-all relative group
@@ -267,11 +314,15 @@ function EquipmentSlotComponent({
           {hasEquipment ? (
             <>
               <img
-                src={`https://tales-calc-next.vercel.app/equipments/${equipped.equipment!.icon}`}
+                src={equipped.equipment!.image || equipped.equipment!.icon}
                 alt={equipped.equipment!.name}
                 className="w-full h-full object-contain p-0.5"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://tales-calc-next.vercel.app/empty_slot-removebg-preview.png'
+                  const img = e.target as HTMLImageElement;
+                  // Se imagem local falhar, usa API do RagnaTales
+                  if (!img.src.includes('api.ragnatales')) {
+                    img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${equipped.equipment!.nameid || equipped.equipment!.id}`;
+                  }
                 }}
               />
               {equipped.refine > 0 && (
@@ -287,7 +338,7 @@ function EquipmentSlotComponent({
         
         {/* Card slots */}
         {hasEquipment && cardSlots > 0 && (
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-0.5">
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-20">
             {Array.from({ length: cardSlots }).map((_, idx) => (
               <button
                 key={idx}
@@ -295,12 +346,12 @@ function EquipmentSlotComponent({
                   e.stopPropagation()
                   onCardClick(idx)
                 }}
-                className={`w-3 h-3 rounded-sm border transition-all
+                className={`w-4 h-4 rounded border-2 transition-all cursor-pointer hover:scale-125
                   ${equipped.cards[idx] 
-                    ? 'bg-purple-500 border-purple-600' 
-                    : 'bg-gray-200 border-gray-300 hover:bg-purple-200'
+                    ? 'bg-purple-500 border-purple-600 shadow-md' 
+                    : 'bg-white border-gray-400 hover:bg-purple-200 hover:border-purple-400'
                   }`}
-                title={equipped.cards[idx]?.name || 'Slot vazio'}
+                title={equipped.cards[idx]?.name || 'Clique para adicionar carta'}
               />
             ))}
           </div>
@@ -335,31 +386,9 @@ function CardModal({
 }) {
   const [search, setSearch] = useState('')
 
-  // Mapear slots do equipamento para slots compatíveis dos cards
-  const getCompatibleSlotTypes = (slot: string): string[] => {
-    const slotMap: Record<string, string[]> = {
-      'topo': ['Topo', 'Headgear'],
-      'meio': ['Meio', 'Headgear'],
-      'baixo': ['Baixo', 'Headgear'],
-      'armadura': ['Armadura', 'Armor'],
-      'arma': ['Arma', 'Weapon'],
-      'escudo': ['Escudo', 'Shield'],
-      'capa': ['Capa', 'Garment'],
-      'sapato': ['Sapato', 'Footgear'],
-      'acessorio1': ['Acessório', 'Accessory'],
-      'acessorio2': ['Acessório', 'Accessory'],
-    }
-    return slotMap[slot] || []
-  }
-
-  const compatibleSlots = getCompatibleSlotTypes(equipmentSlot)
-
+  // Não filtra por slot - mostra todas as cartas e deixa o jogador escolher
   const filteredCards = useMemo(() => {
-    let items = cards.filter(card => {
-      // Verificar se o card é compatível com o slot
-      if (!card.compatibleSlots || card.compatibleSlots.length === 0) return true
-      return card.compatibleSlots.some(s => compatibleSlots.includes(s))
-    })
+    let items = [...cards]
 
     if (search) {
       const searchLower = search.toLowerCase()
@@ -367,7 +396,7 @@ function CardModal({
     }
 
     return items.slice(0, 100) // Limitar para performance
-  }, [cards, search, compatibleSlots])
+  }, [cards, search])
 
   if (!isOpen) return null
 
@@ -405,9 +434,17 @@ function CardModal({
         {currentCard && (
           <div className="p-4 bg-purple-50 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
-                🃏
-              </div>
+              <img
+                src={currentCard.image || currentCard.icon}
+                alt={currentCard.name}
+                className="w-10 h-10 rounded-lg object-contain"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  if (!img.src.includes('api.ragnatales')) {
+                    img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${currentCard.id}`;
+                  }
+                }}
+              />
               <div>
                 <div className="font-medium text-gray-800">{currentCard.name}</div>
                 <div className="text-sm text-gray-500">Card equipado</div>
@@ -425,16 +462,24 @@ function CardModal({
         {/* Card List */}
         <div className="flex-1 overflow-y-auto p-2">
           <div className="grid grid-cols-1 gap-1">
-            {filteredCards.map(card => (
+            {filteredCards.map((card, idx) => (
               <button
-                key={card.id}
+                key={`${card.id}-${idx}`}
                 onClick={() => onSelect(card)}
                 className={`flex items-center gap-3 p-2 rounded-lg hover:bg-purple-50 transition-colors text-left
                   ${currentCard?.id === card.id ? 'bg-purple-100' : ''}`}
               >
-                <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center text-lg flex-shrink-0">
-                  🃏
-                </div>
+                <img
+                  src={card.image || card.icon}
+                  alt={card.name}
+                  className="w-8 h-8 rounded flex-shrink-0"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    if (!img.src.includes('api.ragnatales')) {
+                      img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${card.id}`;
+                    }
+                  }}
+                />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-800 truncate">{card.name}</div>
                   <div className="text-xs text-gray-500">
@@ -442,7 +487,7 @@ function CardModal({
                       <span key={idx}>
                         {group.effects.slice(0, 2).map((eff, i) => (
                           <span key={i} className="mr-1">
-                            {eff.stat && `${eff.stat}: ${eff.value > 0 ? '+' : ''}${eff.value}${eff.modifier === 'percent' ? '%' : ''}`}
+                            {eff.stat && `${eff.stat}: ${(eff.value || 0) > 0 ? '+' : ''}${eff.value || 0}${eff.modifier === 'percent' ? '%' : ''}`}
                           </span>
                         ))}
                       </span>
@@ -495,9 +540,9 @@ function EquipmentModal({
       items = weapons
     } else {
       items = equipments.filter(e => {
-        const equipSlot = SLOT_MAP[e.slot] || e.slot.toLowerCase()
+        const equipSlot = e.slot?.toLowerCase() || SLOT_MAP[e.slot] || ''
         return equipSlot === slot.id || 
-               (slot.id.startsWith('acessorio') && e.slot === 'Acessório')
+               (slot.id.startsWith('acessorio') && (equipSlot === 'acessorio' || e.slot === 'Acessório'))
       })
     }
 
@@ -544,9 +589,15 @@ function EquipmentModal({
           <div className="p-4 bg-blue-50 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
-                src={`https://tales-calc-next.vercel.app/equipments/${currentEquipment.equipment.icon}`}
+                src={currentEquipment.equipment.image || currentEquipment.equipment.icon}
                 alt={currentEquipment.equipment.name}
                 className="w-10 h-10 object-contain"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  if (!img.src.includes('api.ragnatales') && currentEquipment.equipment) {
+                    img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${currentEquipment.equipment.nameid || currentEquipment.equipment.id}`;
+                  }
+                }}
               />
               <div>
                 <div className="font-medium text-gray-800">{currentEquipment.equipment.name}</div>
@@ -582,19 +633,22 @@ function EquipmentModal({
         {/* Equipment List */}
         <div className="flex-1 overflow-y-auto p-2">
           <div className="grid grid-cols-1 gap-1">
-            {filteredItems.map(item => (
+            {filteredItems.map((item, idx) => (
               <button
-                key={item.id}
+                key={`${item.id}-${item.cardSlots}-${idx}`}
                 onClick={() => onSelect(item, selectedRefine)}
                 className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors text-left
                   ${currentEquipment.equipment?.id === item.id ? 'bg-blue-100' : ''}`}
               >
                 <img
-                  src={`https://tales-calc-next.vercel.app/equipments/${item.icon}`}
+                  src={item.image || item.icon}
                   alt={item.name}
                   className="w-10 h-10 object-contain flex-shrink-0"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://tales-calc-next.vercel.app/empty_slot-removebg-preview.png'
+                    const img = e.target as HTMLImageElement;
+                    if (!img.src.includes('api.ragnatales')) {
+                      img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${item.nameid || item.id}`;
+                    }
                   }}
                 />
                 <div className="flex-1 min-w-0">
@@ -668,6 +722,7 @@ export default function CalculadoraFisica() {
 
   // State - Skill
   const [selectedSkillId, setSelectedSkillId] = useState('ataque-normal')
+  const [skillLevel, setSkillLevel] = useState(10) // Nível da skill (1-10)
   const [attackElement, setAttackElement] = useState('neutro')
   const [isCritical, setIsCritical] = useState(false)
 
@@ -695,6 +750,7 @@ export default function CalculadoraFisica() {
   const [showModifiers, setShowModifiers] = useState(true)
   const [showBuffs, setShowBuffs] = useState(true)
   const [showElementTable, setShowElementTable] = useState(false)
+  const [showBreakdown, setShowBreakdown] = useState(true)
 
   // Carregar dados do RagnaTales
   useEffect(() => {
@@ -707,47 +763,59 @@ export default function CalculadoraFisica() {
       setMonsters(monstersData)
       
       // Transforma armas do RagnaTales para o formato esperado
-      const transformedWeapons: Equipment[] = weaponsData.map((w: any) => ({
-        id: String(w.nameid),
-        name: w.name,
-        slot: 'weapon',
-        cardSlots: w.slots || 0,
-        icon: w.image,
-        weaponAttack: w.attack || 0,
-        level: w.weaponLevel || 1,
-        effects: [],
-        requiredLevel: w.requiredLevel || 0,
-      }))
+      // Cria mapa de ID por nome para reutilizar o ID do primeiro item encontrado
+      const weaponIdMap: Record<string, number> = {}
+      weaponsData.forEach((w: any) => {
+        if (!weaponIdMap[w.name]) {
+          weaponIdMap[w.name] = w.nameid || w.id
+        }
+      })
+      
+      const transformedWeapons: Equipment[] = weaponsData.map((w: any) => {
+        // Usa o ID do primeiro item com o mesmo nome para a imagem
+        const imageId = weaponIdMap[w.name] || w.nameid || w.id
+        const imageUrl = `/images/ragnatales/${imageId}.png`
+        return {
+          id: String(w.nameid || w.id),
+          nameid: w.nameid || w.id,
+          name: w.name,
+          slot: 'weapon',
+          cardSlots: w.slots || 0,
+          icon: imageUrl,
+          image: imageUrl,
+          weaponAttack: w.attack || 0,
+          level: w.weaponLevel || 1,
+          weaponLevel: w.weaponLevel || 1,
+          effects: w.effects || [],
+          requiredLevel: w.requiredLevel || 0,
+          description: w.description || '',
+        }
+      })
       setWeapons(transformedWeapons)
       
-      // Transforma equipamentos - detecta o slot pelo tipo
+      // Transforma equipamentos - usa o slot que já vem nos dados
+      // Cria mapa de ID por nome para reutilizar o ID do primeiro item encontrado
+      const equipIdMap: Record<string, number> = {}
+      equipmentsData.forEach((e: any) => {
+        if (!equipIdMap[e.name]) {
+          equipIdMap[e.name] = e.nameid || e.id
+        }
+      })
+      
       const transformedEquipments: Equipment[] = equipmentsData.map((e: any) => {
-        // Detecta slot baseado no subtype do RagnaTales
-        let slot = 'accessory'
-        const name = (e.name || '').toLowerCase()
-        if (e.subtype === 1) slot = 'armor'
-        else if (e.subtype === 2) slot = 'shield'
-        else if (e.subtype === 3) slot = 'garment'
-        else if (e.subtype === 4) slot = 'footgear'
-        else if (e.subtype === 5 || e.subtype === 6) slot = 'accessory'
-        else if (e.subtype === 256) slot = 'upper'
-        else if (e.subtype === 512) slot = 'middle'
-        else if (e.subtype === 1) slot = 'lower'
-        // Tenta detectar pelo nome também
-        if (name.includes('armadura') || name.includes('armor')) slot = 'armor'
-        else if (name.includes('escudo') || name.includes('shield')) slot = 'shield'
-        else if (name.includes('capa') || name.includes('manto') || name.includes('garment')) slot = 'garment'
-        else if (name.includes('sapato') || name.includes('bota') || name.includes('shoes')) slot = 'footgear'
-        else if (name.includes('anel') || name.includes('brinco') || name.includes('colar') || name.includes('ring')) slot = 'accessory'
-        
+        // Usa o ID do primeiro item com o mesmo nome para a imagem
+        const imageId = equipIdMap[e.name] || e.nameid || e.id
+        const imageUrl = `/images/ragnatales/${imageId}.png`
         return {
-          id: String(e.nameid),
+          id: String(e.nameid || e.id),
+          nameid: e.nameid || e.id,
           name: e.name,
-          slot,
-          cardSlots: e.slots || 0,
-          icon: e.image,
+          slot: e.slot || 'outro',
+          cardSlots: e.slots || e.cardSlots || 0,
+          icon: imageUrl,
+          image: imageUrl,
           weaponAttack: 0,
-          effects: [],
+          effects: e.effects || [],
           defense: e.defense || 0,
           requiredLevel: e.requiredLevel || 0,
         }
@@ -755,13 +823,26 @@ export default function CalculadoraFisica() {
       setEquipments(transformedEquipments)
       
       // Transforma cartas
-      const transformedCards: Card[] = cardsData.map((c: any) => ({
-        id: String(c.nameid),
-        name: c.name,
-        compatibleSlots: ['weapon', 'armor', 'shield', 'garment', 'footgear', 'accessory', 'upper', 'middle', 'lower'],
-        effects: [],
-        icon: c.image,
-      }))
+      // Cria mapa de ID por nome para reutilizar o ID do primeiro item encontrado
+      const cardIdMap: Record<string, number> = {}
+      cardsData.forEach((c: any) => {
+        if (!cardIdMap[c.name]) {
+          cardIdMap[c.name] = c.nameid || c.id
+        }
+      })
+      
+      const transformedCards: Card[] = cardsData.map((c: any) => {
+        const imageId = cardIdMap[c.name] || c.nameid || c.id
+        const imageUrl = `/images/ragnatales/${imageId}.png`
+        return {
+          id: String(c.nameid || c.id),
+          name: c.name,
+          compatibleSlots: c.compatibleSlots || ['weapon', 'armadura', 'escudo', 'capa', 'sapato', 'acessorio', 'topo', 'meio', 'baixo'],
+          effects: c.effects || [],
+          icon: imageUrl,
+          image: imageUrl,
+        }
+      })
       setCards(transformedCards)
       
       setLoading(false)
@@ -808,7 +889,7 @@ export default function CalculadoraFisica() {
     setCardModalSlot(null)
   }, [])
 
-  // Calcular ATK de equipamentos
+  // Calcular todos os modificadores de equipamentos e cartas
   const equipmentStats = useMemo(() => {
     let equipAtk = 0
     let weaponAtk = 0
@@ -816,29 +897,148 @@ export default function CalculadoraFisica() {
     let weaponRefine = 0
     let weaponType = 'Espada'
 
-    const weapon = equippedItems.arma?.equipment
-    if (weapon) {
-      weaponAtk = weapon.weaponAttack || 0
-      weaponLevel = weapon.level || 1
-      weaponRefine = equippedItems.arma.refine
-      weaponType = weapon.type || 'Espada'
+    // Modificadores acumulados
+    const modifiers = {
+      atk_percent: 0,
+      atk_flat: 0,
+      physical_damage_percent: 0,
+      ranged_damage_percent: 0,
+      melee_damage_percent: 0,
+      damage_vs_small: 0,
+      damage_vs_medium: 0,
+      damage_vs_large: 0,
+      damage_vs_all_sizes: 0,
+      damage_vs_undead: 0,
+      damage_vs_demon: 0,
+      damage_vs_demi_human: 0,
+      damage_vs_brute: 0,
+      damage_vs_plant: 0,
+      damage_vs_insect: 0,
+      damage_vs_fish: 0,
+      damage_vs_dragon: 0,
+      damage_vs_angel: 0,
+      damage_vs_formless: 0,
+      damage_vs_all_races: 0,
+      damage_vs_fire: 0,
+      damage_vs_water: 0,
+      damage_vs_wind: 0,
+      damage_vs_earth: 0,
+      damage_vs_shadow: 0,
+      damage_vs_holy: 0,
+      damage_vs_ghost: 0,
+      damage_vs_poison: 0,
+      damage_vs_neutral: 0,
+      ignore_def_percent: 0,
+      ignore_mdef_percent: 0,
+      crit_damage_percent: 0,
+      crit_rate: 0,
+      aspd_percent: 0,
+      str: 0,
+      agi: 0,
+      vit: 0,
+      int: 0,
+      dex: 0,
+      luk: 0,
+      skill_damage: {} as Record<string, number>, // skill name -> bonus %
     }
 
-    // Calcular ATK de outros equipamentos
-    Object.entries(equippedItems).forEach(([slotId, item]) => {
-      if (slotId !== 'arma' && item.equipment) {
-        // Processar effects do equipamento
-        item.equipment.effects.forEach(group => {
-          group.effects.forEach(effect => {
-            if (effect.type === 'stat' && effect.stat === 'equipAttack') {
-              equipAtk += effect.value || 0
-            }
-          })
-        })
+    // Função para verificar se uma condição é atendida
+    const checkCondition = (condition: any, refine: number): boolean => {
+      if (!condition) return true
+      
+      switch (condition.type) {
+        case 'per_refine':
+          return true // Valor será multiplicado pelo refino
+        case 'refine_min':
+          return refine >= condition.value
+        case 'refine_exact':
+          return refine === condition.value
+        case 'on_attack':
+          return true // Sempre ativo para cálculo
+        default:
+          return true
       }
+    }
+
+    // Função para calcular valor do efeito considerando condição
+    const getEffectValue = (effect: any, refine: number): number => {
+      if (!effect.condition) return effect.value || 0
+      
+      if (effect.condition.type === 'per_refine') {
+        const maxRefine = effect.condition.max || 20
+        const effectiveRefine = Math.min(refine, maxRefine)
+        return (effect.value || 0) * effectiveRefine
+      }
+      
+      if (checkCondition(effect.condition, refine)) {
+        return effect.value || 0
+      }
+      
+      return 0
+    }
+
+    // Função para processar efeitos de um item
+    const processEffects = (effects: any[], refine: number) => {
+      if (!effects || !Array.isArray(effects)) return
+      
+      effects.forEach((effect: any) => {
+        const value = getEffectValue(effect, refine)
+        if (value === 0) return
+        
+        const stat = effect.stat
+        
+        if (stat === 'skill_damage' && effect.skill) {
+          modifiers.skill_damage[effect.skill] = (modifiers.skill_damage[effect.skill] || 0) + value
+        } else if (stat in modifiers && stat !== 'skill_damage') {
+          (modifiers as any)[stat] += value
+        }
+      })
+    }
+
+    // Processar arma
+    const weapon = equippedItems.arma?.equipment
+    if (weapon) {
+      weaponAtk = weapon.weaponAttack || weapon.attack || 0
+      weaponLevel = weapon.level || weapon.weaponLevel || 1
+      weaponRefine = equippedItems.arma.refine
+      weaponType = weapon.type || 'Espada'
+      
+      // Processar efeitos da arma
+      processEffects(weapon.effects, weaponRefine)
+      
+      // Processar cartas da arma
+      equippedItems.arma.cards.forEach((card: any) => {
+        if (card?.effects) {
+          processEffects(card.effects, weaponRefine)
+        }
+      })
+    }
+
+    // Processar outros equipamentos
+    Object.entries(equippedItems).forEach(([slotId, item]) => {
+      if (slotId === 'arma' || !item.equipment) return
+      
+      const refine = item.refine || 0
+      
+      // Processar efeitos do equipamento
+      processEffects(item.equipment.effects, refine)
+      
+      // Processar cartas do equipamento
+      item.cards.forEach((card: any) => {
+        if (card?.effects) {
+          processEffects(card.effects, refine)
+        }
+      })
     })
 
-    return { equipAtk, weaponAtk, weaponLevel, weaponRefine, weaponType }
+    return { 
+      equipAtk, 
+      weaponAtk, 
+      weaponLevel, 
+      weaponRefine, 
+      weaponType,
+      modifiers 
+    }
   }, [equippedItems])
 
   // Monstro selecionado
@@ -868,11 +1068,16 @@ export default function CalculadoraFisica() {
   const damageCalculation = useMemo(() => {
     if (!selectedMonster) return { min: 0, max: 0, average: 0, breakdown: {} }
 
-    const { weaponAtk, weaponLevel, weaponRefine, weaponType, equipAtk } = equipmentStats
+    const { weaponAtk, weaponLevel, weaponRefine, weaponType, equipAtk, modifiers } = equipmentStats
     const totalEquipAtk = equipAtk + manualEquipAtk + manualCardAtk
 
+    // Adicionar stats dos equipamentos
+    const totalStrWithEquip = totalStr + modifiers.str
+    const totalDexWithEquip = totalDex + modifiers.dex
+    const totalLukWithEquip = totalLuk + modifiers.luk
+
     // Status ATK = STR + [STR/10]² + [DEX/5] + [LUK/5]
-    const statusAtk = totalStr + Math.floor(totalStr / 10) ** 2 + Math.floor(totalDex / 5) + Math.floor(totalLuk / 5)
+    const statusAtk = totalStrWithEquip + Math.floor(totalStrWithEquip / 10) ** 2 + Math.floor(totalDexWithEquip / 5) + Math.floor(totalLukWithEquip / 5)
 
     // Refine ATK: Nível 1=+2, Nível 2=+3, Nível 3=+5, Nível 4=+7 por refino
     const refineBonus = [0, 2, 3, 5, 7][weaponLevel] * weaponRefine
@@ -897,26 +1102,94 @@ export default function CalculadoraFisica() {
     const elementModifier = (ELEMENT_TABLE[atkElement]?.[monsterElement] || 100) / 100
 
     // Base ATK com size modifier
-    const modifiedAtkMin = statusAtk + (weaponAtkMin * sizeModifier) + refineBonus + overRefineBonus + totalEquipAtk
-    const modifiedAtkMax = statusAtk + (weaponAtkMax * sizeModifier) + refineBonus + overRefineBonus + totalEquipAtk
+    const modifiedAtkMin = statusAtk + (weaponAtkMin * sizeModifier) + refineBonus + overRefineBonus + totalEquipAtk + modifiers.atk_flat
+    const modifiedAtkMax = statusAtk + (weaponAtkMax * sizeModifier) + refineBonus + overRefineBonus + totalEquipAtk + modifiers.atk_flat
 
-    // Skill multiplier
-    const skillMult = selectedSkill.multiplier / 100
+    // ATK% dos equipamentos
+    const atkPercentMod = 1 + (modifiers.atk_percent / 100)
+
+    // Skill multiplier - usa nível da skill se disponível
+    const skillMultiplierValue = (selectedSkill as any).levelMultipliers 
+      ? (selectedSkill as any).levelMultipliers[Math.min(skillLevel, (selectedSkill as any).maxLevel || 10)] || selectedSkill.multiplier
+      : selectedSkill.multiplier
+    
+    // Aplicar fórmula especial se existir
+    let skillMult = skillMultiplierValue / 100
+    const skillFormula = selectedSkill.formula
+    
+    // Fórmula: ATK × BaseLv / 100 (ex: Lâminas de Loki)
+    if (skillFormula === 'atk*baselv') {
+      skillMult = (skillMultiplierValue * baseLevel / 100) / 100
+    }
+    
     const skillHits = selectedSkill.hits
 
-    // DEF calculation
+    // Skill damage bonus dos equipamentos
+    const skillDamageBonus = modifiers.skill_damage[selectedSkill.name] || 0
+    const skillBonusMod = 1 + (skillDamageBonus / 100)
+
+    // DEF calculation - incluir ignore DEF dos equipamentos
     const hardDef = selectedMonster.def
-    const defBypassMult = defBypass / 100
+    const totalDefBypass = defBypass + modifiers.ignore_def_percent
+    const defBypassMult = Math.min(totalDefBypass, 100) / 100
     const effectiveHardDef = Math.floor(hardDef * (1 - defBypassMult))
     const hardDefReduction = effectiveHardDef / (effectiveHardDef + 400)
 
-    // Damage modifiers
-    const raceMod = 1 + raceDmg / 100
-    const sizeMod = 1 + sizeDmg / 100
-    const elemMod = 1 + elementDmg / 100
-    const physMod = 1 + physicalDmg / 100
-    const rangeMod = 1 + rangedDmg / 100
-    const critMod = isCritical ? 1 + critDmg / 100 : 1
+    // Damage modifiers - combinar manuais com equipamentos
+    // Raça
+    let totalRaceDmg = raceDmg + modifiers.damage_vs_all_races
+    const monsterRace = selectedMonster.race?.toLowerCase() || ''
+    if (monsterRace.includes('morto') || monsterRace.includes('undead')) totalRaceDmg += modifiers.damage_vs_undead
+    if (monsterRace.includes('demônio') || monsterRace.includes('demon')) totalRaceDmg += modifiers.damage_vs_demon
+    if (monsterRace.includes('humano') || monsterRace.includes('demi')) totalRaceDmg += modifiers.damage_vs_demi_human
+    if (monsterRace.includes('bruto') || monsterRace.includes('brute')) totalRaceDmg += modifiers.damage_vs_brute
+    if (monsterRace.includes('planta') || monsterRace.includes('plant')) totalRaceDmg += modifiers.damage_vs_plant
+    if (monsterRace.includes('inseto') || monsterRace.includes('insect')) totalRaceDmg += modifiers.damage_vs_insect
+    if (monsterRace.includes('peixe') || monsterRace.includes('fish')) totalRaceDmg += modifiers.damage_vs_fish
+    if (monsterRace.includes('dragão') || monsterRace.includes('dragon')) totalRaceDmg += modifiers.damage_vs_dragon
+    if (monsterRace.includes('anjo') || monsterRace.includes('angel')) totalRaceDmg += modifiers.damage_vs_angel
+    if (monsterRace.includes('amorfo') || monsterRace.includes('formless')) totalRaceDmg += modifiers.damage_vs_formless
+    const raceMod = 1 + totalRaceDmg / 100
+
+    // Tamanho
+    let totalSizeDmg = sizeDmg + modifiers.damage_vs_all_sizes
+    if (selectedMonster.size === 'Pequeno') totalSizeDmg += modifiers.damage_vs_small
+    if (selectedMonster.size === 'Médio') totalSizeDmg += modifiers.damage_vs_medium
+    if (selectedMonster.size === 'Grande') totalSizeDmg += modifiers.damage_vs_large
+    const sizeMod = 1 + totalSizeDmg / 100
+
+    // Elemento do monstro
+    let totalElemDmg = elementDmg
+    if (monsterElement.includes('fogo') || monsterElement.includes('fire')) totalElemDmg += modifiers.damage_vs_fire
+    if (monsterElement.includes('água') || monsterElement.includes('water')) totalElemDmg += modifiers.damage_vs_water
+    if (monsterElement.includes('vento') || monsterElement.includes('wind')) totalElemDmg += modifiers.damage_vs_wind
+    if (monsterElement.includes('terra') || monsterElement.includes('earth')) totalElemDmg += modifiers.damage_vs_earth
+    if (monsterElement.includes('sombrio') || monsterElement.includes('shadow') || monsterElement.includes('dark')) totalElemDmg += modifiers.damage_vs_shadow
+    if (monsterElement.includes('sagrado') || monsterElement.includes('holy')) totalElemDmg += modifiers.damage_vs_holy
+    if (monsterElement.includes('fantasma') || monsterElement.includes('ghost')) totalElemDmg += modifiers.damage_vs_ghost
+    if (monsterElement.includes('veneno') || monsterElement.includes('poison')) totalElemDmg += modifiers.damage_vs_poison
+    if (monsterElement.includes('neutro') || monsterElement.includes('neutral')) totalElemDmg += modifiers.damage_vs_neutral
+    const elemMod = 1 + totalElemDmg / 100
+
+    // Dano físico
+    const totalPhysDmg = physicalDmg + modifiers.physical_damage_percent
+    const physMod = 1 + totalPhysDmg / 100
+
+    // Determinar se é ranged ou melee baseado na classe/skill
+    const rangedClasses = ['atirador', 'menestrel', 'cigana', 'ninja', 'justiceiro']
+    const rangedSkills = ['double-strafe', 'arrow-shower', 'sharp-shooting', 'arrow-vulcan', 'final-strike']
+    const isRanged = rangedClasses.includes(selectedClass) || rangedSkills.includes(selectedSkill.id)
+    
+    const totalRangedDmg = isRanged ? rangedDmg + modifiers.ranged_damage_percent : 0
+    const rangeMod = 1 + totalRangedDmg / 100
+
+    // Melee (se não for ranged)
+    const totalMeleeDmg = !isRanged ? modifiers.melee_damage_percent : 0
+    const meleeMod = 1 + totalMeleeDmg / 100
+
+    // Crítico
+    const totalCritDmg = critDmg + modifiers.crit_damage_percent
+    const critMod = isCritical ? 1 + totalCritDmg / 100 : 1
 
     // Buff modifiers
     let buffMod = 1
@@ -928,9 +1201,9 @@ export default function CalculadoraFisica() {
     const monsterReduction = 1 - (selectedMonster.reduction / 100)
 
     // Cálculo final
-    const baseDamageMin = modifiedAtkMin * skillMult * skillHits
-    const baseDamageMax = modifiedAtkMax * skillMult * skillHits
-    const totalModifier = elementModifier * raceMod * sizeMod * elemMod * physMod * rangeMod * critMod * buffMod * monsterReduction
+    const baseDamageMin = modifiedAtkMin * atkPercentMod * skillMult * skillHits * skillBonusMod
+    const baseDamageMax = modifiedAtkMax * atkPercentMod * skillMult * skillHits * skillBonusMod
+    const totalModifier = elementModifier * raceMod * sizeMod * elemMod * physMod * rangeMod * meleeMod * critMod * buffMod * monsterReduction
 
     const afterDefMin = baseDamageMin * (1 - hardDefReduction)
     const afterDefMax = baseDamageMax * (1 - hardDefReduction)
@@ -950,7 +1223,7 @@ export default function CalculadoraFisica() {
         overRefineBonus,
         sizeModifier: `${Math.floor(sizeModifier * 100)}%`,
         elementModifier: `${Math.floor(elementModifier * 100)}%`,
-        skillMultiplier: `${selectedSkill.multiplier}% x ${skillHits}`,
+        skillMultiplier: `${skillMultiplierValue}% x ${skillHits}`,
         hardDef: `${effectiveHardDef} (${Math.floor(hardDefReduction * 100)}%)`,
         totalModifier: `${Math.floor(totalModifier * 100)}%`
       }
@@ -958,7 +1231,7 @@ export default function CalculadoraFisica() {
   }, [
     selectedMonster, totalStr, totalDex, totalLuk,
     equipmentStats, manualEquipAtk, manualCardAtk,
-    attackElement, selectedSkill, isCritical,
+    attackElement, selectedSkill, skillLevel, selectedClass, isCritical,
     raceDmg, sizeDmg, elementDmg, physicalDmg, rangedDmg, critDmg, defBypass,
     hasPowerThrust, hasMaxPower, hasConcentrate
   ])
@@ -969,16 +1242,19 @@ export default function CalculadoraFisica() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando dados...</p>
+      <ToolsLayout>
+        <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando dados...</p>
+          </div>
         </div>
-      </div>
+      </ToolsLayout>
     )
   }
 
   return (
+    <ToolsLayout>
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50">
       {/* Background Pattern */}
       <div className="fixed inset-0 opacity-5 pointer-events-none" 
@@ -1233,6 +1509,80 @@ export default function CalculadoraFisica() {
                   Resetar Tudo
                 </button>
               </div>
+              
+              {/* Salvar/Carregar Build */}
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => {
+                    const build = {
+                      class: selectedClass,
+                      skillId: selectedSkillId,
+                      skillLevel,
+                      stats: { str, strBonus, agi, agiBonus, vit, vitBonus, int: int_, intBonus, dex, dexBonus, luk, lukBonus },
+                      baseLevel,
+                      equippedItems,
+                      modifiers: { manualEquipAtk, manualCardAtk, physicalDmg, rangedDmg, raceDmg, sizeDmg, elementDmg, critDmg, defBypass },
+                      buffs: { hasPowerThrust, hasMaxPower, hasConcentrate, hasProvoke },
+                      attackElement,
+                      isCritical,
+                    }
+                    const name = prompt('Nome da build:')
+                    if (name) {
+                      const builds = JSON.parse(localStorage.getItem('ragnatales-builds') || '{}')
+                      builds[name] = build
+                      localStorage.setItem('ragnatales-builds', JSON.stringify(builds))
+                      alert(`Build "${name}" salva!`)
+                    }
+                  }}
+                  className="flex-1 px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 flex items-center justify-center gap-1"
+                >
+                  💾 Salvar
+                </button>
+                <button
+                  onClick={() => {
+                    const builds = JSON.parse(localStorage.getItem('ragnatales-builds') || '{}')
+                    const names = Object.keys(builds)
+                    if (names.length === 0) {
+                      alert('Nenhuma build salva!')
+                      return
+                    }
+                    const name = prompt(`Builds disponíveis:\n${names.join('\n')}\n\nDigite o nome:`)
+                    if (name && builds[name]) {
+                      const b = builds[name]
+                      setSelectedClass(b.class)
+                      setSelectedSkillId(b.skillId)
+                      setSkillLevel(b.skillLevel || 10)
+                      setStr(b.stats.str); setStrBonus(b.stats.strBonus)
+                      setAgi(b.stats.agi); setAgiBonus(b.stats.agiBonus)
+                      setVit(b.stats.vit); setVitBonus(b.stats.vitBonus)
+                      setInt(b.stats.int); setIntBonus(b.stats.intBonus)
+                      setDex(b.stats.dex); setDexBonus(b.stats.dexBonus)
+                      setLuk(b.stats.luk); setLukBonus(b.stats.lukBonus)
+                      setBaseLevel(b.baseLevel || 99)
+                      setEquippedItems(b.equippedItems)
+                      setManualEquipAtk(b.modifiers.manualEquipAtk)
+                      setManualCardAtk(b.modifiers.manualCardAtk)
+                      setPhysicalDmg(b.modifiers.physicalDmg)
+                      setRangedDmg(b.modifiers.rangedDmg)
+                      setRaceDmg(b.modifiers.raceDmg)
+                      setSizeDmg(b.modifiers.sizeDmg)
+                      setElementDmg(b.modifiers.elementDmg)
+                      setCritDmg(b.modifiers.critDmg)
+                      setDefBypass(b.modifiers.defBypass)
+                      setHasPowerThrust(b.buffs.hasPowerThrust)
+                      setHasMaxPower(b.buffs.hasMaxPower)
+                      setHasConcentrate(b.buffs.hasConcentrate)
+                      setHasProvoke(b.buffs.hasProvoke)
+                      setAttackElement(b.attackElement)
+                      setIsCritical(b.isCritical)
+                      alert(`Build "${name}" carregada!`)
+                    }
+                  }}
+                  className="flex-1 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center gap-1"
+                >
+                  📂 Carregar
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1247,15 +1597,54 @@ export default function CalculadoraFisica() {
               <div className="space-y-3">
                 <select
                   value={selectedSkillId}
-                  onChange={(e) => setSelectedSkillId(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedSkillId(e.target.value)
+                    const skill = PHYSICAL_SKILLS.find(s => s.id === e.target.value) as any
+                    if (skill?.maxLevel) setSkillLevel(skill.maxLevel)
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                 >
-                  {availableSkills.map(skill => (
-                    <option key={skill.id} value={skill.id}>
-                      {skill.name} ({skill.multiplier}% x{skill.hits})
-                    </option>
-                  ))}
+                  {availableSkills.map(skill => {
+                    const s = skill as any
+                    const mult = s.levelMultipliers ? s.levelMultipliers[s.maxLevel || 10] : skill.multiplier
+                    return (
+                      <option key={skill.id} value={skill.id}>
+                        {skill.name} ({mult}% x{skill.hits})
+                      </option>
+                    )
+                  })}
                 </select>
+
+                {/* Nível da Skill */}
+                {(selectedSkill as any).maxLevel && (selectedSkill as any).maxLevel > 1 && (
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Nível da Skill: {skillLevel}
+                    </label>
+                    <input
+                      type="range"
+                      min={1}
+                      max={(selectedSkill as any).maxLevel || 10}
+                      value={skillLevel}
+                      onChange={(e) => setSkillLevel(Number(e.target.value))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Nv.1</span>
+                      <span className="font-medium text-blue-600">
+                        {(selectedSkill as any).levelMultipliers?.[skillLevel] || selectedSkill.multiplier}%
+                      </span>
+                      <span>Nv.{(selectedSkill as any).maxLevel}</span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Nota da Skill */}
+                {(selectedSkill as any).note && (
+                  <div className="bg-blue-50 border border-blue-200 rounded p-2 text-xs text-blue-700">
+                    💡 {(selectedSkill as any).note}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">Element</label>
@@ -1390,10 +1779,93 @@ export default function CalculadoraFisica() {
               </div>
 
               {selectedMonster && (
-                <div className="mt-4 pt-4 border-t border-white/20 text-center">
-                  <div className="text-sm opacity-80">Hits para matar</div>
-                  <div className="text-xl font-bold">
-                    {Math.ceil(selectedMonster.hp / damageCalculation.average)} hits
+                <div className="mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-2 text-center">
+                  <div>
+                    <div className="text-xs opacity-80">Hits p/ matar</div>
+                    <div className="text-lg font-bold">
+                      {Math.ceil(selectedMonster.hp / damageCalculation.average)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs opacity-80">HP do Alvo</div>
+                    <div className="text-lg font-bold">
+                      {selectedMonster.hp.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Breakdown do Cálculo */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <button
+                onClick={() => setShowBreakdown(!showBreakdown)}
+                className="w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100"
+              >
+                <span className="font-semibold text-blue-800">📊 Breakdown do Cálculo</span>
+                {showBreakdown ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              </button>
+              
+              {showBreakdown && (
+                <div className="p-4 space-y-2 text-sm">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-gray-50 p-2 rounded">
+                      <div className="text-xs text-gray-500">Status ATK</div>
+                      <div className="font-medium">{damageCalculation.breakdown?.statusAtk || 0}</div>
+                    </div>
+                    <div className="bg-gray-50 p-2 rounded">
+                      <div className="text-xs text-gray-500">Weapon ATK</div>
+                      <div className="font-medium">{equipmentStats.weaponAtk}</div>
+                    </div>
+                    <div className="bg-gray-50 p-2 rounded">
+                      <div className="text-xs text-gray-500">Refine Bonus</div>
+                      <div className="font-medium">+{damageCalculation.breakdown?.refineBonus || 0}</div>
+                    </div>
+                    <div className="bg-gray-50 p-2 rounded">
+                      <div className="text-xs text-gray-500">Over-refine</div>
+                      <div className="font-medium">+{damageCalculation.breakdown?.overRefineBonus || 0}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-2 mt-2">
+                    <div className="text-xs text-gray-500 mb-1">Multiplicadores</div>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">
+                        Skill: {damageCalculation.breakdown?.skillMultiplier}
+                      </span>
+                      <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                        Size: {damageCalculation.breakdown?.sizeModifier}
+                      </span>
+                      <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">
+                        Element: {damageCalculation.breakdown?.elementModifier}
+                      </span>
+                      {equipmentStats.modifiers.atk_percent > 0 && (
+                        <span className="bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs">
+                          ATK%: +{equipmentStats.modifiers.atk_percent}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-2 mt-2">
+                    <div className="text-xs text-gray-500 mb-1">DEF do Alvo</div>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs">
+                        {damageCalculation.breakdown?.hardDef}
+                      </span>
+                      {equipmentStats.modifiers.ignore_def_percent > 0 && (
+                        <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs">
+                          Ignore: {equipmentStats.modifiers.ignore_def_percent}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-2 mt-2 text-center">
+                    <div className="text-xs text-gray-500">Modificador Total</div>
+                    <div className="text-lg font-bold text-blue-600">
+                      {damageCalculation.breakdown?.totalModifier}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1443,6 +1915,52 @@ export default function CalculadoraFisica() {
                       />
                     </div>
                   </div>
+                  
+                  {/* Bônus dos Equipamentos */}
+                  {(equipmentStats.modifiers.atk_percent > 0 || 
+                    equipmentStats.modifiers.physical_damage_percent > 0 ||
+                    equipmentStats.modifiers.ranged_damage_percent > 0 ||
+                    equipmentStats.modifiers.ignore_def_percent > 0 ||
+                    equipmentStats.modifiers.damage_vs_all_sizes > 0 ||
+                    equipmentStats.modifiers.damage_vs_all_races > 0) && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="text-sm text-green-600 font-medium mb-2">📊 Bônus dos Equipamentos</div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {equipmentStats.modifiers.atk_percent > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">ATK: +{equipmentStats.modifiers.atk_percent}%</div>
+                        )}
+                        {equipmentStats.modifiers.atk_flat > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">ATK: +{equipmentStats.modifiers.atk_flat}</div>
+                        )}
+                        {equipmentStats.modifiers.physical_damage_percent > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">Físico: +{equipmentStats.modifiers.physical_damage_percent}%</div>
+                        )}
+                        {equipmentStats.modifiers.ranged_damage_percent > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">Ranged: +{equipmentStats.modifiers.ranged_damage_percent}%</div>
+                        )}
+                        {equipmentStats.modifiers.melee_damage_percent > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">Melee: +{equipmentStats.modifiers.melee_damage_percent}%</div>
+                        )}
+                        {equipmentStats.modifiers.ignore_def_percent > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">Ign DEF: +{equipmentStats.modifiers.ignore_def_percent}%</div>
+                        )}
+                        {equipmentStats.modifiers.damage_vs_all_sizes > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">vs Tam: +{equipmentStats.modifiers.damage_vs_all_sizes}%</div>
+                        )}
+                        {equipmentStats.modifiers.damage_vs_all_races > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">vs Raça: +{equipmentStats.modifiers.damage_vs_all_races}%</div>
+                        )}
+                        {equipmentStats.modifiers.crit_damage_percent > 0 && (
+                          <div className="bg-green-50 px-2 py-1 rounded">Crit: +{equipmentStats.modifiers.crit_damage_percent}%</div>
+                        )}
+                        {Object.entries(equipmentStats.modifiers.skill_damage).map(([skill, bonus]) => (
+                          <div key={skill} className="bg-purple-50 px-2 py-1 rounded col-span-2">
+                            [{skill}]: +{bonus}%
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1526,5 +2044,6 @@ export default function CalculadoraFisica() {
         />
       )}
     </div>
+    </ToolsLayout>
   )
 }
