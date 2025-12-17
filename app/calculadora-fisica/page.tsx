@@ -240,46 +240,225 @@ function EquipmentSlotComponent({
   slot, 
   equipped, 
   onClick,
+  onCardClick,
   position
 }: { 
   slot: typeof EQUIPMENT_SLOTS[0]
   equipped: EquippedItem
   onClick: () => void
+  onCardClick: (cardIndex: number) => void
   position: string
 }) {
   const hasEquipment = equipped.equipment !== null
+  const cardSlots = equipped.equipment?.cardSlots || 0
 
   return (
     <div className={`flex flex-col items-center ${position}`}>
       <span className="text-[10px] text-gray-500 mb-0.5">{slot.name}</span>
-      <button
-        onClick={onClick}
-        className={`w-11 h-11 rounded-lg border-2 transition-all relative group
-          ${hasEquipment 
-            ? 'border-blue-400 bg-blue-50 hover:border-blue-500 hover:shadow-md' 
-            : 'border-dashed border-gray-300 bg-gray-50/50 hover:border-blue-300 hover:bg-blue-50/50'
-          }`}
-      >
-        {hasEquipment ? (
-          <>
-            <img
-              src={`https://tales-calc-next.vercel.app/equipments/${equipped.equipment!.icon}`}
-              alt={equipped.equipment!.name}
-              className="w-full h-full object-contain p-0.5"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://tales-calc-next.vercel.app/empty_slot-removebg-preview.png'
-              }}
-            />
-            {equipped.refine > 0 && (
-              <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                +{equipped.refine}
-              </span>
-            )}
-          </>
-        ) : (
-          <Plus className="w-4 h-4 text-gray-400 mx-auto" />
+      <div className="relative">
+        <button
+          onClick={onClick}
+          className={`w-11 h-11 rounded-lg border-2 transition-all relative group
+            ${hasEquipment 
+              ? 'border-blue-400 bg-blue-50 hover:border-blue-500 hover:shadow-md' 
+              : 'border-dashed border-gray-300 bg-gray-50/50 hover:border-blue-300 hover:bg-blue-50/50'
+            }`}
+        >
+          {hasEquipment ? (
+            <>
+              <img
+                src={`https://tales-calc-next.vercel.app/equipments/${equipped.equipment!.icon}`}
+                alt={equipped.equipment!.name}
+                className="w-full h-full object-contain p-0.5"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://tales-calc-next.vercel.app/empty_slot-removebg-preview.png'
+                }}
+              />
+              {equipped.refine > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  +{equipped.refine}
+                </span>
+              )}
+            </>
+          ) : (
+            <Plus className="w-4 h-4 text-gray-400 mx-auto" />
+          )}
+        </button>
+        
+        {/* Card slots */}
+        {hasEquipment && cardSlots > 0 && (
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-0.5">
+            {Array.from({ length: cardSlots }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onCardClick(idx)
+                }}
+                className={`w-3 h-3 rounded-sm border transition-all
+                  ${equipped.cards[idx] 
+                    ? 'bg-purple-500 border-purple-600' 
+                    : 'bg-gray-200 border-gray-300 hover:bg-purple-200'
+                  }`}
+                title={equipped.cards[idx]?.name || 'Slot vazio'}
+              />
+            ))}
+          </div>
         )}
-      </button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// COMPONENT - Card Modal
+// ============================================
+
+function CardModal({
+  isOpen,
+  onClose,
+  slotName,
+  cardIndex,
+  cards,
+  onSelect,
+  currentCard,
+  equipmentSlot
+}: {
+  isOpen: boolean
+  onClose: () => void
+  slotName: string
+  cardIndex: number
+  cards: Card[]
+  onSelect: (card: Card | null) => void
+  currentCard: Card | null
+  equipmentSlot: string
+}) {
+  const [search, setSearch] = useState('')
+
+  // Mapear slots do equipamento para slots compatíveis dos cards
+  const getCompatibleSlotTypes = (slot: string): string[] => {
+    const slotMap: Record<string, string[]> = {
+      'topo': ['Topo', 'Headgear'],
+      'meio': ['Meio', 'Headgear'],
+      'baixo': ['Baixo', 'Headgear'],
+      'armadura': ['Armadura', 'Armor'],
+      'arma': ['Arma', 'Weapon'],
+      'escudo': ['Escudo', 'Shield'],
+      'capa': ['Capa', 'Garment'],
+      'sapato': ['Sapato', 'Footgear'],
+      'acessorio1': ['Acessório', 'Accessory'],
+      'acessorio2': ['Acessório', 'Accessory'],
+    }
+    return slotMap[slot] || []
+  }
+
+  const compatibleSlots = getCompatibleSlotTypes(equipmentSlot)
+
+  const filteredCards = useMemo(() => {
+    let items = cards.filter(card => {
+      // Verificar se o card é compatível com o slot
+      if (!card.compatibleSlots || card.compatibleSlots.length === 0) return true
+      return card.compatibleSlots.some(s => compatibleSlots.includes(s))
+    })
+
+    if (search) {
+      const searchLower = search.toLowerCase()
+      items = items.filter(c => c.name.toLowerCase().includes(searchLower))
+    }
+
+    return items.slice(0, 100) // Limitar para performance
+  }, [cards, search, compatibleSlots])
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div 
+        className="bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[80vh] flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-purple-50">
+          <h3 className="text-lg font-bold text-purple-800">
+            Card para {slotName} (Slot {cardIndex + 1})
+          </h3>
+          <button onClick={onClose} className="p-1 hover:bg-purple-100 rounded-lg">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="p-4 border-b">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar card..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            />
+          </div>
+        </div>
+
+        {/* Current Card */}
+        {currentCard && (
+          <div className="p-4 bg-purple-50 border-b flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                🃏
+              </div>
+              <div>
+                <div className="font-medium text-gray-800">{currentCard.name}</div>
+                <div className="text-sm text-gray-500">Card equipado</div>
+              </div>
+            </div>
+            <button
+              onClick={() => onSelect(null)}
+              className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+            >
+              Remover
+            </button>
+          </div>
+        )}
+
+        {/* Card List */}
+        <div className="flex-1 overflow-y-auto p-2">
+          <div className="grid grid-cols-1 gap-1">
+            {filteredCards.map(card => (
+              <button
+                key={card.id}
+                onClick={() => onSelect(card)}
+                className={`flex items-center gap-3 p-2 rounded-lg hover:bg-purple-50 transition-colors text-left
+                  ${currentCard?.id === card.id ? 'bg-purple-100' : ''}`}
+              >
+                <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center text-lg flex-shrink-0">
+                  🃏
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-gray-800 truncate">{card.name}</div>
+                  <div className="text-xs text-gray-500">
+                    {card.effects.slice(0, 1).map((group, idx) => (
+                      <span key={idx}>
+                        {group.effects.slice(0, 2).map((eff, i) => (
+                          <span key={i} className="mr-1">
+                            {eff.stat && `${eff.stat}: ${eff.value > 0 ? '+' : ''}${eff.value}${eff.modifier === 'percent' ? '%' : ''}`}
+                          </span>
+                        ))}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </button>
+            ))}
+            {filteredCards.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                Nenhum card encontrado
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -485,6 +664,7 @@ export default function CalculadoraFisica() {
 
   // State - Modal
   const [modalSlot, setModalSlot] = useState<typeof EQUIPMENT_SLOTS[0] | null>(null)
+  const [cardModalSlot, setCardModalSlot] = useState<{ slot: typeof EQUIPMENT_SLOTS[0], cardIndex: number } | null>(null)
 
   // State - Skill
   const [selectedSkillId, setSelectedSkillId] = useState('ataque-normal')
@@ -554,6 +734,22 @@ export default function CalculadoraFisica() {
       }
     }))
     setModalSlot(null)
+  }, [])
+
+  // Handler para equipar card
+  const handleEquipCard = useCallback((slotId: string, cardIndex: number, card: Card | null) => {
+    setEquippedItems(prev => {
+      const newCards = [...prev[slotId].cards]
+      newCards[cardIndex] = card
+      return {
+        ...prev,
+        [slotId]: {
+          ...prev[slotId],
+          cards: newCards
+        }
+      }
+    })
+    setCardModalSlot(null)
   }, [])
 
   // Calcular ATK de equipamentos
@@ -809,12 +1005,14 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[0]} // Topo
                       equipped={equippedItems.topo}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[0])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[0], cardIndex: idx })}
                       position=""
                     />
                     <EquipmentSlotComponent
                       slot={EQUIPMENT_SLOTS[1]} // Meio
                       equipped={equippedItems.meio}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[1])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[1], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -825,6 +1023,7 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[2]} // Baixo
                       equipped={equippedItems.baixo}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[2])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[2], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -833,6 +1032,7 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[3]} // Armadura
                       equipped={equippedItems.armadura}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[3])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[3], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -855,6 +1055,7 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[4]} // Arma
                       equipped={equippedItems.arma}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[4])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[4], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -863,6 +1064,7 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[5]} // Escudo
                       equipped={equippedItems.escudo}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[5])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[5], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -873,12 +1075,14 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[6]} // Capa
                       equipped={equippedItems.capa}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[6])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[6], cardIndex: idx })}
                       position=""
                     />
                     <EquipmentSlotComponent
                       slot={EQUIPMENT_SLOTS[7]} // Sapato
                       equipped={equippedItems.sapato}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[7])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[7], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -889,6 +1093,7 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[8]} // Acc R
                       equipped={equippedItems.acessorio1}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[8])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[8], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -897,6 +1102,7 @@ export default function CalculadoraFisica() {
                       slot={EQUIPMENT_SLOTS[9]} // Acc L
                       equipped={equippedItems.acessorio2}
                       onClick={() => setModalSlot(EQUIPMENT_SLOTS[9])}
+                      onCardClick={(idx) => setCardModalSlot({ slot: EQUIPMENT_SLOTS[9], cardIndex: idx })}
                       position=""
                     />
                   </div>
@@ -1247,6 +1453,20 @@ export default function CalculadoraFisica() {
           weapons={weapons}
           onSelect={(eq, ref) => handleEquip(modalSlot.id, eq, ref)}
           currentEquipment={equippedItems[modalSlot.id]}
+        />
+      )}
+
+      {/* Card Modal */}
+      {cardModalSlot && (
+        <CardModal
+          isOpen={true}
+          onClose={() => setCardModalSlot(null)}
+          slotName={cardModalSlot.slot.name}
+          cardIndex={cardModalSlot.cardIndex}
+          cards={cards}
+          onSelect={(card) => handleEquipCard(cardModalSlot.slot.id, cardModalSlot.cardIndex, card)}
+          currentCard={equippedItems[cardModalSlot.slot.id].cards[cardModalSlot.cardIndex]}
+          equipmentSlot={cardModalSlot.slot.id}
         />
       )}
     </div>

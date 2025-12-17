@@ -20,7 +20,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sword,
-  LineChart
+  LineChart,
+  Settings
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -39,6 +40,7 @@ const menuItems: MenuItem[] = [
   { name: 'Farm', href: '/farm', icon: Flame },
   { name: 'Agenda', href: '/agenda', icon: Calendar },
   { name: 'Preços', href: '/precos', icon: LineChart },
+  { name: 'Config Preços', href: '/config-farm', icon: Settings },
   { name: 'Dano', href: '/dano', icon: Sword },
   { name: 'Carry Grátis', href: '/carry-gratis', icon: Gift },
   

@@ -16,7 +16,9 @@ import {
   ChevronUp,
   RefreshCw,
   ExternalLink,
-  DollarSign
+  DollarSign,
+  Settings,
+  AlertTriangle
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -27,24 +29,29 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // Taxa de conversão: 1kk = R$ 0,32
 const TAXA_REAIS_POR_KK = 0.32
 
-// Interfaces
-interface Consumivel {
-  nome: string
-  qtd: number
-  preco: number
-  itemKey?: string
-  duracao?: string
-  nota?: string
-  isFixed?: boolean
+// Interface para itens do market
+interface MarketPrice {
+  item_key: string
+  item_name: string
+  price: number
+  preco_manual?: number
+  updated_at: string
 }
 
-interface Drop {
+// Interfaces para conteúdos de farm
+interface ItemFarm {
   nome: string
-  preco: number
-  qtdMedia: number
-  itemKey?: string
-  isFixed?: boolean
+  itemKey: string // Chave para buscar no market_prices
+  qtd: number
+  duracao?: string
   nota?: string
+}
+
+interface DropFarm {
+  nome: string
+  itemKey?: string
+  qtdMedia: number
+  precoNpc?: number // Preço fixo do NPC (não vem do market)
 }
 
 interface ConteudoFarm {
@@ -54,13 +61,13 @@ interface ConteudoFarm {
   cor: string
   fadigaMaxima: number | null
   tempoMinutos: number
-  custoEntrada: number
-  consumiveis: Consumivel[]
-  drops: Drop[]
+  consumiveis: ItemFarm[]
+  drops: DropFarm[]
   dicas: string
 }
 
-// Dados dos conteúdos de farm com valores REAIS
+// Configuração dos conteúdos de farm
+// Os preços vêm do banco de dados (market_prices)
 const CONTEUDOS_FARM: ConteudoFarm[] = [
   {
     id: 'bio5',
@@ -69,34 +76,31 @@ const CONTEUDOS_FARM: ConteudoFarm[] = [
     cor: 'emerald',
     fadigaMaxima: 4500,
     tempoMinutos: 150, // 2h30
-    custoEntrada: 0, // 2 alma condensada = 20k alma sombria (calcular depois)
     consumiveis: [
       // Buffs de tempo (para 2h30 = 150min)
-      { nome: 'Poção de Furor Físico', qtd: 30, preco: 50000, itemKey: 'pocao_furor_fisico', duracao: '5min' },
-      { nome: 'Poção Grande de HP', qtd: 18, preco: 30000, itemKey: 'pocao_grande_hp', duracao: '500s' },
-      { nome: 'Poção Grande de SP', qtd: 18, preco: 30000, itemKey: 'pocao_grande_sp', duracao: '500s' },
-      { nome: 'Salada de Frutas Tropicais', qtd: 30, preco: 80000, itemKey: 'salada_frutas', duracao: '5min' },
-      { nome: 'Biscoito Natalino', qtd: 15, preco: 100000, itemKey: 'biscoito_natalino', duracao: '10min' },
-      { nome: 'Suco de Gato', qtd: 15, preco: 50000, itemKey: 'suco_gato', duracao: '10min' },
-      { nome: 'Cozido Imortal', qtd: 30, preco: 150000, itemKey: 'cozido_imortal', duracao: '5min' },
-      { nome: 'Benção de Tyr', qtd: 30, preco: 200000, itemKey: 'bencao_tyr', duracao: '5min' },
-      { nome: 'Suco Celular Enriquecido', qtd: 15, preco: 100000, itemKey: 'suco_celular', duracao: '10min' },
-      { nome: 'Ativador de Erva Vermelha', qtd: 15, preco: 80000, itemKey: 'ativador_erva', duracao: '10min' },
+      { nome: 'Poção de Furor Físico', itemKey: 'pocao_furor_fisico', qtd: 30, duracao: '5min' },
+      { nome: 'Poção Grande de HP', itemKey: 'pocao_grande_hp', qtd: 18, duracao: '500s' },
+      { nome: 'Poção Grande de SP', itemKey: 'pocao_grande_sp', qtd: 18, duracao: '500s' },
+      { nome: 'Salada de Frutas Tropicais', itemKey: 'salada_frutas_tropicais', qtd: 30, duracao: '5min' },
+      { nome: 'Biscoito Natalino', itemKey: 'biscoito_natalino', qtd: 15, duracao: '10min' },
+      { nome: 'Suco de Gato', itemKey: 'suco_gato', qtd: 15, duracao: '10min' },
+      { nome: 'Cozido Imortal', itemKey: 'cozido_imortal', qtd: 30, duracao: '5min' },
+      { nome: 'Benção de Tyr', itemKey: 'bencao_tyr', qtd: 30, duracao: '5min' },
+      { nome: 'Suco Celular Enriquecido', itemKey: 'suco_celular_enriquecido', qtd: 15, duracao: '10min' },
+      { nome: 'Ativador de Erva Vermelha', itemKey: 'ativador_erva_vermelha', qtd: 15, duracao: '10min' },
       // Consumíveis por uso
-      { nome: 'Poção Dourada Concentrada', qtd: 200, preco: 15000, itemKey: 'pocao_dourada' },
-      { nome: 'Poção Branca', qtd: 500, preco: 5000, itemKey: 'pocao_branca' },
-      { nome: 'Poção Azul Concentrada', qtd: 300, preco: 8000, itemKey: 'pocao_azul_conc' },
-      { nome: 'Amuleto de Ziegfried', qtd: 30, preco: 100000, itemKey: 'amuleto_ziegfried' },
+      { nome: 'Poção Dourada Concentrada', itemKey: 'pocao_dourada_concentrada', qtd: 200 },
+      { nome: 'Poção Branca', itemKey: 'pocao_branca', qtd: 500 },
+      { nome: 'Poção Azul Concentrada', itemKey: 'pocao_azul_concentrada', qtd: 300 },
+      { nome: 'Amuleto de Ziegfried', itemKey: 'amuleto_ziegfried', qtd: 30 },
       // Gomas (5x gomas de 30min = 1/3 caixa)
-      { nome: 'Gomas (5x 30min)', qtd: 1, preco: 15000000, itemKey: 'goma_30min', nota: '1/3 caixa 20k cash' },
-      // Skill temporada (2 pós)
-      { nome: 'Pó Skill Temporada', qtd: 2, preco: 500000, itemKey: 'po_skill_temp' },
+      { nome: 'Goma de Bolha (5x)', itemKey: 'goma_bolha', qtd: 5, nota: '5 gomas de 30min' },
     ],
     drops: [
-      { nome: 'Âmagos (média 15)', preco: 2000000, qtdMedia: 15, itemKey: 'amago' },
-      { nome: 'Loot NPC', preco: 1500000, qtdMedia: 1, isFixed: true },
+      { nome: 'Âmagos', itemKey: 'amago', qtdMedia: 15 },
+      { nome: 'Loot NPC', qtdMedia: 1, precoNpc: 1500000 },
     ],
-    dicas: 'Farm principal. 2h30 por run, 4.500 mobs de fadiga.'
+    dicas: 'Farm principal. 2h30 por run, 4.500 mobs de fadiga. Entrada: 2 Alma Condensada.'
   },
   {
     id: 'expedicao',
@@ -105,30 +109,24 @@ const CONTEUDOS_FARM: ConteudoFarm[] = [
     cor: 'cyan',
     fadigaMaxima: null,
     tempoMinutos: 90, // 1h30 máximo
-    custoEntrada: 0, // 250x âmagos sombrios
     consumiveis: [
-      // Compêndios (3x cada)
-      { nome: 'Compêndio Magia Absoluta', qtd: 3, preco: 0, itemKey: 'compendio_magia', nota: '12x Pó Oceânica cada' },
-      { nome: 'Compêndio Espelho Quebrado', qtd: 3, preco: 0, itemKey: 'compendio_espelho', nota: '12x Pó Escarlate cada' },
-      { nome: 'Compêndio Isomorfo', qtd: 3, preco: 0, itemKey: 'compendio_isomorfo', nota: '4x Pó Solar cada' },
-      { nome: 'Compêndio Rei do Deserto', qtd: 3, preco: 0, itemKey: 'compendio_deserto', nota: '12x Pó Celes cada' },
-      // Pós de Meteorita (custo real dos compêndios)
-      { nome: 'Pó de Meteorita Oceânica', qtd: 36, preco: 800000, itemKey: 'po_meteorita_oceanica' },
-      { nome: 'Pó de Meteorita Escarlate', qtd: 36, preco: 500000, itemKey: 'po_meteorita_escarlate' },
-      { nome: 'Pó de Meteorita Solar', qtd: 12, preco: 1200000, itemKey: 'po_meteorita_solar' },
-      { nome: 'Pó de Meteorita Celes', qtd: 36, preco: 600000, itemKey: 'po_meteorita_celes' },
+      // Pós de Meteorita (custo dos compêndios)
+      { nome: 'Pó Meteorita Oceânica (3 comp)', itemKey: 'po_meteorita_oceanica', qtd: 36, nota: '12 cada' },
+      { nome: 'Pó Meteorita Escarlate (3 comp)', itemKey: 'po_meteorita_escarlate', qtd: 36, nota: '12 cada' },
+      { nome: 'Pó Meteorita Solar (3 comp)', itemKey: 'po_meteorita_solar', qtd: 12, nota: '4 cada' },
+      { nome: 'Pó Meteorita Celeste (3 comp)', itemKey: 'po_meteorita_celeste', qtd: 36, nota: '12 cada' },
       // Entrada
-      { nome: 'Âmagos Sombrios (entrada)', qtd: 250, preco: 10000, itemKey: 'amago_sombrio' },
+      { nome: 'Âmagos Sombrios (entrada)', itemKey: 'amago_sombrio', qtd: 250 },
       // Mesmos consumíveis da Bio5
-      { nome: 'Poção Dourada Concentrada', qtd: 200, preco: 15000, itemKey: 'pocao_dourada' },
-      { nome: 'Poção Branca', qtd: 500, preco: 5000, itemKey: 'pocao_branca' },
-      { nome: 'Poção Azul Concentrada', qtd: 300, preco: 8000, itemKey: 'pocao_azul_conc' },
+      { nome: 'Poção Dourada Concentrada', itemKey: 'pocao_dourada_concentrada', qtd: 200 },
+      { nome: 'Poção Branca', itemKey: 'pocao_branca', qtd: 500 },
+      { nome: 'Poção Azul Concentrada', itemKey: 'pocao_azul_concentrada', qtd: 300 },
     ],
     drops: [
-      { nome: 'Pó de Meteorita (variado)', preco: 700000, qtdMedia: 20, itemKey: 'po_meteorita' },
-      { nome: 'Loot NPC', preco: 500000, qtdMedia: 1, isFixed: true },
+      { nome: 'Pó de Meteorita (variado)', itemKey: 'po_meteorita_escarlate', qtdMedia: 20 },
+      { nome: 'Loot NPC', qtdMedia: 1, precoNpc: 500000 },
     ],
-    dicas: 'Entrada: 250 Âmagos Sombrios. Usa compêndios (pós).'
+    dicas: 'Entrada: 250 Âmagos Sombrios. Usa compêndios (pós de meteorita).'
   },
   {
     id: 'verus',
@@ -137,17 +135,16 @@ const CONTEUDOS_FARM: ConteudoFarm[] = [
     cor: 'purple',
     fadigaMaxima: 4500,
     tempoMinutos: 30,
-    custoEntrada: 0,
     consumiveis: [
-      { nome: 'Suco de Gato', qtd: 3, preco: 50000, itemKey: 'suco_gato', duracao: '10min' },
-      { nome: 'Pergaminho do Éden', qtd: 1, preco: 50000, itemKey: 'pergaminho_eden' },
-      { nome: 'Poção Branca', qtd: 30, preco: 5000, itemKey: 'pocao_branca' },
-      { nome: 'Poção Dourada Concentrada', qtd: 2, preco: 15000, itemKey: 'pocao_dourada' },
-      { nome: 'Poção Azul Concentrada', qtd: 20, preco: 8000, itemKey: 'pocao_azul_conc' },
+      { nome: 'Suco de Gato', itemKey: 'suco_gato', qtd: 3, duracao: '10min' },
+      { nome: 'Pergaminho do Éden', itemKey: 'pergaminho_eden', qtd: 1 },
+      { nome: 'Poção Branca', itemKey: 'pocao_branca', qtd: 30 },
+      { nome: 'Poção Dourada Concentrada', itemKey: 'pocao_dourada_concentrada', qtd: 2 },
+      { nome: 'Poção Azul Concentrada', itemKey: 'pocao_azul_concentrada', qtd: 20 },
     ],
     drops: [
       // ~1.130 itens x 9k cada = ~10.17M
-      { nome: 'Loot NPC (~1.130 drops)', preco: 9000, qtdMedia: 1130, isFixed: true },
+      { nome: 'Giroparafuso Rígido (~1.130)', itemKey: 'verus_drop', qtdMedia: 1130, precoNpc: 9000 },
     ],
     dicas: 'Rápido e barato. 4.500 mobs de fadiga, ~30 min.'
   },
@@ -158,18 +155,17 @@ const CONTEUDOS_FARM: ConteudoFarm[] = [
     cor: 'sky',
     fadigaMaxima: 1000,
     tempoMinutos: 40,
-    custoEntrada: 0,
     consumiveis: [
-      { nome: 'Suco de Gato', qtd: 4, preco: 50000, itemKey: 'suco_gato', duracao: '10min' },
-      { nome: 'Pergaminho do Éden', qtd: 1, preco: 50000, itemKey: 'pergaminho_eden' },
-      { nome: 'Poção Branca', qtd: 200, preco: 5000, itemKey: 'pocao_branca' },
-      { nome: 'Poção Dourada Concentrada', qtd: 10, preco: 15000, itemKey: 'pocao_dourada' },
-      { nome: 'Poção Azul Concentrada', qtd: 80, preco: 8000, itemKey: 'pocao_azul_conc' },
-      { nome: 'Gomas (2x 30min)', qtd: 1, preco: 6000000, itemKey: 'goma_30min', nota: '2 gomas max' },
+      { nome: 'Suco de Gato', itemKey: 'suco_gato', qtd: 4, duracao: '10min' },
+      { nome: 'Pergaminho do Éden', itemKey: 'pergaminho_eden', qtd: 1 },
+      { nome: 'Poção Branca', itemKey: 'pocao_branca', qtd: 200 },
+      { nome: 'Poção Dourada Concentrada', itemKey: 'pocao_dourada_concentrada', qtd: 10 },
+      { nome: 'Poção Azul Concentrada', itemKey: 'pocao_azul_concentrada', qtd: 80 },
+      { nome: 'Goma de Bolha (2x)', itemKey: 'goma_bolha', qtd: 2, nota: '2 gomas max' },
     ],
     drops: [
-      // ~120 itens x 150k cada = ~18M
-      { nome: 'Fragment of Rossata Stone (~120)', preco: 150000, qtdMedia: 120, isFixed: true },
+      // ~120 itens x 150k cada = ~18M (preço NPC)
+      { nome: 'Fragment of Rossata Stone (~120)', itemKey: 'rossata_stone', qtdMedia: 120, precoNpc: 150000 },
     ],
     dicas: '1.000 mobs de fadiga. Usa 2 gomas. ~40 min.'
   },
@@ -180,19 +176,17 @@ const CONTEUDOS_FARM: ConteudoFarm[] = [
     cor: 'red',
     fadigaMaxima: null,
     tempoMinutos: 60,
-    custoEntrada: 0,
     consumiveis: [
-      { nome: 'Goma Fracionada', qtd: 1, preco: 0, isFixed: true, nota: 'Só custo do char' },
-      { nome: 'Poção Árvore Envenenada Diluída', qtd: 1, preco: 5000000, itemKey: 'pocao_arvore', nota: '1 item = 2 poções' },
-      { nome: 'Poção Branca', qtd: 500, preco: 5000, itemKey: 'pocao_branca' },
-      { nome: 'Poção Dourada Concentrada', qtd: 150, preco: 15000, itemKey: 'pocao_dourada' },
-      { nome: 'Poção Azul Concentrada', qtd: 200, preco: 8000, itemKey: 'pocao_azul_conc' },
+      { nome: 'Poção Árvore Envenenada Diluída', itemKey: 'pocao_arvore_envenenada', qtd: 1, nota: '1 item = 2 poções' },
+      { nome: 'Poção Branca', itemKey: 'pocao_branca', qtd: 500 },
+      { nome: 'Poção Dourada Concentrada', itemKey: 'pocao_dourada_concentrada', qtd: 150 },
+      { nome: 'Poção Azul Concentrada', itemKey: 'pocao_azul_concentrada', qtd: 200 },
     ],
     drops: [
       // ~150 fragmentos líquidos (220 - 50 craft)
-      { nome: 'Fragmento Maldição (~150)', preco: 500000, qtdMedia: 150, itemKey: 'fragmento_maldicao' },
+      { nome: 'Fragmento Maldição (~150)', itemKey: 'fragmento_maldicao', qtdMedia: 150 },
       // ~10% chance do item raro
-      { nome: 'Essência Thanatos (10%)', preco: 200000000, qtdMedia: 0.1, itemKey: 'essencia_thanatos', nota: 'Drop raro!' },
+      { nome: 'Essência Thanatos (10%)', itemKey: 'essencia_thanatos', qtdMedia: 0.1 },
     ],
     dicas: 'Principal farm! Usa 50 frags pra craft. Chance de Essência.'
   },
@@ -257,11 +251,6 @@ interface Rotina {
   quantidade: number
 }
 
-interface MarketPrice {
-  item_key: string
-  price: number
-}
-
 export default function FarmCalculadoraPage() {
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
   const [rotina, setRotina] = useState<Rotina[]>([])
@@ -269,6 +258,8 @@ export default function FarmCalculadoraPage() {
   const [marketPrices, setMarketPrices] = useState<Record<string, number>>({})
   const [loadingPrices, setLoadingPrices] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [syncingPrices, setSyncingPrices] = useState(false)
+  const [missingItems, setMissingItems] = useState<string[]>([])
   
   useEffect(() => {
     fetchMarketPrices()
@@ -277,7 +268,7 @@ export default function FarmCalculadoraPage() {
   const fetchMarketPrices = async () => {
     setLoadingPrices(true)
     try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/market_prices?select=item_key,price,updated_at`, {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/market_prices?select=item_key,item_name,price,preco_manual,updated_at`, {
         headers: {
           'apikey': SUPABASE_KEY,
           'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -285,15 +276,30 @@ export default function FarmCalculadoraPage() {
       })
       
       if (response.ok) {
-        const prices = await response.json()
+        const prices: MarketPrice[] = await response.json()
         const priceMap: Record<string, number> = {}
-        prices.forEach((p: MarketPrice & { updated_at: string }) => {
-          priceMap[p.item_key] = p.price
+        
+        prices.forEach((p) => {
+          // Prioridade: preço manual > preço do market
+          const finalPrice = (p.preco_manual && p.preco_manual > 0) ? p.preco_manual : p.price
+          priceMap[p.item_key] = finalPrice
         })
+        
         setMarketPrices(priceMap)
         
+        // Encontrar itens que faltam no banco
+        const allItemKeys = new Set<string>()
+        CONTEUDOS_FARM.forEach(c => {
+          c.consumiveis.forEach(item => allItemKeys.add(item.itemKey))
+          c.drops.forEach(drop => { if (drop.itemKey) allItemKeys.add(drop.itemKey) })
+        })
+        
+        const missing = Array.from(allItemKeys).filter(key => !priceMap[key] || priceMap[key] === 0)
+        setMissingItems(missing)
+        
         if (prices.length > 0) {
-          setLastUpdate(new Date(prices[0].updated_at))
+          const latestDate = new Date(Math.max(...prices.map(p => new Date(p.updated_at).getTime())))
+          setLastUpdate(latestDate)
         }
       }
     } catch (err) {
@@ -303,29 +309,45 @@ export default function FarmCalculadoraPage() {
     }
   }
 
+  const syncPrices = async () => {
+    setSyncingPrices(true)
+    try {
+      const response = await fetch('/api/sync-prices', { method: 'POST' })
+      if (response.ok) {
+        await fetchMarketPrices()
+      }
+    } catch (err) {
+      console.error('Erro ao sincronizar:', err)
+    } finally {
+      setSyncingPrices(false)
+    }
+  }
+
+  // Pega o preço de um item do market
+  const getPreco = (itemKey: string, precoNpc?: number): number => {
+    if (precoNpc) return precoNpc // Preço NPC fixo
+    return marketPrices[itemKey] || 0
+  }
+
   // Calcula lucro de um conteúdo
-  const calcularLucro = (conteudo: typeof CONTEUDOS_FARM[0]) => {
-    // Custo total dos consumíveis (usa preço do market se disponível)
-    const custoConsumiveis = conteudo.consumiveis.reduce(
-      (acc, c) => {
-        if (c.isFixed) return acc + (c.preco * c.qtd)
-        const preco = c.itemKey ? (marketPrices[c.itemKey] || c.preco) : c.preco
-        return acc + c.qtd * preco
-      }, 0
-    )
-    const custoTotal = custoConsumiveis + conteudo.custoEntrada
-    
-    // Receita dos drops (usa preço do market se disponível)
-    const receitaDrops = conteudo.drops.reduce((acc, drop) => {
-      const preco = drop.isFixed ? drop.preco : (drop.itemKey ? (marketPrices[drop.itemKey] || drop.preco) : drop.preco)
-      return acc + preco * drop.qtdMedia
+  const calcularLucro = (conteudo: ConteudoFarm) => {
+    // Custo total dos consumíveis
+    const custoConsumiveis = conteudo.consumiveis.reduce((acc, item) => {
+      const preco = getPreco(item.itemKey)
+      return acc + (preco * item.qtd)
     }, 0)
     
-    const lucroRun = receitaDrops - custoTotal
-    const lucroPorHora = (lucroRun / conteudo.tempoMinutos) * 60
+    // Receita dos drops
+    const receitaDrops = conteudo.drops.reduce((acc, drop) => {
+      const preco = drop.precoNpc || getPreco(drop.itemKey || '')
+      return acc + (preco * drop.qtdMedia)
+    }, 0)
+    
+    const lucroRun = receitaDrops - custoConsumiveis
+    const lucroPorHora = conteudo.tempoMinutos > 0 ? (lucroRun / conteudo.tempoMinutos) * 60 : 0
     
     return {
-      custoTotal,
+      custoTotal: custoConsumiveis,
       custoConsumiveis,
       receitaDrops,
       lucroRun,
@@ -340,6 +362,7 @@ export default function FarmCalculadoraPage() {
       ...c,
       ...calcularLucro(c)
     })).sort((a, b) => b.lucroPorHora - a.lucroPorHora)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketPrices])
   
   // Toggle expandir card
@@ -408,6 +431,7 @@ export default function FarmCalculadoraPage() {
       reaisSemana: (lucroTotal * 7 / 1000000) * TAXA_REAIS_POR_KK,
       reaisMes: (lucroTotal * 30 / 1000000) * TAXA_REAIS_POR_KK
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rotina, marketPrices])
 
   return (
@@ -425,6 +449,12 @@ export default function FarmCalculadoraPage() {
             </div>
             
             <div className="flex items-center gap-3">
+              <Link href="/config-farm">
+                <Button variant="secondary" className="border-gray-300">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configurar Preços
+                </Button>
+              </Link>
               <Link href="/agenda">
                 <Button className="bg-blue-600 hover:bg-blue-700">
                   <Calendar className="w-4 h-4 mr-2" />
@@ -433,6 +463,29 @@ export default function FarmCalculadoraPage() {
               </Link>
             </div>
           </div>
+
+          {/* Alerta de itens faltando */}
+          {missingItems.length > 0 && (
+            <Card className="p-4 bg-amber-50 border-amber-200 mb-6">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-amber-800">
+                    {missingItems.length} item(s) sem preço no market
+                  </p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Sincronize os preços ou configure manualmente: {missingItems.slice(0, 5).join(', ')}
+                    {missingItems.length > 5 && ` e mais ${missingItems.length - 5}...`}
+                  </p>
+                </div>
+                <Link href="/config-farm">
+                  <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                    Configurar
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          )}
 
           {/* Info de preços e conversão */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -443,20 +496,21 @@ export default function FarmCalculadoraPage() {
                     <TrendingUp className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Preços do Mercado</p>
+                    <p className="text-sm font-medium text-gray-900">Preços do Market</p>
                     <p className="text-xs text-gray-500">
                       {loadingPrices ? 'Carregando...' : lastUpdate 
                         ? `Atualizado em ${lastUpdate.toLocaleString('pt-BR')}`
-                        : 'Usando valores padrão'}
+                        : 'Clique para sincronizar'}
                     </p>
                   </div>
                 </div>
                 <button
-                  onClick={fetchMarketPrices}
-                  disabled={loadingPrices}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  onClick={syncPrices}
+                  disabled={syncingPrices || loadingPrices}
+                  className="px-3 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors flex items-center gap-2 text-purple-700 text-sm font-medium"
                 >
-                  <RefreshCw className={`w-5 h-5 text-gray-500 ${loadingPrices ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 ${syncingPrices ? 'animate-spin' : ''}`} />
+                  {syncingPrices ? 'Sincronizando...' : 'Atualizar'}
                 </button>
               </div>
             </Card>
@@ -596,20 +650,21 @@ export default function FarmCalculadoraPage() {
                             Custos
                           </h4>
                           <div className="space-y-1 text-xs max-h-48 overflow-y-auto">
-                            {conteudo.custoEntrada > 0 && (
-                              <div className="flex justify-between text-gray-600">
-                                <span>Entrada</span>
-                                <span>{formatZeny(conteudo.custoEntrada)}</span>
-                              </div>
-                            )}
-                            {conteudo.consumiveis.map(c => {
-                              const preco = c.isFixed ? c.preco : (c.itemKey ? (marketPrices[c.itemKey] || c.preco) : c.preco)
+                            {conteudo.consumiveis.map(item => {
+                              const preco = getPreco(item.itemKey)
+                              const total = preco * item.qtd
+                              const semPreco = preco === 0
                               return (
-                                <div key={c.nome} className="flex justify-between text-gray-600">
-                                  <span className="truncate pr-2" title={c.nota || c.nome}>
-                                    {c.nome} x{c.qtd}
+                                <div 
+                                  key={item.nome} 
+                                  className={`flex justify-between ${semPreco ? 'text-amber-600' : 'text-gray-600'}`}
+                                  title={item.nota || item.nome}
+                                >
+                                  <span className="truncate pr-2">
+                                    {item.nome} x{item.qtd}
+                                    {semPreco && ' ⚠️'}
                                   </span>
-                                  <span className="shrink-0">{formatZeny(c.qtd * preco)}</span>
+                                  <span className="shrink-0">{formatZeny(total)}</span>
                                 </div>
                               )
                             })}
@@ -627,12 +682,17 @@ export default function FarmCalculadoraPage() {
                             Receita Estimada
                           </h4>
                           <div className="space-y-1 text-xs">
-                            {conteudo.drops.map(d => {
-                              const preco = d.isFixed ? d.preco : (d.itemKey ? (marketPrices[d.itemKey] || d.preco) : d.preco)
+                            {conteudo.drops.map(drop => {
+                              const preco = drop.precoNpc || getPreco(drop.itemKey || '')
+                              const total = preco * drop.qtdMedia
+                              const isNpc = !!drop.precoNpc
                               return (
-                                <div key={d.nome} className="flex justify-between text-gray-600">
-                                  <span className="truncate pr-2" title={d.nota || d.nome}>{d.nome}</span>
-                                  <span className="shrink-0">{formatZeny(preco * d.qtdMedia)}</span>
+                                <div key={drop.nome} className="flex justify-between text-gray-600">
+                                  <span className="truncate pr-2">
+                                    {drop.nome}
+                                    {isNpc && <span className="text-amber-600 ml-1">(NPC)</span>}
+                                  </span>
+                                  <span className="shrink-0">{formatZeny(total)}</span>
                                 </div>
                               )
                             })}
@@ -823,8 +883,13 @@ export default function FarmCalculadoraPage() {
         
           {/* Disclaimer */}
           <div className="text-center text-gray-500 text-sm">
-            <p>⚠️ Valores são estimativas baseadas em médias.</p>
+            <p>⚠️ Valores são estimativas baseadas em médias e preços do market.</p>
             <p>Taxa: 1 KK = R$ {TAXA_REAIS_POR_KK.toFixed(2)} | Resultados reais podem variar.</p>
+            <p className="mt-2">
+              <Link href="/config-farm" className="text-blue-600 hover:underline">
+                Configure os preços dos itens →
+              </Link>
+            </p>
           </div>
         </div>
       </div>

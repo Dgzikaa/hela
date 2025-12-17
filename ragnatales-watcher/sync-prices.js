@@ -7,30 +7,79 @@ puppeteer.use(StealthPlugin());
 const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3ZkZHNna3NieXVwdG5rZXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzU5NTksImV4cCI6MjA3ODk1MTk1OX0.wkx2__g4rFmEoiBiF-S85txtaQXK1RTDztgC3vSexp4';
 
-// Itens para sincronizar
+// ============================================
+// ITENS PARA SINCRONIZAR
+// Para adicionar um novo item:
+// 1. Acesse https://ragnatales.com.br/db/items/NUMERO
+// 2. Pegue o ID do item na URL
+// 3. Adicione aqui com uma key única
+// ============================================
+
 const ITEMS_TO_SYNC = [
-    { key: 'poEscarlate', id: 1000398, name: 'Pó de Meteorita Escarlate' },
-    { key: 'poSolar', id: 1000399, name: 'Pó de Meteorita Solar' },
-    { key: 'poVerdejante', id: 1000400, name: 'Pó de Meteorita Verdejante' },
-    { key: 'poCeleste', id: 1000401, name: 'Pó de Meteorita Celeste' },
-    { key: 'poOceanica', id: 1000402, name: 'Pó de Meteorita Oceânica' },
-    { key: 'poCrepuscular', id: 1000403, name: 'Pó de Meteorita Crepuscular' },
-    { key: 'almaSombria', id: 25986, name: 'Alma Sombria' },
-    { key: 'bencaoFerreiro', id: 6226, name: 'Bênção do Ferreiro' },
-    { key: 'bencaoMestreFerreiro', id: 6225, name: 'Bênção do Mestre-Ferreiro' },
-    { key: 'desmembrador', id: 1000389, name: 'Desmembrador Químico' },
-    { key: 'auraMente', id: 19439, name: 'Aura da Mente Corrompida' },
-    { key: 'mantoAbstrato', id: 20986, name: 'Manto Abstrato' },
-    { key: 'livroPerverso', id: 540042, name: 'Livro Perverso' },
-    { key: 'garraFerro', id: 1837, name: 'Garra de Ferro' },
-    { key: 'jackEstripadora', id: 28767, name: 'Jack Estripadora' },
-    { key: 'mascaraNobreza', id: 5985, name: 'Máscara da Nobreza' },
-    { key: 'livroAmaldicoado', id: 18752, name: 'Livro Amaldiçoado' },
-    { key: 'quepeGeneral', id: 19379, name: 'Quepe do General' },
-    { key: 'chapeuMaestro', id: 5905, name: 'Chapéu de Maestro' },
-    { key: 'botasCapricornio', id: 470010, name: 'Botas de Capricórnio' },
-    { key: 'palhetaElunium', id: 490141, name: 'Palheta de Elunium' },
-    { key: 'luvasCorrida', id: 2935, name: 'Luvas de Corrida' },
+    // === PÓS DE METEORITA ===
+    { key: 'po_meteorita_escarlate', id: 1000398, name: 'Pó de Meteorita Escarlate', categoria: 'material' },
+    { key: 'po_meteorita_solar', id: 1000399, name: 'Pó de Meteorita Solar', categoria: 'material' },
+    { key: 'po_meteorita_verdejante', id: 1000400, name: 'Pó de Meteorita Verdejante', categoria: 'material' },
+    { key: 'po_meteorita_celeste', id: 1000401, name: 'Pó de Meteorita Celeste', categoria: 'material' },
+    { key: 'po_meteorita_oceanica', id: 1000402, name: 'Pó de Meteorita Oceânica', categoria: 'material' },
+    { key: 'po_meteorita_crepuscular', id: 1000403, name: 'Pó de Meteorita Crepuscular', categoria: 'material' },
+
+    // === MATERIAIS DE CRAFT ===
+    { key: 'alma_sombria', id: 25986, name: 'Alma Sombria', categoria: 'material' },
+    { key: 'bencao_ferreiro', id: 6226, name: 'Bênção do Ferreiro', categoria: 'material' },
+    { key: 'bencao_mestre_ferreiro', id: 6225, name: 'Bênção do Mestre-Ferreiro', categoria: 'material' },
+    { key: 'desmembrador_quimico', id: 1000389, name: 'Desmembrador Químico', categoria: 'material' },
+
+    // === EQUIPAMENTOS PARA PREÇO ===
+    { key: 'aura_mente_corrompida', id: 19439, name: 'Aura da Mente Corrompida', categoria: 'equip' },
+    { key: 'manto_abstrato', id: 20986, name: 'Manto Abstrato', categoria: 'equip' },
+    { key: 'livro_perverso', id: 540042, name: 'Livro Perverso', categoria: 'equip' },
+    { key: 'garra_ferro', id: 1837, name: 'Garra de Ferro', categoria: 'equip' },
+    { key: 'jack_estripadora', id: 28767, name: 'Jack Estripadora', categoria: 'equip' },
+    { key: 'mascara_nobreza', id: 5985, name: 'Máscara da Nobreza', categoria: 'equip' },
+    { key: 'livro_amaldicoado', id: 18752, name: 'Livro Amaldiçoado', categoria: 'equip' },
+    { key: 'quepe_general', id: 19379, name: 'Quepe do General', categoria: 'equip' },
+    { key: 'chapeu_maestro', id: 5905, name: 'Chapéu de Maestro', categoria: 'equip' },
+    { key: 'botas_capricornio', id: 470010, name: 'Botas de Capricórnio', categoria: 'equip' },
+    { key: 'palheta_elunium', id: 490141, name: 'Palheta de Elunium', categoria: 'equip' },
+    { key: 'luvas_corrida', id: 2935, name: 'Luvas de Corrida', categoria: 'equip' },
+
+    // === CONSUMÍVEIS DE BUFF ===
+    { key: 'pocao_furor_fisico', id: 14541, name: 'Poção de Furor Físico', categoria: 'consumivel' },
+    { key: 'pocao_furor_magico', id: 14542, name: 'Poção de Furor Mágico', categoria: 'consumivel' },
+    { key: 'pocao_grande_hp', id: 14536, name: 'Poção Grande de HP', categoria: 'consumivel' },
+    { key: 'pocao_grande_sp', id: 14537, name: 'Poção Grande de SP', categoria: 'consumivel' },
+    { key: 'salada_frutas_tropicais', id: 12065, name: 'Salada de Frutas Tropicais', categoria: 'consumivel' },
+    { key: 'biscoito_natalino', id: 12127, name: 'Biscoito Natalino', categoria: 'consumivel' },
+    { key: 'suco_gato', id: 12072, name: 'Suco de Gato', categoria: 'consumivel' },
+    { key: 'cozido_imortal', id: 12077, name: 'Cozido Imortal', categoria: 'consumivel' },
+    { key: 'bencao_tyr', id: 14546, name: 'Benção de Tyr', categoria: 'consumivel' },
+    { key: 'suco_celular_enriquecido', id: 12079, name: 'Suco Celular Enriquecido', categoria: 'consumivel' },
+    { key: 'ativador_erva_vermelha', id: 14514, name: 'Ativador de Erva Vermelha', categoria: 'consumivel' },
+    
+    // === POÇÕES DE USO ===
+    { key: 'pocao_dourada_concentrada', id: 12424, name: 'Poção Dourada Concentrada', categoria: 'consumivel' },
+    { key: 'pocao_branca', id: 547, name: 'Poção Branca', categoria: 'consumivel' },
+    { key: 'pocao_azul_concentrada', id: 12422, name: 'Poção Azul Concentrada', categoria: 'consumivel' },
+    
+    // === ITENS ESPECIAIS ===
+    { key: 'amuleto_ziegfried', id: 7621, name: 'Amuleto de Ziegfried', categoria: 'consumivel' },
+    { key: 'goma_bolha', id: 25006, name: 'Goma de Bolha', categoria: 'cash' },
+    { key: 'pergaminho_eden', id: 14584, name: 'Pergaminho do Éden', categoria: 'consumivel' },
+    
+    // === ENTRADAS DE DUNGEON ===
+    { key: 'amago', id: 6608, name: 'Âmago', categoria: 'material' },
+    { key: 'amago_sombrio', id: 25988, name: 'Âmago Sombrio', categoria: 'material' },
+    { key: 'alma_condensada', id: 25987, name: 'Alma Condensada', categoria: 'material' },
+    
+    // === THANATOS ===
+    { key: 'pocao_arvore_envenenada', id: 17632, name: 'Poção da Árvore Envenenada Diluída', categoria: 'consumivel' },
+    { key: 'fragmento_maldicao', id: 1222000, name: 'Fragmento da Maldição', categoria: 'material' },
+    { key: 'essencia_thanatos', id: 1222012, name: 'Essência de Thanatos', categoria: 'drop_raro' },
+    
+    // === DROPS PARA VENDA ===
+    { key: 'verus_drop', id: 25317, name: 'Giroparafuso Rígido', categoria: 'drop_npc' },
+    { key: 'rossata_stone', id: 7444, name: 'Fragment of Rossata Stone', categoria: 'drop_npc' },
 ];
 
 // Runas
@@ -120,6 +169,7 @@ async function syncPrices() {
         // Sincroniza itens gerais
         console.log('📦 Sincronizando itens...');
         let successCount = 0;
+        let noSalesCount = 0;
         
         for (const item of ITEMS_TO_SYNC) {
             try {
@@ -131,30 +181,46 @@ async function syncPrices() {
 
                 if (response && response.length > 0) {
                     const prices = response.map(d => d.price).sort((a, b) => a - b);
+                    const minPrice = prices[0]; // Menor preço
                     const top5 = prices.slice(0, Math.min(5, prices.length));
                     const avgPrice = Math.round(top5.reduce((a, b) => a + b, 0) / top5.length);
 
-                    // Atualiza no Supabase
+                    // Atualiza no Supabase com menor preço e média
                     const updated = await updateSupabase('market_prices', {
                         item_key: item.key,
                         item_name: item.name,
                         item_id: item.id,
-                        price: avgPrice,
+                        price: minPrice, // Usar menor preço
+                        avg_price: avgPrice,
+                        categoria: item.categoria || 'outros',
                         sellers: response.length,
                         updated_at: new Date().toISOString()
                     });
 
                     if (updated) {
-                        console.log(`   ✓ ${item.name}: ${formatZeny(avgPrice)}`);
+                        console.log(`   ✓ ${item.name}: ${formatZeny(minPrice)} (${response.length} vendedores)`);
                         successCount++;
                     }
                 } else {
-                    console.log(`   - ${item.name}: sem vendas`);
+                    console.log(`   - ${item.name}: sem vendas no market`);
+                    noSalesCount++;
+                    
+                    // Salva como sem vendas (preço 0) para saber que foi checado
+                    await updateSupabase('market_prices', {
+                        item_key: item.key,
+                        item_name: item.name,
+                        item_id: item.id,
+                        price: 0,
+                        avg_price: 0,
+                        categoria: item.categoria || 'outros',
+                        sellers: 0,
+                        updated_at: new Date().toISOString()
+                    });
                 }
 
                 await new Promise(r => setTimeout(r, 300));
             } catch (error) {
-                console.log(`   ⚠️ ${item.name}: erro`);
+                console.log(`   ⚠️ ${item.name}: erro - ${error.message}`);
             }
         }
 
@@ -172,13 +238,15 @@ async function syncPrices() {
 
                 if (response && response.length > 0) {
                     const prices = response.map(d => d.price).sort((a, b) => a - b);
+                    const minPrice = prices[0];
                     const top5 = prices.slice(0, Math.min(5, prices.length));
                     const avgPrice = Math.round(top5.reduce((a, b) => a + b, 0) / top5.length);
 
                     const updated = await updateSupabase('runa_prices', {
                         runa_id: runa.id,
                         runa_name: runa.name,
-                        price: avgPrice,
+                        price: minPrice,
+                        avg_price: avgPrice,
                         sellers: response.length,
                         updated_at: new Date().toISOString()
                     });
@@ -197,7 +265,8 @@ async function syncPrices() {
         console.log(`   ✓ ${runaCount} runas atualizadas`);
 
         console.log(`\n✅ Sincronização concluída!`);
-        console.log(`   📦 ${successCount}/${ITEMS_TO_SYNC.length} itens`);
+        console.log(`   📦 ${successCount}/${ITEMS_TO_SYNC.length} itens com preço`);
+        console.log(`   ❌ ${noSalesCount} itens sem vendas`);
         console.log(`   🧬 ${runaCount}/${RUNAS.length} runas`);
         console.log(`   🕐 ${new Date().toLocaleString('pt-BR')}\n`);
 
@@ -208,9 +277,10 @@ async function syncPrices() {
     }
 }
 
-// Executa
-syncPrices();
+// Exporta a lista de itens para outros módulos
+module.exports = { syncPrices, ITEMS_TO_SYNC, RUNAS };
 
-// Exporta para uso no watcher
-module.exports = { syncPrices };
-
+// Se executado diretamente
+if (require.main === module) {
+    syncPrices();
+}
