@@ -1,0 +1,38 @@
+{
+  "nameid": 1213,
+  "name": "Dagger",
+  "jname": "Adaga",
+  "value_buy": 14000,
+  "value_sell": 10,
+  "type": 4,
+  "subtype": 1,
+  "sex": 2,
+  "equip": 2,
+  "weight": 600,
+  "atk": 73,
+  "def": 0,
+  "range": 1,
+  "slot": 2,
+  "view_sprite": 0,
+  "elv": 12,
+  "wlv": 2,
+  "view_id": 0,
+  "matk": 0,
+  "elvmax": 175,
+  "delay": 0,
+  "flag_trade": 0,
+  "flag_refine": 1,
+  "flag_buystore": 0,
+  "info": {
+    "nameid": 1213,
+    "resource_name": "´ë°Å",
+    "display_name": "Adaga",
+    "description_name": "Faca usada para apunhalar.  Arraste esta arma para sua janela de equipamento para usar.<br />Classe:<span style=\"color: #6666CC\"> Adaga</span><br />Forca de Ataque:<span style=\"color: #CC0000\"> 73</span><br />Peso:<span style=\"color: #009900\"> 60</span><br />Nível da arma:<span style=\"color: #009900\"> 2</span><br />Nível necessário:<span style=\"color: #009900\"> 12</span><br />Classes que utilizam:<span style=\"color: #6666CC\"> Aprendiz, Espadachim, Mago, Arqueiro, Mercador, Gatuno e as respectivas evoluções</span>"
+  },
+  "drops": [],
+  "data": {
+    "icon": "https://api.ragnatales.com.br/database/item/icon?nameid=1213",
+    "collection": "https://api.ragnatales.com.br/database/item/collection?nameid=1213",
+    "description": "Faca usada para apunhalar.  Arraste esta arma para sua janela de equipamento para usar.<br />Classe:<span style=\"color: #6666CC\"> Adaga</span><br />Forca de Ataque:<span style=\"color: #CC0000\"> 73</span><br />Peso:<span style=\"color: #009900\"> 60</span><br />Nível da arma:<span style=\"color: #009900\"> 2</span><br />Nível necessário:<span style=\"color: #009900\"> 12</span><br />Classes que utilizam:<span style=\"color: #6666CC\"> Aprendiz, Espadachim, Mago, Arqueiro, Mercador, Gatuno e as respectivas evoluções</span>"
+  }
+}

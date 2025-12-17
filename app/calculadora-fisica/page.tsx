@@ -696,18 +696,74 @@ export default function CalculadoraFisica() {
   const [showBuffs, setShowBuffs] = useState(true)
   const [showElementTable, setShowElementTable] = useState(false)
 
-  // Carregar dados
+  // Carregar dados do RagnaTales
   useEffect(() => {
     Promise.all([
       fetch('/data/monsters.json').then(r => r.json()),
-      fetch('/data/weapons.json').then(r => r.json()),
-      fetch('/data/equipments.json').then(r => r.json()),
-      fetch('/data/cards.json').then(r => r.json()),
+      fetch('/data/ragnatales/weapons.json').then(r => r.json()),
+      fetch('/data/ragnatales/equipments.json').then(r => r.json()),
+      fetch('/data/ragnatales/cards.json').then(r => r.json()),
     ]).then(([monstersData, weaponsData, equipmentsData, cardsData]) => {
       setMonsters(monstersData)
-      setWeapons(weaponsData)
-      setEquipments(equipmentsData)
-      setCards(cardsData)
+      
+      // Transforma armas do RagnaTales para o formato esperado
+      const transformedWeapons: Equipment[] = weaponsData.map((w: any) => ({
+        id: String(w.nameid),
+        name: w.name,
+        slot: 'weapon',
+        cardSlots: w.slots || 0,
+        icon: w.image,
+        weaponAttack: w.attack || 0,
+        level: w.weaponLevel || 1,
+        effects: [],
+        requiredLevel: w.requiredLevel || 0,
+      }))
+      setWeapons(transformedWeapons)
+      
+      // Transforma equipamentos - detecta o slot pelo tipo
+      const transformedEquipments: Equipment[] = equipmentsData.map((e: any) => {
+        // Detecta slot baseado no subtype do RagnaTales
+        let slot = 'accessory'
+        const name = (e.name || '').toLowerCase()
+        if (e.subtype === 1) slot = 'armor'
+        else if (e.subtype === 2) slot = 'shield'
+        else if (e.subtype === 3) slot = 'garment'
+        else if (e.subtype === 4) slot = 'footgear'
+        else if (e.subtype === 5 || e.subtype === 6) slot = 'accessory'
+        else if (e.subtype === 256) slot = 'upper'
+        else if (e.subtype === 512) slot = 'middle'
+        else if (e.subtype === 1) slot = 'lower'
+        // Tenta detectar pelo nome também
+        if (name.includes('armadura') || name.includes('armor')) slot = 'armor'
+        else if (name.includes('escudo') || name.includes('shield')) slot = 'shield'
+        else if (name.includes('capa') || name.includes('manto') || name.includes('garment')) slot = 'garment'
+        else if (name.includes('sapato') || name.includes('bota') || name.includes('shoes')) slot = 'footgear'
+        else if (name.includes('anel') || name.includes('brinco') || name.includes('colar') || name.includes('ring')) slot = 'accessory'
+        
+        return {
+          id: String(e.nameid),
+          name: e.name,
+          slot,
+          cardSlots: e.slots || 0,
+          icon: e.image,
+          weaponAttack: 0,
+          effects: [],
+          defense: e.defense || 0,
+          requiredLevel: e.requiredLevel || 0,
+        }
+      })
+      setEquipments(transformedEquipments)
+      
+      // Transforma cartas
+      const transformedCards: Card[] = cardsData.map((c: any) => ({
+        id: String(c.nameid),
+        name: c.name,
+        compatibleSlots: ['weapon', 'armor', 'shield', 'garment', 'footgear', 'accessory', 'upper', 'middle', 'lower'],
+        effects: [],
+        icon: c.image,
+      }))
+      setCards(transformedCards)
+      
       setLoading(false)
     }).catch(err => {
       console.error('Erro ao carregar dados:', err)

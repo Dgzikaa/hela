@@ -45,22 +45,22 @@ const ITEMS_TO_SYNC = [
     { key: 'luvas_corrida', id: 2935, name: 'Luvas de Corrida', categoria: 'equip' },
 
     // === CONSUMÍVEIS DE BUFF ===
-    { key: 'pocao_furor_fisico', id: 14541, name: 'Poção de Furor Físico', categoria: 'consumivel' },
-    { key: 'pocao_furor_magico', id: 14542, name: 'Poção de Furor Mágico', categoria: 'consumivel' },
+    { key: 'pocao_furor_fisico', id: 12418, name: 'Poção de Furor Físico', categoria: 'consumivel' },
+    { key: 'pocao_furor_magico', id: 12419, name: 'Poção de Furor Mágico', categoria: 'consumivel' },
     { key: 'pocao_grande_hp', id: 14536, name: 'Poção Grande de HP', categoria: 'consumivel' },
     { key: 'pocao_grande_sp', id: 14537, name: 'Poção Grande de SP', categoria: 'consumivel' },
-    { key: 'salada_frutas_tropicais', id: 12065, name: 'Salada de Frutas Tropicais', categoria: 'consumivel' },
-    { key: 'biscoito_natalino', id: 12127, name: 'Biscoito Natalino', categoria: 'consumivel' },
-    { key: 'suco_gato', id: 12072, name: 'Suco de Gato', categoria: 'consumivel' },
-    { key: 'cozido_imortal', id: 12077, name: 'Cozido Imortal', categoria: 'consumivel' },
-    { key: 'bencao_tyr', id: 14546, name: 'Benção de Tyr', categoria: 'consumivel' },
-    { key: 'suco_celular_enriquecido', id: 12079, name: 'Suco Celular Enriquecido', categoria: 'consumivel' },
-    { key: 'ativador_erva_vermelha', id: 14514, name: 'Ativador de Erva Vermelha', categoria: 'consumivel' },
+    { key: 'salada_frutas_tropicais', id: 12247, name: 'Salada de Frutas Tropicais', categoria: 'consumivel' },
+    { key: 'biscoito_natalino', id: 2784, name: 'Biscoito Natalino', categoria: 'consumivel' },
+    { key: 'suco_gato', id: 12298, name: 'Suco de Gato', categoria: 'consumivel' },
+    { key: 'cozido_imortal', id: 12085, name: 'Cozido Imortal', categoria: 'consumivel' },
+    { key: 'bencao_tyr', id: 14601, name: 'Benção de Tyr', categoria: 'consumivel' },
+    { key: 'suco_celular_enriquecido', id: 12437, name: 'Suco Celular Enriquecido', categoria: 'consumivel' },
+    { key: 'ativador_erva_vermelha', id: 100232, name: 'Ativador de Erva Vermelha', categoria: 'consumivel' },
     
     // === POÇÕES DE USO ===
     { key: 'pocao_dourada_concentrada', id: 12424, name: 'Poção Dourada Concentrada', categoria: 'consumivel' },
     { key: 'pocao_branca', id: 547, name: 'Poção Branca', categoria: 'consumivel' },
-    { key: 'pocao_azul_concentrada', id: 12422, name: 'Poção Azul Concentrada', categoria: 'consumivel' },
+    { key: 'pocao_azul_concentrada', id: 1100004, name: 'Poção Azul Concentrada', categoria: 'consumivel' },
     
     // === ITENS ESPECIAIS ===
     { key: 'amuleto_ziegfried', id: 7621, name: 'Amuleto de Ziegfried', categoria: 'consumivel' },
@@ -68,8 +68,8 @@ const ITEMS_TO_SYNC = [
     { key: 'pergaminho_eden', id: 14584, name: 'Pergaminho do Éden', categoria: 'consumivel' },
     
     // === ENTRADAS DE DUNGEON ===
-    { key: 'amago', id: 6608, name: 'Âmago', categoria: 'material' },
-    { key: 'amago_sombrio', id: 25988, name: 'Âmago Sombrio', categoria: 'material' },
+    { key: 'amago', id: 25981, name: 'Âmago', categoria: 'material' },
+    { key: 'amago_sombrio', id: 25981, name: 'Âmago Sombrio', categoria: 'material' },
     { key: 'alma_condensada', id: 25987, name: 'Alma Condensada', categoria: 'material' },
     
     // === THANATOS ===
@@ -125,7 +125,9 @@ function formatZeny(value) {
 
 async function updateSupabase(table, data) {
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+        // Usa UPSERT com on_conflict na coluna única (item_key para market_prices, runa_id para runa_prices)
+        const conflictColumn = table === 'market_prices' ? 'item_key' : 'runa_id';
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${conflictColumn}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -135,6 +137,10 @@ async function updateSupabase(table, data) {
             },
             body: JSON.stringify(data)
         });
+        if (!response.ok) {
+            const text = await response.text();
+            console.log(`   ⚠️ Supabase ${table}: ${response.status} - ${text.slice(0, 100)}`);
+        }
         return response.ok;
     } catch (error) {
         console.log(`   ⚠️ Erro Supabase: ${error.message}`);
