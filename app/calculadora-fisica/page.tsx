@@ -318,14 +318,7 @@ function EquipmentSlotComponent({
                 alt={equipped.equipment!.name}
                 className="w-full h-full object-contain p-0.5"
                 onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  const itemId = equipped.equipment!.nameid || equipped.equipment!.id;
-                  // Itens customizados RagnaTales (ID >= 30000) não existem no Divine Pride
-                  if (itemId < 30000 && !img.src.includes('divine-pride')) {
-                    img.src = `https://static.divine-pride.net/images/items/item/${itemId}.png`;
-                  } else {
-                    img.style.display = 'none'; // Esconde imagem quebrada
-                  }
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
               {equipped.refine > 0 && (
@@ -442,12 +435,7 @@ function CardModal({
                 alt={currentCard.name}
                 className="w-10 h-10 rounded-lg object-contain"
                 onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  if (currentCard.id < 30000 && !img.src.includes('divine-pride')) {
-                    img.src = `https://static.divine-pride.net/images/items/item/${currentCard.id}.png`;
-                  } else {
-                    img.style.display = 'none';
-                  }
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
               <div>
@@ -479,12 +467,7 @@ function CardModal({
                   alt={card.name}
                   className="w-8 h-8 rounded flex-shrink-0"
                   onError={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    if (card.id < 30000 && !img.src.includes('divine-pride')) {
-                      img.src = `https://static.divine-pride.net/images/items/item/${card.id}.png`;
-                    } else {
-                      img.style.display = 'none';
-                    }
+                    (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
                 <div className="flex-1 min-w-0">
@@ -600,15 +583,7 @@ function EquipmentModal({
                 alt={currentEquipment.equipment.name}
                 className="w-10 h-10 object-contain"
                 onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  if (currentEquipment.equipment) {
-                    const itemId = currentEquipment.equipment.nameid || currentEquipment.equipment.id;
-                    if (itemId < 30000 && !img.src.includes('divine-pride')) {
-                      img.src = `https://static.divine-pride.net/images/items/item/${itemId}.png`;
-                    } else {
-                      img.style.display = 'none';
-                    }
-                  }
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
               <div>
@@ -657,13 +632,7 @@ function EquipmentModal({
                   alt={item.name}
                   className="w-10 h-10 object-contain flex-shrink-0"
                   onError={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    const itemId = item.nameid || item.id;
-                    if (itemId < 30000 && !img.src.includes('divine-pride')) {
-                      img.src = `https://static.divine-pride.net/images/items/item/${itemId}.png`;
-                    } else {
-                      img.style.display = 'none';
-                    }
+                    (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
                 <div className="flex-1 min-w-0">
