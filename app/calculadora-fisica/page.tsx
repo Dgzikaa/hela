@@ -782,7 +782,7 @@ export default function CalculadoraFisica() {
           slot: 'weapon',
           cardSlots: w.slots || 0,
           icon: localImageUrl,
-          image: w.image || localImageUrl,
+          image: localImageUrl,
           weaponAttack: w.attack || 0,
           level: w.weaponLevel || 1,
           weaponLevel: w.weaponLevel || 1,
@@ -828,7 +828,7 @@ export default function CalculadoraFisica() {
           slot: slot,
           cardSlots: e.slots || e.cardSlots || 0,
           icon: localImageUrl,
-          image: e.image || localImageUrl,
+          image: localImageUrl,
           weaponAttack: 0,
           effects: e.effects || [],
           defense: e.defense || 0,
@@ -856,7 +856,7 @@ export default function CalculadoraFisica() {
           compatibleSlots: c.compatibleSlots || ['weapon', 'armadura', 'escudo', 'capa', 'sapato', 'acessorio', 'topo', 'meio', 'baixo'],
           effects: c.effects || [],
           icon: localImageUrl,
-          image: c.image || localImageUrl,
+          image: localImageUrl,
         }
       })
       setCards(transformedCards)
