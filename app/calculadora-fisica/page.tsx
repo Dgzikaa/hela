@@ -1470,7 +1470,7 @@ export default function CalculadoraFisica() {
 
             {/* Atributos */}
             <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="space-y-2">
                 {[
                   { label: 'FOR', base: str, setBase: setStr, bonus: strBonus, setBonus: setStrBonus },
                   { label: 'AGI', base: agi, setBase: setAgi, bonus: agiBonus, setBonus: setAgiBonus },
@@ -1479,22 +1479,22 @@ export default function CalculadoraFisica() {
                   { label: 'DES', base: dex, setBase: setDex, bonus: dexBonus, setBonus: setDexBonus },
                   { label: 'SOR', base: luk, setBase: setLuk, bonus: lukBonus, setBonus: setLukBonus },
                 ].map(attr => (
-                  <div key={attr.label} className="flex items-center gap-2">
-                    <span className="w-8 text-sm font-medium text-gray-700">{attr.label}</span>
+                  <div key={attr.label} className="flex items-center gap-3">
+                    <span className="w-10 text-sm font-semibold text-gray-700">{attr.label}</span>
                     <input
                       type="number"
                       value={attr.base}
                       onChange={(e) => attr.setBase(Number(e.target.value))}
-                      className="w-12 px-1 py-1 text-center text-sm border border-gray-300 rounded"
+                      className="w-14 px-2 py-1.5 text-center text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <span className="text-gray-400">+</span>
+                    <span className="text-gray-400 font-medium">+</span>
                     <input
                       type="number"
                       value={attr.bonus}
                       onChange={(e) => attr.setBonus(Number(e.target.value))}
-                      className="w-12 px-1 py-1 text-center text-sm border border-gray-300 rounded"
+                      className="w-14 px-2 py-1.5 text-center text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <span className="text-xs text-gray-500">= {attr.base + attr.bonus}</span>
+                    <span className="text-sm font-medium text-blue-600 min-w-[40px]">= {attr.base + attr.bonus}</span>
                   </div>
                 ))}
               </div>
