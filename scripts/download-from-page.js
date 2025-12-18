@@ -64,3 +64,5 @@
   console.log('Tente verificar manualmente: https://ragnatales.com.br/db/items/32257');
 })();
 
+
+
