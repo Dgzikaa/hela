@@ -319,9 +319,13 @@ function EquipmentSlotComponent({
                 className="w-full h-full object-contain p-0.5"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  // Se imagem local falhar, usa API do RagnaTales
-                  if (!img.src.includes('api.ragnatales')) {
-                    img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${equipped.equipment!.nameid || equipped.equipment!.id}`;
+                  const itemId = equipped.equipment!.nameid || equipped.equipment!.id;
+                  // Tenta Divine Pride como fallback
+                  if (!img.src.includes('divine-pride')) {
+                    img.src = `https://static.divine-pride.net/images/items/item/${itemId}.png`;
+                  } else {
+                    // Se Divine Pride também falhar, usa placeholder
+                    img.src = '/images/placeholder-item.png';
                   }
                 }}
               />
@@ -440,8 +444,8 @@ function CardModal({
                 className="w-10 h-10 rounded-lg object-contain"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  if (!img.src.includes('api.ragnatales')) {
-                    img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${currentCard.id}`;
+                  if (!img.src.includes('divine-pride')) {
+                    img.src = `https://static.divine-pride.net/images/items/item/${currentCard.id}.png`;
                   }
                 }}
               />
@@ -475,8 +479,8 @@ function CardModal({
                   className="w-8 h-8 rounded flex-shrink-0"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    if (!img.src.includes('api.ragnatales')) {
-                      img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${card.id}`;
+                    if (!img.src.includes('divine-pride')) {
+                      img.src = `https://static.divine-pride.net/images/items/item/${card.id}.png`;
                     }
                   }}
                 />
@@ -594,8 +598,9 @@ function EquipmentModal({
                 className="w-10 h-10 object-contain"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  if (!img.src.includes('api.ragnatales') && currentEquipment.equipment) {
-                    img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${currentEquipment.equipment.nameid || currentEquipment.equipment.id}`;
+                  if (!img.src.includes('divine-pride') && currentEquipment.equipment) {
+                    const itemId = currentEquipment.equipment.nameid || currentEquipment.equipment.id;
+                    img.src = `https://static.divine-pride.net/images/items/item/${itemId}.png`;
                   }
                 }}
               />
@@ -646,8 +651,8 @@ function EquipmentModal({
                   className="w-10 h-10 object-contain flex-shrink-0"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    if (!img.src.includes('api.ragnatales')) {
-                      img.src = `https://api.ragnatales.com.br/database/item/icon?nameid=${item.nameid || item.id}`;
+                    if (!img.src.includes('divine-pride')) {
+                      img.src = `https://static.divine-pride.net/images/items/item/${item.nameid || item.id}.png`;
                     }
                   }}
                 />
