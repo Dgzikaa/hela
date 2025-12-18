@@ -756,9 +756,9 @@ export default function CalculadoraFisica() {
   useEffect(() => {
     Promise.all([
       fetch('/data/monsters.json').then(r => r.json()),
-      fetch('/data/ragnatales/weapons.json').then(r => r.json()),
-      fetch('/data/ragnatales/equipments.json').then(r => r.json()),
-      fetch('/data/ragnatales/cards.json').then(r => r.json()),
+      fetch('/data/ragnatales/weapons-with-effects.json').then(r => r.json()),
+      fetch('/data/ragnatales/equipments-with-effects.json').then(r => r.json()),
+      fetch('/data/ragnatales/cards-with-effects.json').then(r => r.json()),
     ]).then(([monstersData, weaponsData, equipmentsData, cardsData]) => {
       setMonsters(monstersData)
       
@@ -774,15 +774,15 @@ export default function CalculadoraFisica() {
       const transformedWeapons: Equipment[] = weaponsData.map((w: any) => {
         // Usa o ID do primeiro item com o mesmo nome para a imagem
         const imageId = weaponIdMap[w.name] || w.nameid || w.id
-        const imageUrl = `/images/ragnatales/${imageId}.png`
+        const localImageUrl = `/images/ragnatales/${imageId}.png`
         return {
           id: String(w.nameid || w.id),
           nameid: w.nameid || w.id,
           name: w.name,
           slot: 'weapon',
           cardSlots: w.slots || 0,
-          icon: imageUrl,
-          image: imageUrl,
+          icon: localImageUrl,
+          image: w.image || localImageUrl,
           weaponAttack: w.attack || 0,
           level: w.weaponLevel || 1,
           weaponLevel: w.weaponLevel || 1,
@@ -805,19 +805,35 @@ export default function CalculadoraFisica() {
       const transformedEquipments: Equipment[] = equipmentsData.map((e: any) => {
         // Usa o ID do primeiro item com o mesmo nome para a imagem
         const imageId = equipIdMap[e.name] || e.nameid || e.id
-        const imageUrl = `/images/ragnatales/${imageId}.png`
+        const localImageUrl = `/images/ragnatales/${imageId}.png`
+        
+        // Extrair slot da descrição se não estiver definido corretamente
+        let slot = e.slot || 'outro'
+        if (slot === 'outro' && e.description) {
+          const desc = e.description.toLowerCase()
+          if (desc.includes('equipa em: topo') || desc.includes('classe: headgear')) slot = 'topo'
+          else if (desc.includes('equipa em: meio')) slot = 'meio'
+          else if (desc.includes('equipa em: baixo')) slot = 'baixo'
+          else if (desc.includes('equipa em: armadura') || desc.includes('classe: armadura')) slot = 'armadura'
+          else if (desc.includes('equipa em: escudo') || desc.includes('classe: escudo')) slot = 'escudo'
+          else if (desc.includes('equipa em: capa') || desc.includes('classe: capa')) slot = 'capa'
+          else if (desc.includes('equipa em: calçado') || desc.includes('classe: calçado') || desc.includes('equipa em: sapato')) slot = 'sapato'
+          else if (desc.includes('equipa em: acessório') || desc.includes('classe: acessório')) slot = 'acessorio'
+        }
+        
         return {
           id: String(e.nameid || e.id),
           nameid: e.nameid || e.id,
           name: e.name,
-          slot: e.slot || 'outro',
+          slot: slot,
           cardSlots: e.slots || e.cardSlots || 0,
-          icon: imageUrl,
-          image: imageUrl,
+          icon: localImageUrl,
+          image: e.image || localImageUrl,
           weaponAttack: 0,
           effects: e.effects || [],
           defense: e.defense || 0,
           requiredLevel: e.requiredLevel || 0,
+          description: e.description || '',
         }
       })
       setEquipments(transformedEquipments)
@@ -833,14 +849,14 @@ export default function CalculadoraFisica() {
       
       const transformedCards: Card[] = cardsData.map((c: any) => {
         const imageId = cardIdMap[c.name] || c.nameid || c.id
-        const imageUrl = `/images/ragnatales/${imageId}.png`
+        const localImageUrl = `/images/ragnatales/${imageId}.png`
         return {
           id: String(c.nameid || c.id),
           name: c.name,
           compatibleSlots: c.compatibleSlots || ['weapon', 'armadura', 'escudo', 'capa', 'sapato', 'acessorio', 'topo', 'meio', 'baixo'],
           effects: c.effects || [],
-          icon: imageUrl,
-          image: imageUrl,
+          icon: localImageUrl,
+          image: c.image || localImageUrl,
         }
       })
       setCards(transformedCards)
