@@ -25,7 +25,7 @@ export async function GET() {
       }
     })
 
-    // Análise por Boss
+    // Análise por Boss (contando apenas bosses PAGOS - preco > 0)
     const demandaPorBoss: Record<string, {
       total: number
       porDiaSemana: Record<string, number>
@@ -36,6 +36,10 @@ export async function GET() {
 
     pedidos.forEach(pedido => {
       pedido.itens.forEach(item => {
+        // Contar apenas bosses pagos (preco > 0)
+        // Bosses grátis no pacote Hela não devem ser contados
+        if (item.preco === 0) return
+
         const bossNome = item.boss.nome
         const diaSemana = new Date(pedido.createdAt).toLocaleDateString('pt-BR', { weekday: 'long' })
 
@@ -61,14 +65,15 @@ export async function GET() {
     const ultimos30Dias = new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000)
 
     Object.keys(demandaPorBoss).forEach(bossNome => {
+      // Contar apenas pedidos com boss PAGO (preco > 0)
       const pedidos7Dias = pedidos.filter(p => 
         new Date(p.createdAt) >= ultimos7Dias &&
-        p.itens.some(item => item.boss.nome === bossNome)
+        p.itens.some(item => item.boss.nome === bossNome && item.preco > 0)
       ).length
 
       const pedidos30Dias = pedidos.filter(p => 
         new Date(p.createdAt) >= ultimos30Dias &&
-        p.itens.some(item => item.boss.nome === bossNome)
+        p.itens.some(item => item.boss.nome === bossNome && item.preco > 0)
       ).length
 
       demandaPorBoss[bossNome].mediaUltimos7Dias = pedidos7Dias / 7
@@ -108,10 +113,12 @@ export async function GET() {
     const diaComMaisDemanda = Object.entries(pedidosPorDiaSemana)
       .sort(([,a], [,b]) => b - a)[0]
 
-    // Previsão para próximos 7 dias
-    const previsaoProximos7Dias = Math.round(
-      Object.values(demandaPorBoss).reduce((sum, boss) => sum + boss.mediaUltimos7Dias, 0) * 7
-    )
+    // Previsão para próximos 7 dias (baseada na média diária de PEDIDOS)
+    const pedidosUltimos7Dias = pedidos.filter(p => 
+      new Date(p.createdAt) >= ultimos7Dias
+    ).length
+    const mediaDiaria7Dias = pedidosUltimos7Dias / 7
+    const previsaoProximos7Dias = Math.round(mediaDiaria7Dias * 7)
 
     return NextResponse.json({
       demandaPorBoss,
