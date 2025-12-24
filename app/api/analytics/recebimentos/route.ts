@@ -86,14 +86,17 @@ export async function GET() {
     // Ordenar por valor total (maior para menor)
     estatisticas.sort((a, b) => b.valorTotal - a.valorTotal)
 
-    // Calcular totais gerais
+    // Calcular totais gerais (soma direta dos pedidos, não dos jogadores)
+    const valorTotalRecebido = pedidosConcluidos.reduce((sum, p) => sum + p.valorFinal, 0)
+    const valorTotalAReceber = pedidosAgendados.reduce((sum, p) => sum + p.valorFinal, 0)
+    
     const totais = {
       totalCarrysConcluidos: pedidosConcluidos.length,
       totalCarrysFuturos: pedidosAgendados.length,
       totalCarrys: pedidosConcluidos.length + pedidosAgendados.length,
-      valorTotalRecebido: estatisticas.reduce((sum, e) => sum + e.valorRecebido, 0),
-      valorTotalAReceber: estatisticas.reduce((sum, e) => sum + e.valorAReceber, 0),
-      valorTotalGeral: estatisticas.reduce((sum, e) => sum + e.valorTotal, 0)
+      valorTotalRecebido,
+      valorTotalAReceber,
+      valorTotalGeral: valorTotalRecebido + valorTotalAReceber
     }
 
     return NextResponse.json({

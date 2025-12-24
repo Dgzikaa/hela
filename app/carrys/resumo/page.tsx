@@ -8,9 +8,7 @@ import { Badge } from '@/app/components/Badge'
 import {
   BarChart3,
   TrendingUp,
-  Clock,
   Calendar,
-  Target,
   Users,
   DollarSign,
   AlertCircle,
@@ -44,21 +42,12 @@ interface Recebimentos {
   }
 }
 
-interface AnaliseDemanda {
-  diaComMaisDemanda: {
-    dia: string
-    quantidade: number
-  }
-  previsaoProximos7Dias: number
-  mediaDiaria: string
-  horariosPico: number[]
-}
+// Removido - não precisamos mais da API de análise de demanda
 
 export default function ResumoPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [recebimentos, setRecebimentos] = useState<Recebimentos | null>(null)
-  const [analise, setAnalise] = useState<AnaliseDemanda | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -71,19 +60,11 @@ export default function ResumoPage() {
 
   const carregarDados = async () => {
     try {
-      const [resRecebimentos, resAnalise] = await Promise.all([
-        fetch('/api/analytics/recebimentos'),
-        fetch('/api/analytics/demanda')
-      ])
+      const resRecebimentos = await fetch('/api/analytics/recebimentos')
       
       if (resRecebimentos.ok) {
         const data = await resRecebimentos.json()
         setRecebimentos(data)
-      }
-      
-      if (resAnalise.ok) {
-        const data = await resAnalise.json()
-        setAnalise(data)
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
@@ -110,7 +91,7 @@ export default function ResumoPage() {
     )
   }
 
-  if (!recebimentos || !analise) {
+  if (!recebimentos) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -142,7 +123,7 @@ export default function ResumoPage() {
         </div>
 
         {/* Cards de Totais Gerais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
@@ -193,58 +174,21 @@ export default function ResumoPage() {
               {recebimentos.totais.totalCarrys} carrys no total
             </p>
           </Card>
-        </div>
 
-        {/* Cards Informativos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <Card className="p-6 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-2 border-orange-200 dark:border-orange-800">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Previsão 7 Dias
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                Próximos 30 Dias
               </h3>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {analise.previsaoProximos7Dias}
+            <p className="text-3xl font-bold text-orange-700 dark:text-orange-400 mb-1">
+              {recebimentos.totais.totalCarrysFuturos}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              carrys estimados
-            </p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Melhor Dia
-              </h3>
-            </div>
-            <p className="text-lg font-bold text-gray-900 dark:text-white capitalize">
-              {analise.diaComMaisDemanda.dia}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {analise.diaComMaisDemanda.quantidade} carrys
-            </p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Horários de Pico
-              </h3>
-            </div>
-            <p className="text-lg font-bold text-gray-900 dark:text-white">
-              {analise.horariosPico.map(h => `${h}h`).join(', ')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              maior demanda
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              carrys agendados
             </p>
           </Card>
         </div>
