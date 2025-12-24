@@ -79,7 +79,7 @@ export function UserMenu() {
       label: 'Meus Ganhos',
       icon: Wallet,
       onClick: () => {
-        router.push('/admin/meus-ganhos')
+        router.push('/perfil/ganhos')
         setIsOpen(false)
       },
       show: true
@@ -103,7 +103,7 @@ export function UserMenu() {
       label: 'Ajuda',
       icon: HelpCircle,
       onClick: () => {
-        router.push('/admin/ajuda')
+        router.push('/ajuda')
         setIsOpen(false)
       },
       show: true

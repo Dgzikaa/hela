@@ -82,6 +82,17 @@ const nextConfig: NextConfig = {
         destination: '/configuracoes/geral',
         permanent: true,
       },
+      // Outras páginas
+      {
+        source: '/admin/meus-ganhos',
+        destination: '/perfil/ganhos',
+        permanent: true,
+      },
+      {
+        source: '/admin/ajuda',
+        destination: '/ajuda',
+        permanent: true,
+      },
     ];
   },
 };
