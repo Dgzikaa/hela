@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { Search, Bell } from 'lucide-react'
 import { UserMenu } from './UserMenu'
 import { GlobalSearch } from './GlobalSearch'
+import { NotificationCenter } from './NotificationCenter'
 
 export function TopBar() {
   const router = useRouter()
@@ -72,7 +73,8 @@ export function TopBar() {
             onClose={() => setIsSearchOpen(false)} 
           />
 
-          {/* Notificações - Comentado por enquanto, sistema Discord já existe */}
+          {/* Notificações */}
+          {isLoggedIn && <NotificationCenter />}
           {/* {isLoggedIn && (
             <button 
               onClick={() => router.push('/notificacoes')}
