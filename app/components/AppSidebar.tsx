@@ -22,7 +22,12 @@ import {
   Sword,
   LineChart,
   Settings,
-  Target
+  Target,
+  Wallet,
+  CalendarRange,
+  Wrench,
+  Calculator,
+  UserCog
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -32,30 +37,56 @@ interface MenuItem {
   icon: any
   isAdmin?: boolean
   isDanger?: boolean
+  category?: string
 }
 
-const menuItems: MenuItem[] = [
-  // Ferramentas Públicas
-  { name: 'Início', href: '/', icon: Home },
-  { name: 'Tigrinho', href: '/calculadora', icon: Dices },
-  { name: 'Farm', href: '/farm', icon: Flame },
-  { name: 'Agenda', href: '/agenda', icon: Calendar },
-  { name: 'Preços', href: '/precos', icon: LineChart },
-  { name: 'Config Preços', href: '/config-farm', icon: Settings },
-  { name: 'Dano', href: '/dano', icon: Sword },
-  { name: 'Calc. Física', href: '/calculadora-fisica', icon: Target },
-  { name: 'Carry Grátis', href: '/carry-gratis', icon: Gift },
-  
-  // Admin (só aparece logado)
-  { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart, isAdmin: true },
-  { name: 'Projeção', href: '/admin/projecao', icon: TrendingUp, isAdmin: true },
-  { name: 'Calendário', href: '/admin/calendario', icon: Calendar, isAdmin: true },
-  { name: 'Jogadores', href: '/admin/jogadores', icon: Gamepad2, isAdmin: true },
-  { name: 'CRM', href: '/admin/crm', icon: BarChart3, isAdmin: true },
-  { name: 'Carry Grátis Admin', href: '/admin/carry-gratis', icon: Gift, isAdmin: true },
-  { name: 'Usuários', href: '/admin/usuarios', icon: Users, isAdmin: true },
-  { name: 'Limpar Dados', href: '/admin/limpar', icon: Trash2, isAdmin: true, isDanger: true },
+interface MenuCategory {
+  name: string
+  items: MenuItem[]
+}
+
+// Home sempre visível (sem categoria)
+const homeItem: MenuItem = { name: 'Home', href: '/', icon: Home }
+
+// Categorias do menu
+const menuCategories: MenuCategory[] = [
+  {
+    name: 'Carrys',
+    items: [
+      { name: 'Agendamento', href: '/admin/pedidos', icon: Calendar, isAdmin: true },
+      { name: 'Resumo', href: '/admin/projecao', icon: Wallet, isAdmin: true },
+      { name: 'Calendário', href: '/admin/calendario', icon: CalendarRange, isAdmin: true },
+      { name: 'CRM', href: '/admin/crm', icon: BarChart3, isAdmin: true },
+      { name: 'Carry Grátis', href: '/admin/carry-gratis', icon: Gift, isAdmin: true },
+    ]
+  },
+  {
+    name: 'Ferramentas',
+    items: [
+      { name: 'Tigrinho', href: '/calculadora', icon: Dices },
+      { name: 'Preços', href: '/precos', icon: LineChart },
+    ]
+  },
+  {
+    name: 'Calculadoras',
+    items: [
+      { name: 'Calc. Física', href: '/calculadora-fisica', icon: Target },
+      { name: 'Calc. Mágica', href: '/dano', icon: Sword },
+      { name: 'Farm', href: '/farm', icon: Flame },
+    ]
+  },
+  {
+    name: 'Configurações',
+    items: [
+      { name: 'Config. Preços', href: '/config-farm', icon: Settings, isAdmin: true },
+      { name: 'Usuários', href: '/admin/usuarios', icon: Users, isAdmin: true },
+      { name: 'Membros', href: '/admin/jogadores', icon: Gamepad2, isAdmin: true },
+    ]
+  }
 ]
+
+// Item de perigo (Limpar Dados)
+const dangerItem: MenuItem = { name: 'Limpar Dados', href: '/admin/limpar', icon: Trash2, isAdmin: true, isDanger: true }
 
 interface AppSidebarProps {
   defaultCollapsed?: boolean
@@ -86,16 +117,19 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
     return pathname?.startsWith(href)
   }
 
-  // Filtra itens do menu baseado no status de login
-  const visibleItems = menuItems.filter(item => {
-    if (item.isAdmin) return isLoggedIn
-    return true
-  })
+  // Filtra categorias baseado no status de login
+  const getVisibleCategories = (): MenuCategory[] => {
+    return menuCategories.map(category => ({
+      ...category,
+      items: category.items.filter(item => {
+        if (item.isAdmin) return isLoggedIn
+        return true
+      })
+    })).filter(category => category.items.length > 0)
+  }
 
-  // Separa itens públicos e admin
-  const publicItems = visibleItems.filter(item => !item.isAdmin)
-  const adminItems = visibleItems.filter(item => item.isAdmin && !item.isDanger)
-  const dangerItems = visibleItems.filter(item => item.isDanger)
+  const visibleCategories = getVisibleCategories()
+  const showDangerItem = isLoggedIn && dangerItem.isAdmin
 
   return (
     <>
@@ -158,53 +192,44 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
-            {/* Ferramentas Públicas */}
-            {showExpanded && (
-              <p className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Ferramentas
-              </p>
-            )}
-            {publicItems.map((item) => {
-              const Icon = item.icon
-              const active = isActive(item.href)
-              
-              return (
-                <button
-                  key={item.href}
-                  onClick={() => {
-                    router.push(item.href)
-                    setIsMobileMenuOpen(false)
-                  }}
-                  title={!showExpanded ? item.name : undefined}
-                  className={`
-                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                    transition-all duration-200 group
-                    ${active 
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }
-                    ${!showExpanded ? 'justify-center' : ''}
-                  `}
-                >
-                  <Icon className={`w-5 h-5 shrink-0 transition-transform ${active ? '' : 'group-hover:scale-110'}`} />
-                  {showExpanded && (
-                    <span className="font-medium text-sm whitespace-nowrap">{item.name}</span>
-                  )}
-                </button>
-              )
-            })}
+            {/* Home - Sempre visível separado */}
+            <button
+              onClick={() => {
+                router.push(homeItem.href)
+                setIsMobileMenuOpen(false)
+              }}
+              title={!showExpanded ? homeItem.name : undefined}
+              className={`
+                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                transition-all duration-200 group
+                ${isActive(homeItem.href)
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }
+                ${!showExpanded ? 'justify-center' : ''}
+              `}
+            >
+              <homeItem.icon className={`w-5 h-5 shrink-0 transition-transform ${isActive(homeItem.href) ? '' : 'group-hover:scale-110'}`} />
+              {showExpanded && (
+                <span className="font-medium text-sm whitespace-nowrap">{homeItem.name}</span>
+              )}
+            </button>
 
-            {/* Admin Items */}
-            {isLoggedIn && adminItems.length > 0 && (
-              <>
+            {/* Separador após Home */}
+            {showExpanded && <div className="my-2 border-t border-gray-200" />}
+            {!showExpanded && <div className="my-1 border-t border-gray-200" />}
+
+            {/* Categorias */}
+            {visibleCategories.map((category, categoryIndex) => (
+              <div key={category.name}>
                 {showExpanded && (
-                  <p className="px-3 py-2 mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Admin
+                  <p className="px-3 py-2 mt-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    {category.name}
                   </p>
                 )}
-                {!showExpanded && <div className="my-2 border-t border-gray-200" />}
+                {!showExpanded && categoryIndex > 0 && <div className="my-1 border-t border-gray-200" />}
                 
-                {adminItems.map((item) => {
+                {category.items.map((item) => {
                   const Icon = item.icon
                   const active = isActive(item.href)
                   
@@ -233,37 +258,36 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
                     </button>
                   )
                 })}
+              </div>
+            ))}
 
-                {/* Danger Items */}
-                {dangerItems.map((item) => {
-                  const Icon = item.icon
-                  const active = isActive(item.href)
-                  
-                  return (
-                    <button
-                      key={item.href}
-                      onClick={() => {
-                        router.push(item.href)
-                        setIsMobileMenuOpen(false)
-                      }}
-                      title={!showExpanded ? item.name : undefined}
-                      className={`
-                        w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                        transition-all duration-200 group mt-2
-                        ${active 
-                          ? 'bg-red-600 text-white' 
-                          : 'text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200'
-                        }
-                        ${!showExpanded ? 'justify-center' : ''}
-                      `}
-                    >
-                      <Icon className={`w-5 h-5 shrink-0 transition-transform ${active ? '' : 'group-hover:scale-110'}`} />
-                      {showExpanded && (
-                        <span className="font-medium text-sm whitespace-nowrap">⚠️ {item.name}</span>
-                      )}
-                    </button>
-                  )
-                })}
+            {/* Danger Item - Limpar Dados */}
+            {showDangerItem && (
+              <>
+                {showExpanded && <div className="mt-4 border-t border-gray-200" />}
+                {!showExpanded && <div className="mt-2 border-t border-gray-200" />}
+                
+                <button
+                  onClick={() => {
+                    router.push(dangerItem.href)
+                    setIsMobileMenuOpen(false)
+                  }}
+                  title={!showExpanded ? dangerItem.name : undefined}
+                  className={`
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                    transition-all duration-200 group mt-2
+                    ${isActive(dangerItem.href)
+                      ? 'bg-red-600 text-white' 
+                      : 'text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200'
+                    }
+                    ${!showExpanded ? 'justify-center' : ''}
+                  `}
+                >
+                  <dangerItem.icon className={`w-5 h-5 shrink-0 transition-transform ${isActive(dangerItem.href) ? '' : 'group-hover:scale-110'}`} />
+                  {showExpanded && (
+                    <span className="font-medium text-sm whitespace-nowrap">⚠️ {dangerItem.name}</span>
+                  )}
+                </button>
               </>
             )}
           </nav>
