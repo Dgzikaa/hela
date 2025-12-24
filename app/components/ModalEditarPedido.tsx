@@ -86,6 +86,13 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
     }
   }, [pedido])
 
+  // Atualizar valor pago automaticamente quando valor final mudar e status for PAGO
+  useEffect(() => {
+    if (statusPagamento === 'PAGO') {
+      setValorPago(valorFinal)
+    }
+  }, [valorFinal, statusPagamento])
+
   if (!pedido) return null
 
   const helaSelecionada = Object.keys(bossesPrecos).includes('7') // Boss ID 7 = Hela
@@ -354,7 +361,15 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
                 <label className="block text-gray-300 text-sm mb-2">Status de Pagamento</label>
                 <select
                   value={statusPagamento}
-                  onChange={(e) => setStatusPagamento(e.target.value)}
+                  onChange={(e) => {
+                    const novoStatus = e.target.value
+                    setStatusPagamento(novoStatus)
+                    
+                    // Se selecionar "PAGO", preencher automaticamente com valor total
+                    if (novoStatus === 'PAGO') {
+                      setValorPago(valorFinal)
+                    }
+                  }}
                   className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600"
                 >
                   <option value="NAO_PAGO">❌ Não Pagou</option>
