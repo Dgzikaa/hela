@@ -1,12 +1,10 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { 
   ShoppingCart,
-  Users,
   Calendar,
-  LogOut,
   Menu,
   X,
   Gamepad2,
@@ -25,9 +23,7 @@ import {
   Target,
   Wallet,
   CalendarRange,
-  Wrench,
-  Calculator,
-  UserCog
+  Users
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -105,10 +101,6 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
   // Determina se deve mostrar expandido (colapsado mas com hover, ou não colapsado)
   const showExpanded = !isCollapsed || isHovering
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false })
-    router.push('/admin/login')
-  }
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -169,18 +161,8 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
         `}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center gap-3 p-4 border-b border-gray-200 h-16">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shrink-0">
-              <span className="text-white text-xl font-bold">H</span>
-            </div>
-            {showExpanded && (
-              <div className="overflow-hidden">
-                <h1 className="text-gray-900 font-bold text-lg whitespace-nowrap">Hela Carrys</h1>
-                <p className="text-gray-500 text-xs">RagnaTales</p>
-              </div>
-            )}
-          </div>
+          {/* Espaçamento do topo (removido logo) */}
+          <div className="h-4"></div>
 
           {/* Toggle Collapse Button (desktop only) */}
           <button
@@ -291,37 +273,6 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
               </>
             )}
           </nav>
-
-          {/* Footer - Login/Logout */}
-          <div className="p-2 border-t border-gray-200">
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                title={!showExpanded ? 'Sair' : undefined}
-                className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                  text-red-600 hover:text-red-700 hover:bg-red-50 transition-all group
-                  ${!showExpanded ? 'justify-center' : ''}
-                `}
-              >
-                <LogOut className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-                {showExpanded && <span className="font-medium text-sm">Sair</span>}
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push('/admin/login')}
-                title={!showExpanded ? 'Login Admin' : undefined}
-                className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                  text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all group
-                  ${!showExpanded ? 'justify-center' : ''}
-                `}
-              >
-                <Users className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-                {showExpanded && <span className="font-medium text-sm">Login Admin</span>}
-              </button>
-            )}
-          </div>
         </div>
       </aside>
 

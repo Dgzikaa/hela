@@ -2,6 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react'
 import { AppSidebar } from './AppSidebar'
+import { TopBar } from './TopBar'
 
 interface ToolsLayoutProps {
   children: React.ReactNode
@@ -12,7 +13,8 @@ export function ToolsLayout({ children }: ToolsLayoutProps) {
     <SessionProvider>
       <div className="flex min-h-screen bg-gray-50">
         <AppSidebar defaultCollapsed={true} />
-        <main className="flex-1 min-h-screen lg:mt-0 mt-14">
+        <TopBar />
+        <main className="flex-1 min-h-screen pt-16">
           {children}
         </main>
       </div>

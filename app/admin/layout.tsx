@@ -4,6 +4,7 @@ import { SessionProvider, useSession } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { AdminSidebar } from '../components/AdminSidebar'
+import { TopBar } from '../components/TopBar'
 
 function AdminContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
@@ -57,7 +58,8 @@ function AdminContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
-      <main className="flex-1 lg:ml-64 mt-14 lg:mt-0">
+      <TopBar />
+      <main className="flex-1 lg:ml-64 pt-16">
         {children}
       </main>
     </div>
