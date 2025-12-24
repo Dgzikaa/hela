@@ -6,6 +6,7 @@ import { NotificationsProvider } from './contexts/NotificationsContext';
 import { PriceAlertsProvider } from './contexts/PriceAlertsContext';
 import { AvailabilityProvider } from './contexts/AvailabilityContext';
 import { RemindersProvider } from './contexts/RemindersContext';
+import { SessionProvider } from 'next-auth/react';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,17 +54,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PreferencesProvider>
-          <NotificationsProvider>
-            <PriceAlertsProvider>
-              <AvailabilityProvider>
-                <RemindersProvider>
-                  {children}
-                </RemindersProvider>
-              </AvailabilityProvider>
-            </PriceAlertsProvider>
-          </NotificationsProvider>
-        </PreferencesProvider>
+        <SessionProvider>
+          <PreferencesProvider>
+            <NotificationsProvider>
+              <PriceAlertsProvider>
+                <AvailabilityProvider>
+                  <RemindersProvider>
+                    {children}
+                  </RemindersProvider>
+                </AvailabilityProvider>
+              </PriceAlertsProvider>
+            </NotificationsProvider>
+          </PreferencesProvider>
+        </SessionProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `
