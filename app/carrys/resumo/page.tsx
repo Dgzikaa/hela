@@ -19,7 +19,7 @@ import {
   Activity
 } from 'lucide-react'
 
-interface AnaliseD emanda {
+interface AnaliseDemanda {
   demandaPorBoss: Record<string, {
     total: number
     tendencia: 'crescente' | 'estavel' | 'decrescente'
