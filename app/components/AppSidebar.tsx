@@ -153,7 +153,7 @@ export function AppSidebar({ defaultCollapsed = true }: AppSidebarProps) {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
         className={`
-          fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 shadow-lg
+          fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-[60] shadow-lg
           transition-all duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
