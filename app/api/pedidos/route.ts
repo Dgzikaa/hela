@@ -88,13 +88,21 @@ export async function POST(req: Request) {
         origem: origem || 'WEB',
         observacoes,
         itens: {
-          create: bossesData.map(boss => ({
-            bossId: boss.id,
-            // Usar preço customizado se fornecido, senão usar preço padrão
-            preco: bossesPrecos && bossesPrecos[boss.id] !== undefined 
-              ? bossesPrecos[boss.id] 
-              : boss.preco
-          }))
+          create: bossesData.map(boss => {
+            // Se for pacote completo: Hela tem preço, bosses 1-6 são grátis
+            let precoFinal = boss.preco
+            if (pacoteCompleto) {
+              precoFinal = boss.id === 7 ? boss.preco : 0
+            } else if (bossesPrecos && bossesPrecos[boss.id] !== undefined) {
+              // Usar preço customizado se fornecido
+              precoFinal = bossesPrecos[boss.id]
+            }
+            
+            return {
+              bossId: boss.id,
+              preco: precoFinal
+            }
+          })
         },
         participacoes: jogadores && jogadores.length > 0 ? {
           create: jogadores.map((jogadorId: number) => ({

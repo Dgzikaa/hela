@@ -88,7 +88,8 @@ export async function POST(request: Request) {
             itens: {
               create: bosses.map(boss => ({
                 bossId: boss.id,
-                preco: boss.preco
+                // Pacote Completo: Hela tem preço, bosses 1-6 são grátis (relíquias)
+                preco: boss.id === 7 ? boss.preco : 0
               }))
             }
           },
