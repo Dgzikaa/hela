@@ -162,8 +162,8 @@ export default function ProjecaoPage() {
 
   const formatarValor = (valor: number): string => {
     if (valor === 0) return '0'
-    if (valor >= 1000) {
-      const bilhoes = (valor / 1000).toFixed(1)
+    if (valor >= 100000) {
+      const bilhoes = (valor / 100000).toFixed(2)
       return `${bilhoes}b`
     }
     return `${valor}kk`

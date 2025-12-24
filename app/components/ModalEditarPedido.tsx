@@ -352,7 +352,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
                   <span className="text-gray-400">kk</span>
                 </div>
                 <p className="text-gray-400 text-xs mt-1">
-                  = {(valorFinal / 1000).toFixed(1)}b
+                  = {valorFinal >= 100000 ? `${(valorFinal / 100000).toFixed(2)}b` : `${valorFinal}kk`}
                 </p>
               </div>
 
@@ -392,7 +392,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
                     placeholder="Ex: 2000 (2b)"
                   />
                   <p className="text-gray-400 text-xs mt-1">
-                    = {(valorPago / 1000).toFixed(1)}b
+                    = {valorPago >= 100000 ? `${(valorPago / 100000).toFixed(2)}b` : `${valorPago}kk`}
                   </p>
                 </div>
               )}
@@ -405,7 +405,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
                     {valorFinal - valorPago}kk
                   </p>
                   <p className="text-yellow-300 text-xs">
-                    = {((valorFinal - valorPago) / 1000).toFixed(1)}b
+                    = {(valorFinal - valorPago) >= 100000 ? `${((valorFinal - valorPago) / 100000).toFixed(2)}b` : `${valorFinal - valorPago}kk`}
                   </p>
                 </div>
               )}

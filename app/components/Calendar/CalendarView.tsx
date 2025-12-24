@@ -227,8 +227,8 @@ export function CalendarView({
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Receita</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {stats.totalValue >= 1000 
-                  ? `${(stats.totalValue / 1000).toFixed(1)}b` 
+                {stats.totalValue >= 100000 
+                  ? `${(stats.totalValue / 100000).toFixed(2)}b` 
                   : `${stats.totalValue}kk`}
               </p>
             </div>

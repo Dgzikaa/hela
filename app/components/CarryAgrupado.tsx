@@ -97,9 +97,10 @@ export function CarryAgrupado({
       return <Badge variant="success">✅ Pago Completo</Badge>
     } else if (statusPagamento === 'SINAL') {
       const restante = valorTotal - valorReserva
+      const formatVal = (v: number) => v >= 100000 ? `${(v / 100000).toFixed(2)}b` : `${v}kk`
       return (
         <Badge variant="warning">
-          💰 Sinal {(valorReserva / 1000).toFixed(1)}b | Falta {(restante / 1000).toFixed(1)}b
+          💰 Sinal {formatVal(valorReserva)} | Falta {formatVal(restante)}
         </Badge>
       )
     }
@@ -155,9 +156,9 @@ export function CarryAgrupado({
             {/* Valor */}
             <div className="flex items-center gap-2 text-lg font-semibold text-green-600">
               <DollarSign className="w-5 h-5" />
-              {(carry.valorFinal / 1000).toFixed(1)}b
+              {carry.valorFinal >= 100000 ? `${(carry.valorFinal / 100000).toFixed(2)}b` : `${carry.valorFinal}kk`}
               <span className="text-sm text-gray-600">
-                ({carry.valorFinal}kk) • {valorPorJogador}kk/jogador
+                • {valorPorJogador}kk/jogador
               </span>
             </div>
 
@@ -240,7 +241,7 @@ export function CarryAgrupado({
           <div className="text-right">
             <div className="text-sm text-gray-600 mb-1">Valor Total</div>
             <div className="text-3xl font-bold text-green-600">
-              {(valorTotalAgrupado / 1000).toFixed(1)}b
+              {valorTotalAgrupado >= 100000 ? `${(valorTotalAgrupado / 100000).toFixed(2)}b` : `${valorTotalAgrupado}kk`}
             </div>
             <div className="text-sm text-gray-600">
               {valorPorJogador}kk por jogador
@@ -284,7 +285,7 @@ export function CarryAgrupado({
                     </div>
                   )}
                   <div className="text-green-600 font-semibold">
-                    {(carry.valorFinal / 1000).toFixed(1)}b ({carry.valorFinal}kk)
+                    {carry.valorFinal >= 100000 ? `${(carry.valorFinal / 100000).toFixed(2)}b` : `${carry.valorFinal}kk`}
                   </div>
                 </div>
 

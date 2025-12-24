@@ -74,8 +74,8 @@ export default function ResumoPage() {
   }
 
   const formatarValor = (valor: number) => {
-    if (valor >= 1000) {
-      return `${(valor / 1000).toFixed(2)}b`
+    if (valor >= 100000) {
+      return `${(valor / 100000).toFixed(2)}b`
     }
     return `${valor}kk`
   }
