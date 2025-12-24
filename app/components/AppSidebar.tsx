@@ -77,6 +77,7 @@ const menuCategories: MenuCategory[] = [
       { name: 'Config. Preços', href: '/configuracoes/precos', icon: Settings, isAdmin: true },
       { name: 'Usuários', href: '/configuracoes/usuarios', icon: Users, isAdmin: true },
       { name: 'Membros', href: '/configuracoes/membros', icon: Gamepad2, isAdmin: true },
+      { name: '🛠️ Gerenciar Time', href: '/admin/gerenciar-time', icon: Settings, isAdmin: true },
     ]
   }
 ]

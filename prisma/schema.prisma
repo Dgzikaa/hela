@@ -414,6 +414,12 @@ enum StatusPedido {
   CANCELADO     // Cancelado
 }
 
+enum StatusPagamento {
+  NAO_PAGO  // Cliente não pagou nada ainda
+  SINAL     // Cliente pagou entrada/sinal (ex: 2b)
+  PAGO      // Cliente pagou valor total
+}
+
 model Pedido {
   id            Int          @id @default(autoincrement())
   
@@ -428,8 +434,10 @@ model Pedido {
   origem        String       @default("WEB") // "WEB", "DISCORD"
   
   // Detalhes
-  status        StatusPedido @default(PENDENTE)
+  status        StatusPedido     @default(PENDENTE)
+  statusPagamento StatusPagamento @default(NAO_PAGO)
   dataAgendada  DateTime?
+  horario       DateTime?        @db.Time // Horário do carry
   
   // Valores
   valorTotal    Int          @default(0)

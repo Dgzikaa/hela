@@ -66,6 +66,7 @@ export async function GET(req: Request) {
         dataAgendada: string
         bosses: string[]
         horario: string
+        valorTotal: number
       }>
     }>()
 
@@ -80,19 +81,26 @@ export async function GET(req: Request) {
           })
         }
 
-        const horario = pedido.dataAgendada
+        // Usar horario do pedido se existir, senão pegar da dataAgendada
+        const horario = (pedido as any).horario
+          ? new Date(`2000-01-01T${(pedido as any).horario}`).toLocaleTimeString('pt-BR', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : pedido.dataAgendada
           ? new Date(pedido.dataAgendada).toLocaleTimeString('pt-BR', {
               hour: '2-digit',
               minute: '2-digit'
             })
-          : 'Horário não definido'
+          : '21:00'
 
         carrysPorJogador.get(participacao.jogadorId)!.carrys.push({
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,
           dataAgendada: pedido.dataAgendada!.toISOString(),
           bosses: pedido.itens.map((i: any) => i.boss.nome),
-          horario
+          horario,
+          valorTotal: pedido.valorTotal
         })
       })
     })

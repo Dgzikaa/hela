@@ -25,13 +25,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false
   },
-  manifest: "/manifest.json",
-  themeColor: "#9333ea",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1
-  }
+  manifest: "/manifest.json"
 };
 
 export default function RootLayout({
@@ -44,7 +38,6 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#9333ea" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -52,24 +45,6 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    function(registration) {
-                      console.log('Service Worker registrado com sucesso:', registration.scope);
-                    },
-                    function(err) {
-                      console.log('Falha ao registrar Service Worker:', err);
-                    }
-                  );
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );

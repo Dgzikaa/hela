@@ -20,7 +20,10 @@ import {
   Medal,
   Zap,
   Filter,
-  Search
+  Search,
+  Edit2,
+  Save,
+  X
 } from 'lucide-react'
 
 interface Jogador {
@@ -49,6 +52,7 @@ export default function MembrosPage() {
   const [jogadores, setJogadores] = useState<Jogador[]>([])
   const [loading, setLoading] = useState(true)
   const [jogadorSelecionado, setJogadorSelecionado] = useState<Jogador | null>(null)
+  const [jogadorEditando, setJogadorEditando] = useState<Jogador | null>(null)
   const [busca, setBusca] = useState('')
   const [filtroCategoria, setFiltroCategoria] = useState<string>('todos')
 
@@ -71,6 +75,27 @@ export default function MembrosPage() {
       console.error('Erro ao carregar jogadores:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const salvarEdicao = async () => {
+    if (!jogadorEditando) return
+
+    try {
+      const res = await fetch(`/api/jogadores/${jogadorEditando.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jogadorEditando)
+      })
+
+      if (res.ok) {
+        await carregarJogadores()
+        setJogadorEditando(null)
+        alert('✅ Jogador atualizado com sucesso!')
+      }
+    } catch (error) {
+      console.error('Erro ao salvar jogador:', error)
+      alert('❌ Erro ao salvar jogador')
     }
   }
 
@@ -281,15 +306,99 @@ export default function MembrosPage() {
                 {jogadoresFiltrados.map((jogador) => {
                   const conquistas = calcularConquistas(jogador)
                   const conquistasConcluidas = conquistas.filter(c => c.concluida).length
+                  const editando = jogadorEditando?.id === jogador.id
+                  
+                  if (editando) {
+                    return (
+                      <div
+                        key={jogador.id}
+                        className="w-full p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 border-blue-300"
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold text-gray-900 dark:text-white">
+                              Editando: {jogador.nick}
+                            </h3>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={salvarEdicao}
+                                className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                              >
+                                <Save className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setJogadorEditando(null)}
+                                className="p-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <label className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={jogadorEditando.essencial}
+                                onChange={(e) => setJogadorEditando({
+                                  ...jogadorEditando,
+                                  essencial: e.target.checked
+                                })}
+                                className="rounded"
+                              />
+                              <span className="text-gray-700 dark:text-gray-300">
+                                ⭐ Time Principal (Essencial)
+                              </span>
+                            </label>
+
+                            <label className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={jogadorEditando.ativo}
+                                onChange={(e) => setJogadorEditando({
+                                  ...jogadorEditando,
+                                  ativo: e.target.checked
+                                })}
+                                className="rounded"
+                              />
+                              <span className="text-gray-700 dark:text-gray-300">
+                                ✅ Ativo
+                              </span>
+                            </label>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                              Categorias:
+                            </label>
+                            <select
+                              value={jogadorEditando.categorias}
+                              onChange={(e) => setJogadorEditando({
+                                ...jogadorEditando,
+                                categorias: e.target.value
+                              })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            >
+                              <option value="HELA,CARRYS">Hela + Carrys (Time Principal)</option>
+                              <option value="CARRYS">Apenas Carrys (4, 5, 6)</option>
+                              <option value="SUPLENTE">Suplente (Pode tudo)</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
                   
                   return (
-                    <button
+                    <div
                       key={jogador.id}
-                      onClick={() => setJogadorSelecionado(jogador)}
-                      className="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors text-left"
+                      className="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setJogadorSelecionado(jogador)}
+                          className="flex items-center gap-3 flex-1 text-left"
+                        >
                           <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                             {jogador.nick[0].toUpperCase()}
                           </div>
@@ -313,14 +422,20 @@ export default function MembrosPage() {
                               <span>{conquistasConcluidas}/7 conquistas</span>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right">
+                        </button>
+                        <div className="flex items-center gap-2">
                           <Badge variant={jogador.ativo ? 'success' : 'default'}>
                             {jogador.ativo ? 'Ativo' : 'Inativo'}
                           </Badge>
+                          <button
+                            onClick={() => setJogadorEditando(jogador)}
+                            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                    </button>
+                    </div>
                   )
                 })}
               </div>

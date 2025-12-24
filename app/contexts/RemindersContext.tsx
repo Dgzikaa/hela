@@ -44,37 +44,6 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  useEffect(() => {
-    if (reminders.length > 0) {
-      localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders))
-    }
-  }, [reminders])
-
-  // Verificar lembretes a cada minuto
-  useEffect(() => {
-    const interval = setInterval(() => {
-      checkReminders()
-    }, 60000) // 1 minuto
-
-    // Verificar imediatamente ao montar
-    checkReminders()
-
-    return () => clearInterval(interval)
-  }, [reminders])
-
-  const addReminder = (reminder: Omit<Reminder, 'id' | 'triggered'>) => {
-    const newReminder: Reminder = {
-      ...reminder,
-      id: `reminder-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      triggered: false
-    }
-    setReminders(prev => [...prev, newReminder])
-  }
-
-  const removeReminder = (id: string) => {
-    setReminders(prev => prev.filter(r => r.id !== id))
-  }
-
   const checkReminders = useCallback(() => {
     const now = new Date()
     
@@ -120,7 +89,38 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
         (now.getTime() - r.triggerAt.getTime()) < 24 * 60 * 60 * 1000
       )
     })
+  }, [addNotification])
+
+  const addReminder = (reminder: Omit<Reminder, 'id' | 'triggered'>) => {
+    const newReminder: Reminder = {
+      ...reminder,
+      id: `reminder-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      triggered: false
+    }
+    setReminders(prev => [...prev, newReminder])
   }
+
+  const removeReminder = (id: string) => {
+    setReminders(prev => prev.filter(r => r.id !== id))
+  }
+
+  useEffect(() => {
+    if (reminders.length > 0) {
+      localStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders))
+    }
+  }, [reminders])
+
+  // Verificar lembretes a cada minuto
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkReminders()
+    }, 60000) // 1 minuto
+
+    // Verificar imediatamente ao montar
+    checkReminders()
+
+    return () => clearInterval(interval)
+  }, [checkReminders])
 
   return (
     <RemindersContext.Provider

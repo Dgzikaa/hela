@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ToolsLayout } from '../components/ToolsLayout'
@@ -11,9 +11,50 @@ import { TopJogadores } from '../components/Dashboard/TopJogadores'
 import { MetasProgress } from '../components/Dashboard/MetasProgress'
 import { AcoesRapidas } from '../components/Dashboard/AcoesRapidas'
 
+interface DashboardData {
+  metricas: {
+    totalCarrys: number
+    receitaTotal: number
+    totalClientes: number
+    taxaConclusao: number
+    variacaoCarrys: number
+    variacaoReceita: number
+  }
+  dadosGrafico: Array<{
+    mes: string
+    carrys: number
+    receita: number
+  }>
+  atividades: Array<{
+    id: number
+    tipo: 'concluido' | 'carry' | 'pagamento' | 'jogador'
+    titulo: string
+    descricao: string
+    tempo: string
+    valor?: number
+  }>
+  topJogadores: Array<{
+    id: number
+    nome: string
+    carrys: number
+    ganhos: number
+    posicao: number
+  }>
+  metas: Array<{
+    id: number
+    titulo: string
+    atual: number
+    objetivo: number
+    unidade: string
+    cor: 'purple' | 'green' | 'blue' | 'orange'
+  }>
+}
+
 export default function HomePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -21,79 +62,47 @@ export default function HomePage() {
     }
   }, [status, router])
 
-  if (status === 'loading') {
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchDashboardData()
+    }
+  }, [status])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/dashboard/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setDashboardData(data)
+      } else {
+        console.error('Erro ao buscar dados do dashboard')
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do dashboard:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (status === 'loading' || loading) {
     return (
       <ToolsLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Carregando...</p>
+            <p className="text-gray-600">Carregando dashboard...</p>
           </div>
         </div>
       </ToolsLayout>
     )
   }
 
-  if (!session) {
+  if (!session || !dashboardData) {
     return null
   }
 
-  const dadosGrafico = [
-    { mes: 'Jul', carrys: 15, receita: 1.2 },
-    { mes: 'Ago', carrys: 22, receita: 1.8 },
-    { mes: 'Set', carrys: 28, receita: 2.3 },
-    { mes: 'Out', carrys: 32, receita: 2.7 },
-    { mes: 'Nov', carrys: 38, receita: 3.2 },
-    { mes: 'Dez', carrys: 42, receita: 3.6 },
-  ]
-
-  const atividades = [
-    {
-      id: 1,
-      tipo: 'concluido' as const,
-      titulo: 'Carry Hela concluído',
-      descricao: 'Cliente: João Silva',
-      tempo: '2h atrás',
-      valor: 850
-    },
-    {
-      id: 2,
-      tipo: 'carry' as const,
-      titulo: 'Novo carry agendado',
-      descricao: 'Bosses 1-6 para amanhã às 20h',
-      tempo: '5h atrás'
-    },
-    {
-      id: 3,
-      tipo: 'pagamento' as const,
-      titulo: 'Pagamento processado',
-      descricao: '12 jogadores receberam',
-      tempo: '1 dia atrás',
-      valor: 1020
-    },
-    {
-      id: 4,
-      tipo: 'jogador' as const,
-      titulo: 'Novo membro adicionado',
-      descricao: 'PlayerX entrou no time CARRYS',
-      tempo: '2 dias atrás'
-    },
-  ]
-
-  const topJogadores = [
-    { id: 1, nome: 'Supaturk', carrys: 12, ganhos: 1020, posicao: 1 },
-    { id: 2, nome: 'Isami', carrys: 12, ganhos: 1020, posicao: 2 },
-    { id: 3, nome: 'PlayerX', carrys: 10, ganhos: 850, posicao: 3 },
-    { id: 4, nome: 'PlayerY', carrys: 8, ganhos: 680, posicao: 4 },
-    { id: 5, nome: 'PlayerZ', carrys: 7, ganhos: 595, posicao: 5 },
-  ]
-
-  const metas = [
-    { id: 1, titulo: 'Carrys do Mês', atual: 42, objetivo: 50, unidade: 'carrys', cor: 'purple' as const },
-    { id: 2, titulo: 'Receita Mensal', atual: 3.6, objetivo: 4.0, unidade: 'b', cor: 'green' as const },
-    { id: 3, titulo: 'Novos Clientes', atual: 18, objetivo: 20, unidade: 'clientes', cor: 'blue' as const },
-    { id: 4, titulo: 'Taxa de Conclusão', atual: 95, objetivo: 100, unidade: '%', cor: 'orange' as const },
-  ]
+  const { metricas, dadosGrafico, atividades, topJogadores, metas } = dashboardData
 
   return (
     <ToolsLayout>
@@ -101,7 +110,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="mb-6">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-              👋 Bem-vindo de volta!
+              👋 Bem-vindo de volta, {session.user?.name || 'Usuário'}!
             </h1>
             <p className="text-gray-600 mt-1">
               Confira o resumo de hoje
@@ -109,13 +118,13 @@ export default function HomePage() {
           </div>
 
           <DashboardMetrics
-            totalCarrys={42}
-            totalReceita={3600}
-            jogadoresAtivos={14}
-            proximosCarrys={8}
+            totalCarrys={metricas.totalCarrys}
+            totalReceita={metricas.receitaTotal * 1000}
+            jogadoresAtivos={topJogadores.length}
+            proximosCarrys={metricas.totalClientes}
             changes={{
-              carrys: 12,
-              receita: 8,
+              carrys: metricas.variacaoCarrys,
+              receita: metricas.variacaoReceita,
               jogadores: 0
             }}
           />

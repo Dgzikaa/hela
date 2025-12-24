@@ -8,6 +8,8 @@ import { Badge } from '@/app/components/Badge'
 import { Button } from '@/app/components/Button'
 import { ToastContainer } from '@/app/components/Toast'
 import { useToast } from '@/app/hooks/useToast'
+import { ModalEditarPedido } from '@/app/components/ModalEditarPedido'
+import { CarryAgrupado } from '@/app/components/CarryAgrupado'
 
 interface Boss {
   id: number
@@ -91,6 +93,10 @@ export default function PedidosPage() {
     precoCustomizado: false,
     bossesPrecos: {} as Record<number, number>
   })
+
+  // Novo Modal de Edição Completo
+  const [showNovoEditModal, setShowNovoEditModal] = useState(false)
+  const [pedidoParaEditarNovo, setPedidoParaEditarNovo] = useState<Pedido | null>(null)
   
   // Form state para criar novo pedido
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -400,6 +406,29 @@ export default function PedidosPage() {
     }
   }
 
+  const handleSalvarEdicao = async (dados: any) => {
+    try {
+      const res = await fetch(`/api/pedidos/${dados.id}/editar`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      })
+      
+      if (res.ok) {
+        toast.success('✅ Pedido atualizado com sucesso!')
+        fetchPedidos()
+        setShowNovoEditModal(false)
+        setPedidoParaEditarNovo(null)
+      } else {
+        const error = await res.json()
+        toast.error(`❌ Erro: ${error.details || 'Erro ao salvar'}`)
+      }
+    } catch (error) {
+      console.error('Erro:', error)
+      toast.error('❌ Erro ao salvar edição')
+    }
+  }
+
   const handleUpdatePedido = async () => {
     try {
       if (!pedidoParaEditar) return
@@ -531,6 +560,23 @@ export default function PedidosPage() {
     )
   }
 
+  // Agrupar pedidos por data
+  const pedidosAgrupados: Record<string, typeof pedidos> = {}
+  pedidos.forEach(pedido => {
+    if (pedido.dataAgendada) {
+      const data = new Date(pedido.dataAgendada).toISOString().split('T')[0]
+      if (!pedidosAgrupados[data]) {
+        pedidosAgrupados[data] = []
+      }
+      pedidosAgrupados[data].push(pedido)
+    }
+  })
+
+  // Ordenar datas
+  const datasOrdenadas = Object.keys(pedidosAgrupados).sort((a, b) => 
+    new Date(a).getTime() - new Date(b).getTime()
+  )
+
   return (
     <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -577,9 +623,43 @@ export default function PedidosPage() {
           </Card>
         </div>
 
-        {/* Lista de Pedidos */}
-        <div className="space-y-4">
-          {pedidos.map(pedido => {
+        {/* Lista de Pedidos Agrupados */}
+        <div className="space-y-6">
+          {datasOrdenadas.map(data => (
+            <CarryAgrupado
+              key={data}
+              data={data}
+              carrys={pedidosAgrupados[data]}
+              onEdit={(pedido) => {
+                setPedidoParaEditarNovo(pedido)
+                setShowNovoEditModal(true)
+              }}
+              onDelete={(pedido) => {
+                setPedidoParaExcluir(pedido)
+                setShowExcluirModal(true)
+              }}
+              onUpdateStatus={handleUpdateStatus}
+              onAgendar={(pedido) => {
+                setPedidoParaAgendar(pedido)
+                const amanha = new Date()
+                amanha.setDate(amanha.getDate() + 1)
+                setDataAgendamento(amanha.toISOString().split('T')[0])
+                setHoraAgendamento('20:00')
+                setShowAgendarModal(true)
+              }}
+              onCancelar={(pedido) => {
+                setPedidoParaCancelar(pedido)
+                setShowCancelarModal(true)
+              }}
+              onConcluir={(pedido) => {
+                setPedidoParaConcluir(pedido)
+                setShowConcluirModal(true)
+              }}
+            />
+          ))}
+
+          {/* Renderização antiga (caso não tenha data agendada) */}
+          {pedidos.filter(p => !p.dataAgendada).map(pedido => {
             // Verificar se o pedido está concluído ou cancelado
             const isFinalizado = ['CONCLUIDO', 'CANCELADO'].includes(pedido.status)
             const dataAgendada = pedido.dataAgendada ? new Date(pedido.dataAgendada) : null
@@ -682,8 +762,21 @@ export default function PedidosPage() {
                     <Trash2 className="w-4 h-4" />
                   </Button>
 
-                  {/* Botão Editar - aparece sempre exceto quando concluído ou cancelado */}
-                  {!['CONCLUIDO', 'CANCELADO'].includes(pedido.status) && (
+                  {/* Botão Editar - APARECE SEMPRE (incluindo finalizados) */}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      setPedidoParaEditarNovo(pedido)
+                      setShowNovoEditModal(true)
+                    }}
+                    title="Editar valores e pagamento"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+
+                  {/* Botão Editar antigo - só para não finalizados */}
+                  {!['CONCLUIDO', 'CANCELADO'].includes(pedido.status) && false && (
                     <Button
                       size="sm"
                       variant="secondary"
@@ -1997,6 +2090,19 @@ export default function PedidosPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Novo Modal de Edição Completo */}
+        {showNovoEditModal && pedidoParaEditarNovo && (
+          <ModalEditarPedido
+            pedido={pedidoParaEditarNovo}
+            bosses={bosses}
+            onClose={() => {
+              setShowNovoEditModal(false)
+              setPedidoParaEditarNovo(null)
+            }}
+            onSave={handleSalvarEdicao}
+          />
         )}
 
         {/* Toast Container */}

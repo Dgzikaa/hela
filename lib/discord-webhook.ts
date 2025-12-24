@@ -485,63 +485,94 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
     dataAgendada: string
     bosses: string[]
     horario: string
+    valorTotal: number
   }>
 }>) {
   if (jogadores.length === 0) return
 
-  // Agrupar carries por horário
-  const carrysPorHorario = new Map<string, Array<{
+  // Agrupar todos os carries únicos (sem duplicar por jogador)
+  const carrysPorData = new Map<string, Array<{
+    id: number
     cliente: string
     bosses: string[]
-    jogadores: string[]
+    horario: string
+    valorTotal: number
   }>>()
 
+  // Coletar carries únicos (um carry por ID)
+  const carrysUnicos = new Map<number, any>()
   jogadores.forEach(jogador => {
     jogador.carrys.forEach(carry => {
-      if (!carrysPorHorario.has(carry.horario)) {
-        carrysPorHorario.set(carry.horario, [])
+      if (!carrysUnicos.has(carry.id)) {
+        carrysUnicos.set(carry.id, carry)
       }
-      
-      const carryExistente = carrysPorHorario.get(carry.horario)!.find(
-        c => c.cliente === carry.nomeCliente
-      )
-      
-      if (carryExistente) {
-        carryExistente.jogadores.push(jogador.nick)
-      } else {
-        carrysPorHorario.get(carry.horario)!.push({
-          cliente: carry.nomeCliente,
-          bosses: carry.bosses,
-          jogadores: [jogador.nick]
-        })
-      }
+    })
+  })
+
+  // Agrupar por data
+  carrysUnicos.forEach(carry => {
+    const data = carry.dataAgendada.split('T')[0]
+    if (!carrysPorData.has(data)) {
+      carrysPorData.set(data, [])
+    }
+    carrysPorData.get(data)!.push({
+      id: carry.id,
+      cliente: carry.nomeCliente,
+      bosses: carry.bosses,
+      horario: carry.horario,
+      valorTotal: carry.valorTotal
     })
   })
 
   // Montar mensagem
   let descricao = '☀️ **Bom dia, equipe!** Temos carries agendados para hoje!\n\n'
   
-  const carrysOrdenados = Array.from(carrysPorHorario.entries())
-    .sort((a, b) => a[0].localeCompare(b[0]))
+  // Para cada data (no caso de hoje, só uma data)
+  carrysPorData.forEach((carries, data) => {
+    const numCarrys = carries.length
+    const isAgrupado = numCarrys >= 2
 
-  carrysOrdenados.forEach(([horario, carries]) => {
-    carries.forEach(carry => {
-      descricao += `🕐 **${horario}** - ${carry.cliente}\n`
-      descricao += `🎯 ${carry.bosses.join(', ')}\n`
-      descricao += `👥 ${carry.jogadores.join(', ')}\n\n`
-    })
+    // Calcular valor total e divisão
+    const valorTotal = carries.reduce((sum, c) => sum + c.valorTotal, 0)
+    const numJogadores = isAgrupado ? 10 : 11 // 10 sem Pablo, 11 com Pablo
+    const valorPorJogador = Math.floor(valorTotal / numJogadores)
+
+    if (isAgrupado) {
+      // MODO AGRUPADO (2+ carrys)
+      descricao += `🔥 **${numCarrys} CARRYS AGRUPADOS** 🔥\n`
+      descricao += `📅 Data: ${new Date(data + 'T00:00:00').toLocaleDateString('pt-BR')}\n`
+      descricao += `👥 **${numJogadores} jogadores** (SEM Pablo)\n`
+      descricao += `💰 Valor total: **${(valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n\n`
+      
+      carries.forEach((carry, index) => {
+        descricao += `**Carry #${index + 1}:** ${carry.cliente}\n`
+        descricao += `🕐 **${carry.horario}**\n`
+        descricao += `💵 ${(carry.valorTotal / 1000).toFixed(1)}b\n`
+        descricao += `🎯 ${carry.bosses.join(', ')}\n\n`
+      })
+    } else {
+      // MODO NORMAL (1 carry)
+      const carry = carries[0]
+      descricao += `🎮 **Carry:** ${carry.cliente}\n`
+      descricao += `🕐 **${carry.horario}**\n`
+      descricao += `💰 Valor: **${(carry.valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n`
+      descricao += `👥 **11 jogadores** (COM Pablo)\n`
+      descricao += `🎯 ${carry.bosses.join(', ')}\n\n`
+    }
   })
 
   // Coletar todos os jogadores únicos com Discord ID
   const jogadoresUnicos = new Set<string>()
+  const jogadoresNicks = new Set<string>()
   jogadores.forEach(j => {
     if (j.discordId) jogadoresUnicos.add(j.discordId)
+    jogadoresNicks.add(j.nick)
   })
 
   // Adicionar menções
   const mencoes = Array.from(jogadoresUnicos).map(id => `<@${id}>`).join(' ')
   descricao += `\n📢 **Atenção:** ${mencoes}\n`
-  descricao += `\n📋 Total: **${carrysOrdenados.reduce((acc, [, carries]) => acc + carries.length, 0)} carry(s)** | **${jogadoresUnicos.size} jogador(es)** escalados\n`
+  descricao += `\n📋 Total: **${Array.from(carrysPorData.values()).flat().length} carry(s)** | **${jogadoresNicks.size} jogador(es)** escalados\n`
   descricao += `🎮 Preparem-se! Boa sorte a todos!`
 
   // Enviar no canal

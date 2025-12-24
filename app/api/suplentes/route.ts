@@ -10,7 +10,7 @@ export async function GET() {
           select: {
             missoes: {
               where: {
-                status: 'Concluído'
+                status: 'CONCLUIDO'
               }
             }
           }

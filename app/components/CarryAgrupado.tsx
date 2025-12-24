@@ -1,0 +1,318 @@
+'use client'
+
+import { Calendar, Clock, Users, DollarSign, Edit2, Trash2, CheckCircle, Ban } from 'lucide-react'
+import { Card } from './Card'
+import { Badge } from './Badge'
+import { Button } from './Button'
+
+interface Boss {
+  id: number
+  nome: string
+  preco: number
+  ordem: number
+}
+
+interface Pedido {
+  id: number
+  nomeCliente: string
+  contatoCliente: string
+  status: string
+  statusPagamento?: string
+  dataAgendada: string | null
+  horario?: string | null
+  valorTotal: number
+  valorFinal: number
+  valorReserva: number
+  reservaPaga: boolean
+  pacoteCompleto: boolean
+  itens: {
+    id: number
+    preco: number
+    boss: Boss
+  }[]
+}
+
+interface Props {
+  data: string // Data no formato YYYY-MM-DD
+  carrys: Pedido[]
+  onEdit: (pedido: Pedido) => void
+  onDelete: (pedido: Pedido) => void
+  onUpdateStatus: (pedidoId: number, status: string) => void
+  onAgendar: (pedido: Pedido) => void
+  onCancelar: (pedido: Pedido) => void
+  onConcluir: (pedido: Pedido) => void
+}
+
+export function CarryAgrupado({ 
+  data, 
+  carrys, 
+  onEdit, 
+  onDelete, 
+  onUpdateStatus,
+  onAgendar,
+  onCancelar,
+  onConcluir 
+}: Props) {
+  // Só agrupa se tiver 2+ carrys
+  const isAgrupado = carrys.length >= 2
+  
+  // Calcular totais quando agrupado
+  const valorTotalAgrupado = isAgrupado 
+    ? carrys.reduce((sum, c) => sum + c.valorFinal, 0)
+    : carrys[0]?.valorFinal || 0
+  
+  const numJogadores = isAgrupado ? 10 : 11 // 10 sem Pablo, 11 com Pablo
+  const valorPorJogador = Math.floor(valorTotalAgrupado / numJogadores)
+
+  // Data formatada
+  const dataFormatada = new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+
+  // Status geral (se todos forem AGENDADO, mostrar AGENDADO, etc)
+  const statusComum = carrys.every(c => c.status === carrys[0].status) 
+    ? carrys[0].status 
+    : 'MISTO'
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'PENDENTE': return 'warning'
+      case 'APROVADO': return 'info'
+      case 'AGENDADO': return 'primary'
+      case 'EM_ANDAMENTO': return 'primary'
+      case 'CONCLUIDO': return 'success'
+      case 'CANCELADO': return 'danger'
+      default: return 'default'
+    }
+  }
+
+  const getPaymentBadge = (statusPagamento: string, valorReserva: number, valorTotal: number) => {
+    if (statusPagamento === 'PAGO') {
+      return <Badge variant="success">✅ Pago Completo</Badge>
+    } else if (statusPagamento === 'SINAL') {
+      const restante = valorTotal - valorReserva
+      return (
+        <Badge variant="warning">
+          💰 Sinal {(valorReserva / 1000).toFixed(1)}b | Falta {(restante / 1000).toFixed(1)}b
+        </Badge>
+      )
+    }
+    return <Badge variant="danger">❌ Não Pago</Badge>
+  }
+
+  if (!isAgrupado) {
+    // Renderizar carry único (layout normal)
+    const carry = carrys[0]
+    if (!carry) return null
+
+    return (
+      <Card className="hover:border-purple-500 transition-all">
+        <div className="flex items-start justify-between gap-4">
+          {/* Informações */}
+          <div className="flex-1 space-y-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="text-xl font-bold text-white">{carry.nomeCliente}</h3>
+              <Badge variant={getStatusColor(carry.status) as any}>
+                {carry.status}
+              </Badge>
+              {carry.statusPagamento && getPaymentBadge(carry.statusPagamento, carry.valorReserva, carry.valorFinal)}
+              {carry.pacoteCompleto && (
+                <Badge variant="success">Pacote Completo</Badge>
+              )}
+            </div>
+
+            {/* Data e Horário */}
+            {carry.dataAgendada && (
+              <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {dataFormatada}
+                </div>
+                {carry.horario && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    {new Date(`2000-01-01T${carry.horario}`).toLocaleTimeString('pt-BR', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Valor */}
+            <div className="flex items-center gap-2 text-lg font-semibold text-green-400">
+              <DollarSign className="w-5 h-5" />
+              {(carry.valorFinal / 1000).toFixed(1)}b
+              <span className="text-sm text-gray-400">
+                ({carry.valorFinal}kk) • {valorPorJogador}kk/jogador
+              </span>
+            </div>
+
+            {/* Bosses */}
+            <div className="flex gap-2 flex-wrap">
+              {carry.itens.map(item => (
+                <Badge 
+                  key={item.id} 
+                  variant={item.preco === 0 ? 'success' : 'info'}
+                >
+                  {item.boss.nome} ({item.preco === 0 ? 'Grátis' : `${item.preco}kk`})
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Ações */}
+          <div className="flex gap-2 flex-wrap">
+            <Button size="sm" variant="secondary" onClick={() => onEdit(carry)}>
+              <Edit2 className="w-4 h-4" />
+            </Button>
+            <Button size="sm" variant="danger" onClick={() => onDelete(carry)}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    )
+  }
+
+  // Renderizar carrys agrupados
+  return (
+    <Card className="border-2 border-purple-500 bg-gradient-to-r from-purple-900/10 to-pink-900/10">
+      {/* Header do Agrupamento */}
+      <div className="mb-4 pb-4 border-b border-gray-700">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Calendar className="w-6 h-6 text-purple-400" />
+                {dataFormatada}
+              </h3>
+              <Badge variant="warning" className="text-lg px-3 py-1">
+                🔥 {carrys.length} CARRYS
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-6 text-sm">
+              {/* Horários */}
+              <div className="flex items-center gap-2 text-gray-400">
+                <Clock className="w-4 h-4" />
+                {carrys.map(c => c.horario ? 
+                  new Date(`2000-01-01T${c.horario}`).toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : '21:00'
+                ).join(', ')}
+              </div>
+
+              {/* Jogadores */}
+              <div className="flex items-center gap-2 text-purple-400 font-semibold">
+                <Users className="w-4 h-4" />
+                {numJogadores} jogadores {isAgrupado && '(SEM Pablo)'}
+              </div>
+            </div>
+          </div>
+
+          {/* Valor Total */}
+          <div className="text-right">
+            <div className="text-sm text-gray-400 mb-1">Valor Total</div>
+            <div className="text-3xl font-bold text-green-400">
+              {(valorTotalAgrupado / 1000).toFixed(1)}b
+            </div>
+            <div className="text-sm text-gray-400">
+              {valorPorJogador}kk por jogador
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lista de Carrys */}
+      <div className="space-y-3">
+        {carrys.map((carry, index) => (
+          <div 
+            key={carry.id}
+            className="p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-all border border-gray-700"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-bold text-purple-400">#{index + 1}</span>
+                  <h4 className="text-lg font-bold text-white">{carry.nomeCliente}</h4>
+                  <Badge variant={getStatusColor(carry.status) as any}>
+                    {carry.status}
+                  </Badge>
+                  {carry.statusPagamento && getPaymentBadge(carry.statusPagamento, carry.valorReserva, carry.valorFinal)}
+                </div>
+
+                <div className="flex items-center gap-4 text-sm">
+                  {carry.horario && (
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <Clock className="w-4 h-4" />
+                      {new Date(`2000-01-01T${carry.horario}`).toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  )}
+                  <div className="text-green-400 font-semibold">
+                    {(carry.valorFinal / 1000).toFixed(1)}b ({carry.valorFinal}kk)
+                  </div>
+                </div>
+
+                <div className="flex gap-2 flex-wrap">
+                  {carry.itens.map(item => (
+                    <Badge 
+                      key={item.id} 
+                      variant={item.preco === 0 ? 'success' : 'info'}
+                      className="text-xs"
+                    >
+                      {item.boss.nome}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ações individuais */}
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" onClick={() => onEdit(carry)}>
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+                <Button size="sm" variant="danger" onClick={() => onDelete(carry)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Ações do Grupo */}
+      {statusComum !== 'MISTO' && (
+        <div className="mt-4 pt-4 border-t border-gray-700 flex gap-3">
+          {statusComum === 'AGENDADO' && (
+            <Button
+              variant="primary"
+              onClick={() => carrys.forEach(c => onUpdateStatus(c.id, 'EM_ANDAMENTO'))}
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              Iniciar Todos
+            </Button>
+          )}
+          {statusComum === 'EM_ANDAMENTO' && (
+            <Button
+              variant="success"
+              onClick={() => carrys.forEach(c => onConcluir(c))}
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Concluir Todos
+            </Button>
+          )}
+        </div>
+      )}
+    </Card>
+  )
+}
+
