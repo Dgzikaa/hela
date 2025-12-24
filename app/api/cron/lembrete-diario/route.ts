@@ -125,7 +125,11 @@ export async function GET(req: Request) {
       success: true,
       message: `Lembretes enviados para ${jogadoresParaNotificar.length} jogador(es)`,
       jogadores: jogadoresParaNotificar.length,
-      pedidos: pedidosComRelacoes.length
+      pedidos: pedidosComRelacoes.length,
+      debug: {
+        primeiroCarry: jogadoresParaNotificar[0]?.carrys[0],
+        horarioTipo: typeof jogadoresParaNotificar[0]?.carrys[0]?.horario
+      }
     })
   } catch (error: any) {
     console.error('Erro ao enviar lembrete diário:', error)
