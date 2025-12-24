@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido, notificarJogadoresNovoCarry, notificarCarryCancelado } from '@/lib/discord-webhook'
+import { escalarJogadoresAutomaticamente } from '@/lib/escalar-jogadores'
 
 export async function GET() {
   try {
@@ -312,8 +313,39 @@ export async function PATCH(req: Request) {
       const bossesNomes = pedido.itens.map((i: any) => i.boss.nome)
 
       if (status === 'AGENDADO' && dataAgendada) {
+        console.log('📅 [API] Carry AGENDADO - Escalando jogadores automaticamente...')
+        
+        // Escalar jogadores automaticamente
+        const resultadoEscalacao = await escalarJogadoresAutomaticamente(
+          id,
+          new Date(dataAgendada)
+        )
+        
+        if (resultadoEscalacao.success) {
+          console.log(`✅ [API] ${resultadoEscalacao.jogadoresEscalados} jogadores escalados automaticamente`)
+        } else {
+          console.warn(`⚠️ [API] Aviso na escalação: ${resultadoEscalacao.erro}`)
+        }
+        
+        // Recarregar pedido com participações atualizadas
+        const pedidoAtualizado = await prisma.pedido.findUnique({
+          where: { id },
+          include: {
+            participacoes: {
+              include: {
+                jogador: {
+                  select: {
+                    nick: true
+                  }
+                }
+              }
+            }
+          }
+        })
+        
+        const jogadoresEscalados = pedidoAtualizado?.participacoes.map((p: any) => p.jogador.nick) || []
+        
         console.log('📅 [API] Enviando notificação de AGENDAMENTO...')
-        const jogadoresEscalados = pedido.participacoes.map((p: any) => p.jogador.nick)
         await notificarCarryAgendado({
           id: pedido.id,
           nomeCliente: pedido.nomeCliente,
