@@ -1,6 +1,31 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Função auxiliar para formatar horário
+function formatarHorario(horario: any): string | null {
+  if (!horario) return null
+  
+  try {
+    // Se for Date, extrair hora
+    if (horario instanceof Date) {
+      const hours = horario.getUTCHours().toString().padStart(2, '0')
+      const minutes = horario.getUTCMinutes().toString().padStart(2, '0')
+      const seconds = horario.getUTCSeconds().toString().padStart(2, '0')
+      return `${hours}:${minutes}:${seconds}`
+    }
+    
+    // Se for string, retornar como está
+    if (typeof horario === 'string') {
+      return horario
+    }
+    
+    return null
+  } catch (e) {
+    console.error('Erro ao formatar horário:', e)
+    return null
+  }
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -85,7 +110,13 @@ export async function PATCH(
       }
     })
 
-    return NextResponse.json(pedidoAtualizado)
+    // Formatar horário antes de retornar
+    const pedidoFormatado = pedidoAtualizado ? {
+      ...pedidoAtualizado,
+      horario: formatarHorario(pedidoAtualizado.horario)
+    } : null
+
+    return NextResponse.json(pedidoFormatado)
   } catch (error) {
     console.error('Erro ao editar pedido:', error)
     return NextResponse.json(

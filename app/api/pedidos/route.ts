@@ -3,6 +3,31 @@ import { prisma } from '@/lib/prisma'
 import { notificarNovoCarry, notificarCarryAgendado, notificarCarryConcluido, notificarJogadoresNovoCarry, notificarCarryCancelado } from '@/lib/discord-webhook'
 import { escalarJogadoresAutomaticamente } from '@/lib/escalar-jogadores'
 
+// Função auxiliar para formatar horário
+function formatarHorario(horario: any): string | null {
+  if (!horario) return null
+  
+  try {
+    // Se for Date, extrair hora
+    if (horario instanceof Date) {
+      const hours = horario.getUTCHours().toString().padStart(2, '0')
+      const minutes = horario.getUTCMinutes().toString().padStart(2, '0')
+      const seconds = horario.getUTCSeconds().toString().padStart(2, '0')
+      return `${hours}:${minutes}:${seconds}`
+    }
+    
+    // Se for string, retornar como está
+    if (typeof horario === 'string') {
+      return horario
+    }
+    
+    return null
+  } catch (e) {
+    console.error('Erro ao formatar horário:', e)
+    return null
+  }
+}
+
 export async function GET() {
   try {
     const pedidos = await prisma.pedido.findMany({
@@ -32,7 +57,13 @@ export async function GET() {
       orderBy: { createdAt: 'desc' }
     })
     
-    return NextResponse.json(pedidos)
+    // Formatar horário para string antes de enviar ao frontend
+    const pedidosFormatados = pedidos.map(pedido => ({
+      ...pedido,
+      horario: pedido.horario ? formatarHorario(pedido.horario) : null
+    }))
+    
+    return NextResponse.json(pedidosFormatados)
   } catch (error: any) {
     console.error('Erro ao buscar pedidos:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
