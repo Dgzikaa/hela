@@ -123,7 +123,7 @@ export default function MeusGanhosPage() {
   // Ganhos por mês
   const ganhosPorMes: Record<string, number> = {}
   participacoes.forEach(p => {
-    const mes = new Date(p.pedido.dataCriacao).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+    const mes = new Date(p.pedido.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
     ganhosPorMes[mes] = (ganhosPorMes[mes] || 0) + p.valorRecebido
   })
 
@@ -141,7 +141,7 @@ export default function MeusGanhosPage() {
   // Filtros
   const participacoesFiltradas = participacoes.filter(p => {
     const matchMes = filtroMes === 'todos' || 
-      new Date(p.pedido.dataCriacao).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) === filtroMes
+      new Date(p.pedido.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) === filtroMes
     const matchBoss = filtroBoss === 'todos' || 
       p.pedido.itens.some(item => item.boss.nome.toLowerCase().includes(filtroBoss.toLowerCase()))
     return matchMes && matchBoss
@@ -303,7 +303,7 @@ export default function MeusGanhosPage() {
                               +{part.valorRecebido}kk
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(part.pedido.dataCriacao).toLocaleDateString('pt-BR')}
+                              {new Date(part.pedido.createdAt).toLocaleDateString('pt-BR')}
                             </p>
                           </div>
                         </div>

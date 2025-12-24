@@ -58,7 +58,7 @@ export async function GET(
     }
     
     jogador.participacoes.forEach(p => {
-      const data = new Date(p.pedido.dataCriacao)
+      const data = new Date(p.pedido.createdAt)
       const mesKey = data.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
       if (mesKey in carrysPorMes) {
         carrysPorMes[mesKey]++

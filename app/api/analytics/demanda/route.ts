@@ -9,7 +9,7 @@ export async function GET() {
 
     const pedidos = await prisma.pedido.findMany({
       where: {
-        dataCriacao: {
+        createdAt: {
           gte: dataLimite
         }
       },
@@ -21,7 +21,7 @@ export async function GET() {
         }
       },
       orderBy: {
-        dataCriacao: 'asc'
+        createdAt: 'asc'
       }
     })
 
@@ -37,7 +37,7 @@ export async function GET() {
     pedidos.forEach(pedido => {
       pedido.itens.forEach(item => {
         const bossNome = item.boss.nome
-        const diaSemana = new Date(pedido.dataCriacao).toLocaleDateString('pt-BR', { weekday: 'long' })
+        const diaSemana = new Date(pedido.createdAt).toLocaleDateString('pt-BR', { weekday: 'long' })
 
         if (!demandaPorBoss[bossNome]) {
           demandaPorBoss[bossNome] = {
@@ -62,12 +62,12 @@ export async function GET() {
 
     Object.keys(demandaPorBoss).forEach(bossNome => {
       const pedidos7Dias = pedidos.filter(p => 
-        new Date(p.dataCriacao) >= ultimos7Dias &&
+        new Date(p.createdAt) >= ultimos7Dias &&
         p.itens.some(item => item.boss.nome === bossNome)
       ).length
 
       const pedidos30Dias = pedidos.filter(p => 
-        new Date(p.dataCriacao) >= ultimos30Dias &&
+        new Date(p.createdAt) >= ultimos30Dias &&
         p.itens.some(item => item.boss.nome === bossNome)
       ).length
 
@@ -89,7 +89,7 @@ export async function GET() {
     // Horários de pico
     const pedidosPorHora: Record<number, number> = {}
     pedidos.forEach(pedido => {
-      const hora = new Date(pedido.dataCriacao).getHours()
+      const hora = new Date(pedido.createdAt).getHours()
       pedidosPorHora[hora] = (pedidosPorHora[hora] || 0) + 1
     })
 
@@ -101,7 +101,7 @@ export async function GET() {
     // Dia da semana com mais demanda
     const pedidosPorDiaSemana: Record<string, number> = {}
     pedidos.forEach(pedido => {
-      const diaSemana = new Date(pedido.dataCriacao).toLocaleDateString('pt-BR', { weekday: 'long' })
+      const diaSemana = new Date(pedido.createdAt).toLocaleDateString('pt-BR', { weekday: 'long' })
       pedidosPorDiaSemana[diaSemana] = (pedidosPorDiaSemana[diaSemana] || 0) + 1
     })
 
