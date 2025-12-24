@@ -539,16 +539,10 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
 
     // Pegar o primeiro horário como referência (geralmente todos são iguais)
     const horarioPrincipal = carries[0].horario
-    // Formatar horário (pode vir como Date, string "15:00:00" ou "15:00")
+    // Formatar horário (vem como string "15:00:00" ou "15:00")
     let horarioFormatado = '21:00' // Padrão
-    if (horarioPrincipal) {
-      if (typeof horarioPrincipal === 'string') {
-        horarioFormatado = horarioPrincipal.substring(0, 5)
-      } else if (horarioPrincipal instanceof Date || (typeof horarioPrincipal === 'object' && horarioPrincipal !== null)) {
-        // Se for um Date, extrair apenas HH:MM
-        const dateObj = new Date(horarioPrincipal)
-        horarioFormatado = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false })
-      }
+    if (horarioPrincipal && typeof horarioPrincipal === 'string') {
+      horarioFormatado = horarioPrincipal.substring(0, 5) // Pegar apenas HH:MM
     }
 
     if (isAgrupado) {
