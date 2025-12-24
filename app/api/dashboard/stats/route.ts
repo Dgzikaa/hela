@@ -147,7 +147,7 @@ export async function GET() {
 
         return {
           id: jogador.id,
-          nome: jogador.nome,
+          nome: jogador.nick,
           carrys: totalCarrysJogador,
           ganhos: totalGanhos,
           posicao: 0
