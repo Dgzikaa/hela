@@ -15,6 +15,7 @@ interface Pedido {
   valorTotal: number
   status: string
   dataAgendada: string | null
+  horario?: string | null
   pacoteCompleto: boolean
   participacoes?: {
     jogador: {
@@ -68,6 +69,13 @@ export default function CalendarioPage() {
       const [ano, mes, dia] = dataStr.split('-').map(Number)
       const dataAgendada = new Date(ano, mes - 1, dia, 12, 0, 0) // Meio-dia para evitar DST
       
+      // Usar horário real do pedido, se disponível
+      let startTime = '12:00'
+      if (p.horario && typeof p.horario === 'string') {
+        // Extrair apenas HH:MM do horário (pode vir como "HH:MM:SS")
+        startTime = p.horario.substring(0, 5)
+      }
+      
       // Determinar tipo de carry
       let type: 'HELA' | 'CARRY_PAGO' | 'CARRY_GRATIS' = 'CARRY_PAGO'
       if (p.pacoteCompleto) {
@@ -84,10 +92,7 @@ export default function CalendarioPage() {
         id: p.id,
         title: p.nomeCliente,
         date: dataAgendada,
-        startTime: dataAgendada.toLocaleTimeString('pt-BR', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }),
+        startTime,
         type,
         status: p.status as any,
         client: p.nomeCliente,
