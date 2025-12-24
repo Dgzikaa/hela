@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { useNotifications } from './NotificationsContext'
 
 interface Reminder {
@@ -75,7 +75,7 @@ export function RemindersProvider({ children }: { children: ReactNode }) {
     setReminders(prev => prev.filter(r => r.id !== id))
   }
 
-  const checkReminders = () => {
+  const checkReminders = useCallback(() => {
     const now = new Date()
     
     setReminders(prev => {
