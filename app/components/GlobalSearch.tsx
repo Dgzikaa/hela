@@ -206,7 +206,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-20 z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-20 z-[80] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[600px] flex flex-col">
         {/* Header com Input */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">

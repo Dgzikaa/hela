@@ -107,7 +107,7 @@ export function NotificationCenter() {
           />
 
           {/* Painel de Notificações */}
-          <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl z-50 border border-gray-200 dark:border-gray-700 max-h-[600px] flex flex-col">
+          <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl z-[70] border border-gray-200 dark:border-gray-700 max-h-[600px] flex flex-col">
             {/* Header */}
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-3">
