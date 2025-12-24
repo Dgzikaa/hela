@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PreferencesProvider } from './contexts/PreferencesContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
+import { PriceAlertsProvider } from './contexts/PriceAlertsContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,7 +53,9 @@ export default function RootLayout({
       >
         <PreferencesProvider>
           <NotificationsProvider>
-            {children}
+            <PriceAlertsProvider>
+              {children}
+            </PriceAlertsProvider>
           </NotificationsProvider>
         </PreferencesProvider>
         <script
