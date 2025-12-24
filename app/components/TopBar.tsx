@@ -2,13 +2,29 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { Search, Bell } from 'lucide-react'
 import { UserMenu } from './UserMenu'
+import { GlobalSearch } from './GlobalSearch'
 
 export function TopBar() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const isLoggedIn = status === 'authenticated'
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+
+  // Atalho Ctrl+K / Cmd+K para abrir busca
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-64 h-16 bg-white border-b border-gray-200 z-30 px-4 md:px-8">
@@ -26,22 +42,35 @@ export function TopBar() {
 
         {/* Busca Global (Desktop) */}
         <div className="hidden md:flex items-center flex-1 max-w-2xl">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar clientes, pedidos, jogadores..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-            />
-          </div>
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="relative w-full group"
+          >
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-gray-500 transition-colors" />
+            <div className="w-full pl-10 pr-16 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-left text-gray-500 dark:text-gray-400 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors text-sm">
+              Buscar clientes, pedidos, jogadores...
+            </div>
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 text-xs text-gray-500 dark:text-gray-400 font-mono">
+              ⌘K
+            </kbd>
+          </button>
         </div>
 
         {/* Ações da Direita */}
         <div className="flex items-center gap-4">
           {/* Busca Mobile */}
-          <button className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <Search className="w-5 h-5 text-gray-600" />
+          <button 
+            onClick={() => setIsSearchOpen(true)}
+            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          >
+            <Search className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
+
+          {/* Global Search Modal */}
+          <GlobalSearch 
+            isOpen={isSearchOpen} 
+            onClose={() => setIsSearchOpen(false)} 
+          />
 
           {/* Notificações - Comentado por enquanto, sistema Discord já existe */}
           {/* {isLoggedIn && (
