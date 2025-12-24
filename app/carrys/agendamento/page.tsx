@@ -683,7 +683,7 @@ export default function PedidosPage() {
                       {pedido.nomeCliente}
                     </h3>
                     {getStatusBadge(pedido.status)}
-                    <Badge variant="default">{pedido.origem}</Badge>
+                    {pedido.origem && <Badge variant="default">{pedido.origem}</Badge>}
                     {isFinalizado && (
                       <Badge variant="default">✓ Finalizado</Badge>
                     )}
@@ -698,7 +698,7 @@ export default function PedidosPage() {
                       <span className="font-semibold">
                         Valor: {pedido.valorTotal >= 1000 ? `${(pedido.valorTotal / 1000).toFixed(1)}b` : `${pedido.valorTotal}kk`}
                       </span>
-                      {pedido.desconto > 0 && (
+                      {pedido.desconto && pedido.desconto > 0 && (
                         <span className="text-green-600 font-semibold">
                           (Desconto: -{pedido.desconto >= 1000 ? `${(pedido.desconto / 1000).toFixed(1)}b` : `${pedido.desconto}kk`})
                         </span>
@@ -748,7 +748,7 @@ export default function PedidosPage() {
                   </div>
 
                   <div className={`text-sm font-medium ${isFinalizado ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Contato: {pedido.contatoCliente} • Criado em {new Date(pedido.createdAt).toLocaleDateString('pt-BR')}
+                    Contato: {pedido.contatoCliente}{pedido.createdAt && ` • Criado em ${new Date(pedido.createdAt).toLocaleDateString('pt-BR')}`}
                   </div>
                 </div>
 
