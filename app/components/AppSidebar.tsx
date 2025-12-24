@@ -49,34 +49,34 @@ const menuCategories: MenuCategory[] = [
   {
     name: 'Carrys',
     items: [
-      { name: 'Agendamento', href: '/admin/pedidos', icon: Calendar, isAdmin: true },
-      { name: 'Resumo', href: '/admin/projecao', icon: Wallet, isAdmin: true },
-      { name: 'Calendário', href: '/admin/calendario', icon: CalendarRange, isAdmin: true },
-      { name: 'CRM', href: '/admin/crm', icon: BarChart3, isAdmin: true },
-      { name: 'Carry Grátis', href: '/admin/carry-gratis', icon: Gift, isAdmin: true },
+      { name: 'Agendamento', href: '/carrys/agendamento', icon: Calendar, isAdmin: true },
+      { name: 'Resumo', href: '/carrys/resumo', icon: Wallet, isAdmin: true },
+      { name: 'Calendário', href: '/carrys/calendario', icon: CalendarRange, isAdmin: true },
+      { name: 'Carry Grátis', href: '/carrys/carry-gratis', icon: Gift, isAdmin: true },
     ]
   },
   {
     name: 'Ferramentas',
     items: [
-      { name: 'Tigrinho', href: '/calculadora', icon: Dices },
-      { name: 'Preços', href: '/precos', icon: LineChart },
+      { name: 'CRM', href: '/ferramentas/crm', icon: BarChart3, isAdmin: true },
+      { name: 'Tigrinho', href: '/ferramentas/tigrinho', icon: Dices },
+      { name: 'Preços', href: '/ferramentas/precos', icon: LineChart },
     ]
   },
   {
     name: 'Calculadoras',
     items: [
-      { name: 'Calc. Física', href: '/calculadora-fisica', icon: Target },
-      { name: 'Calc. Mágica', href: '/dano', icon: Sword },
-      { name: 'Farm', href: '/farm', icon: Flame },
+      { name: 'Calc. Física', href: '/calculadoras/fisica', icon: Target },
+      { name: 'Calc. Mágica', href: '/calculadoras/magica', icon: Sword },
+      { name: 'Farm', href: '/calculadoras/farm', icon: Flame },
     ]
   },
   {
     name: 'Configurações',
     items: [
-      { name: 'Config. Preços', href: '/config-farm', icon: Settings, isAdmin: true },
-      { name: 'Usuários', href: '/admin/usuarios', icon: Users, isAdmin: true },
-      { name: 'Membros', href: '/admin/jogadores', icon: Gamepad2, isAdmin: true },
+      { name: 'Config. Preços', href: '/configuracoes/precos', icon: Settings, isAdmin: true },
+      { name: 'Usuários', href: '/configuracoes/usuarios', icon: Users, isAdmin: true },
+      { name: 'Membros', href: '/configuracoes/membros', icon: Gamepad2, isAdmin: true },
     ]
   }
 ]

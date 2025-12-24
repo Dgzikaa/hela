@@ -64,7 +64,7 @@ export function UserMenu() {
       label: 'Meu Perfil',
       icon: User,
       onClick: () => {
-        router.push('/admin/perfil')
+        router.push('/configuracoes/perfil')
         setIsOpen(false)
       },
       show: true
@@ -79,16 +79,6 @@ export function UserMenu() {
       show: true
     },
     {
-      label: 'Notificações',
-      icon: Bell,
-      onClick: () => {
-        router.push('/admin/notificacoes')
-        setIsOpen(false)
-      },
-      badge: 3, // Número de notificações não lidas
-      show: true
-    },
-    {
       label: isDarkMode ? 'Modo Claro' : 'Modo Escuro',
       icon: isDarkMode ? Sun : Moon,
       onClick: toggleDarkMode,
@@ -98,7 +88,7 @@ export function UserMenu() {
       label: 'Configurações',
       icon: Settings,
       onClick: () => {
-        router.push('/admin/configuracoes')
+        router.push('/configuracoes/geral')
         setIsOpen(false)
       },
       show: true

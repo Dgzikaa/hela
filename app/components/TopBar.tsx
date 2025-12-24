@@ -43,17 +43,16 @@ export function TopBar() {
             <Search className="w-5 h-5 text-gray-600" />
           </button>
 
-          {/* Notificações */}
-          {isLoggedIn && (
+          {/* Notificações - Comentado por enquanto, sistema Discord já existe */}
+          {/* {isLoggedIn && (
             <button 
-              onClick={() => router.push('/admin/notificacoes')}
+              onClick={() => router.push('/notificacoes')}
               className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Bell className="w-5 h-5 text-gray-600" />
-              {/* Badge de notificações */}
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-          )}
+          )} */}
 
           {/* Menu do Usuário */}
           {isLoggedIn ? (
