@@ -90,6 +90,7 @@ async function updateSupabase(data: Record<string, unknown>) {
 
 async function fetchMarketPrice(itemId: number): Promise<{ price: number; avgPrice: number; sellers: number } | null> {
   try {
+    console.log(`🔍 Buscando preço para item ${itemId}...`)
     const response = await fetch(`https://api.ragnatales.com.br/market/item/shopping?nameid=${itemId}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -99,13 +100,18 @@ async function fetchMarketPrice(itemId: number): Promise<{ price: number; avgPri
       signal: AbortSignal.timeout(10000)
     })
     
+    console.log(`📡 Status da resposta para item ${itemId}: ${response.status}`)
+    
     if (!response.ok) {
+      console.error(`❌ Erro HTTP ${response.status} para item ${itemId}`)
       return null
     }
     
     const data = await response.json()
+    console.log(`📦 Dados recebidos para item ${itemId}:`, data ? `${data.length} vendedores` : 'sem dados')
     
     if (!data || data.length === 0) {
+      console.log(`⚠️ Sem vendas no mercado para item ${itemId}`)
       return null
     }
     
@@ -114,13 +120,18 @@ async function fetchMarketPrice(itemId: number): Promise<{ price: number; avgPri
     const top5 = prices.slice(0, Math.min(5, prices.length))
     const avgPrice = Math.round(top5.reduce((a: number, b: number) => a + b, 0) / top5.length)
     
+    console.log(`✅ Preço encontrado para item ${itemId}: ${minPrice}`)
     return { price: minPrice, avgPrice, sellers: data.length }
-  } catch {
+  } catch (error) {
+    console.error(`❌ Erro ao buscar item ${itemId}:`, error)
     return null
   }
 }
 
 export async function POST(): Promise<Response> {
+  console.log('🚀 Iniciando sincronização de preços...')
+  console.log(`📊 Total de itens a sincronizar: ${ITEMS_TO_SYNC.length}`)
+  
   const results = {
     success: 0,
     failed: 0,
@@ -133,6 +144,7 @@ export async function POST(): Promise<Response> {
   
   for (let i = 0; i < ITEMS_TO_SYNC.length; i += batchSize) {
     const batch = ITEMS_TO_SYNC.slice(i, i + batchSize)
+    console.log(`📦 Processando lote ${Math.floor(i/batchSize) + 1}/${Math.ceil(ITEMS_TO_SYNC.length/batchSize)}...`)
     
     await Promise.all(batch.map(async (item) => {
       try {
@@ -151,12 +163,15 @@ export async function POST(): Promise<Response> {
           })
           
           if (updated) {
+            console.log(`✅ ${item.name}: ${priceData.price}`)
             results.success++
           } else {
+            console.error(`❌ Falha ao salvar ${item.name}`)
             results.failed++
           }
         } else {
           // Sem vendas no market
+          console.log(`⚠️ ${item.name}: sem vendas`)
           await updateSupabase({
             item_key: item.key,
             item_name: item.name,
@@ -170,6 +185,7 @@ export async function POST(): Promise<Response> {
           results.noSales++
         }
       } catch (error) {
+        console.error(`❌ Erro ao processar ${item.name}:`, error)
         results.failed++
         results.errors.push(`${item.name}: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
       }
@@ -179,11 +195,15 @@ export async function POST(): Promise<Response> {
     await new Promise(r => setTimeout(r, 500))
   }
 
+  console.log('✅ Sincronização concluída!')
+  console.log(`📊 Resultado: ${results.success} sucesso | ${results.noSales} sem vendas | ${results.failed} falhas`)
+  
   return NextResponse.json({
     message: `Sincronizados ${results.success} itens do mercado`,
     success: results.success,
     noSales: results.noSales,
     failed: results.failed,
-    errors: results.errors.slice(0, 5) // Só mostra os 5 primeiros erros
+    total: ITEMS_TO_SYNC.length,
+    errors: results.errors.slice(0, 10) // Mostra os 10 primeiros erros
   })
 }

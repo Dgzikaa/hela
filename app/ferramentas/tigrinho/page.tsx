@@ -288,14 +288,17 @@ export default function CalculadoraPage() {
       const response = await fetch('/api/sync-prices', { method: 'POST' })
       const data = await response.json()
       if (response.ok) {
-        setSyncMessage(`✓ ${data.message}`)
+        const msg = `✓ ${data.success} itens sincronizados | ${data.noSales} sem vendas | ${data.failed} erros`
+        setSyncMessage(msg)
+        console.log('📊 Resultado da sincronização:', data)
         // Recarrega os preços
-        fetchAllPrices()
+        await fetchAllPrices()
       } else {
-        setSyncMessage('Erro ao sincronizar preços')
+        setSyncMessage(`❌ Erro: ${data.error || 'Falha na sincronização'}`)
       }
-    } catch {
-      setSyncMessage('Erro de conexão')
+    } catch (error) {
+      console.error('Erro ao sincronizar:', error)
+      setSyncMessage('❌ Erro de conexão com a API')
     } finally {
       setSyncing(false)
     }
@@ -612,7 +615,16 @@ export default function CalculadoraPage() {
             </div>
 
             {loading && <p className="text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{loadingMessage}</p>}
-            {syncMessage && <p className={`text-sm ${syncMessage.includes('Erro') ? 'text-red-600' : 'text-green-600'}`}>{syncMessage}</p>}
+            {syncMessage && (
+              <div className={`text-sm p-3 rounded-lg ${syncMessage.includes('Erro') || syncMessage.includes('❌') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                {syncMessage}
+                {syncMessage.includes('0 itens sincronizados') && (
+                  <div className="mt-2 text-xs text-gray-600">
+                    💡 Abra o Console do Navegador (F12) para ver logs detalhados
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Preços */}
             <Card className="p-4 bg-white border-gray-200 shadow-sm">
