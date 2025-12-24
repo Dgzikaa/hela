@@ -209,17 +209,23 @@ export function CarryAgrupado({
               {/* Horários */}
               <div className="flex items-center gap-2 text-gray-600">
                 <Clock className="w-4 h-4" />
-                {carrys.map(c => {
-                  if (!c.horario) return '21:00'
-                  try {
-                    const horarioStr = typeof c.horario === 'string' 
-                      ? c.horario 
-                      : String(c.horario)
-                    return horarioStr.substring(0, 5) // Pegar apenas HH:MM
-                  } catch (e) {
-                    return '21:00'
-                  }
-                }).join(', ')}
+                {(() => {
+                  // Pegar apenas horários únicos
+                  const horariosUnicos = Array.from(new Set(
+                    carrys.map(c => {
+                      if (!c.horario) return '21:00'
+                      try {
+                        const horarioStr = typeof c.horario === 'string' 
+                          ? c.horario 
+                          : String(c.horario)
+                        return horarioStr.substring(0, 5) // Pegar apenas HH:MM
+                      } catch (e) {
+                        return '21:00'
+                      }
+                    })
+                  ))
+                  return horariosUnicos.join(', ')
+                })()}
               </div>
 
               {/* Jogadores */}
