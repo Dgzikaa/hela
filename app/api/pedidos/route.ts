@@ -395,7 +395,8 @@ export async function PATCH(req: Request) {
           nomeCliente: pedido.nomeCliente,
           jogadores: jogadoresEscalados,
           valorTotal: pedido.valorTotal,
-          bosses: bossesNomes
+          bosses: bossesNomes,
+          pacoteCompleto: pedido.pacoteCompleto
         })
         console.log('✅ [API] Notificação de CONCLUSÃO enviada!')
       } else if (status === 'CANCELADO') {

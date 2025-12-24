@@ -22,7 +22,7 @@ interface EstatisticaJogador {
   jogador: {
     id: number
     nick: string
-    categoria: string
+    essencial: boolean
   }
   carrysConcluidos: number
   carrysFuturos: number

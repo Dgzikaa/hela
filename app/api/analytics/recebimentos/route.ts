@@ -3,11 +3,14 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    // Buscar todos os jogadores da categoria PRINCIPAL
+    // Buscar todos os jogadores principais (essenciais + Pablo)
     const jogadores = await prisma.jogador.findMany({
       where: {
-        categoria: 'PRINCIPAL',
-        ativo: true
+        ativo: true,
+        OR: [
+          { essencial: true },
+          { nick: 'Pablo' }
+        ]
       },
       orderBy: {
         nick: 'asc'
@@ -69,7 +72,7 @@ export async function GET() {
         jogador: {
           id: jogador.id,
           nick: jogador.nick,
-          categoria: jogador.categoria
+          essencial: jogador.essencial
         },
         carrysConcluidos: carrysConcluidos.length,
         carrysFuturos: carrysFuturos.length,

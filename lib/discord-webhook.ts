@@ -200,13 +200,30 @@ export async function notificarCarryConcluido(pedido: {
   valorTotal: number
   bosses: string[]
   jogadores?: string[]
+  pacoteCompleto?: boolean
 }) {
   const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
   
-  const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join(', ')
+  // Formatar valor em "b" se >= 1000kk
+  const valorFormatado = pedido.valorTotal >= 1000 
+    ? `${(pedido.valorTotal / 1000).toFixed(1)}b`
+    : `${pedido.valorTotal}kk`
+
+  // Se for pacote completo, mostrar apenas "Hela - Pacote Completo"
+  const bossesTexto = pedido.pacoteCompleto 
+    ? '🔴 **Hela - Pacote Completo**'
+    : pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join(', ')
+
+  // Calcular valor por jogador (sempre 11)
+  const numJogadores = 11
+  const valorPorJogador = Math.floor(pedido.valorTotal / numJogadores)
+  const valorPorJogadorFormatado = valorPorJogador >= 1000
+    ? `${(valorPorJogador / 1000).toFixed(2)}b`
+    : `${valorPorJogador}kk`
 
   const campos = [
-    { nome: '💰 Valor', valor: `${pedido.valorTotal}KK`, inline: true },
+    { nome: '💰 Valor Total', valor: valorFormatado, inline: true },
+    { nome: '👥 Por Jogador', valor: `${valorPorJogadorFormatado} (11 jogadores)`, inline: true },
     { nome: '📊 Pedido', valor: `#${pedido.id}`, inline: true }
   ]
 
@@ -219,9 +236,9 @@ export async function notificarCarryConcluido(pedido: {
   await enviarWebhookDiscord({
     titulo: '✅ Carry Concluído!',
     descricao: `**${pedido.nomeCliente}** completou:\n${bossesTexto}`,
-    cor: 0xFFD700, // Dourado
+    cor: 0x00FF00, // Verde
     campos,
-    rodape: 'Parabéns ao time! 🎉'
+    rodape: `Parabéns ao time! 🎉 • ${valorPorJogadorFormatado}/jogador`
   })
 }
 
