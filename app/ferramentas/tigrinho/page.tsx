@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Card } from '../components/Card'
+import { Card } from '@/app/components/Card'
 import { ArrowLeft, Calculator, Gem, FlaskConical, RefreshCw, Loader2, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
-import { ToolsLayout } from '../components/ToolsLayout'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 // IDs dos itens do mercado
 const ITEM_IDS = {

@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ToolsLayout } from '../components/ToolsLayout'
-import { Card } from '../components/Card'
-import { Button } from '../components/Button'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
+import { Card } from '@/app/components/Card'
+import { Button } from '@/app/components/Button'
 import { 
   Settings, 
   RefreshCw, 

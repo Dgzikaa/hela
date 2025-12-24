@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card } from '../components/Card'
-import { Button } from '../components/Button'
-import { ToolsLayout } from '../components/ToolsLayout'
+import { Card } from '@/app/components/Card'
+import { Button } from '@/app/components/Button'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 import { 
   TrendingUp,
   Clock,

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Card } from '../components/Card'
-import { Input } from '../components/Input'
+import { Card } from '@/app/components/Card'
+import { Input } from '@/app/components/Input'
 import { 
   Sword, 
   Shield,
@@ -17,7 +17,7 @@ import {
   Timer,
   Percent
 } from 'lucide-react'
-import { ToolsLayout } from '../components/ToolsLayout'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 // ============================================
 // CONSTANTES E TABELAS DO RAGNAROK

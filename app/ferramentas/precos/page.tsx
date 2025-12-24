@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card } from '../components/Card'
+import { Card } from '@/app/components/Card'
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -14,7 +14,7 @@ import {
   Clock
 } from 'lucide-react'
 import Link from 'next/link'
-import { ToolsLayout } from '../components/ToolsLayout'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 // Supabase config
 const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co'

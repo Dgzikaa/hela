@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { ChevronDown, ChevronUp, Swords, Info, X, Search, Plus } from 'lucide-react'
-import { ToolsLayout } from '../components/ToolsLayout'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 // ============================================
 // TIPOS
