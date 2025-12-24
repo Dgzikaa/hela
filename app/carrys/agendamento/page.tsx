@@ -33,17 +33,20 @@ interface Pedido {
   nomeCliente: string
   contatoCliente: string
   status: string
+  statusPagamento?: string
   dataAgendada: string | null
+  horario?: string | null
   valorTotal: number
   valorFinal: number
-  desconto: number
-  conquistaSemMorrer: boolean
+  desconto?: number
+  conquistaSemMorrer?: boolean
   pacoteCompleto: boolean
-  origem: string
-  createdAt: string
+  origem?: string
+  createdAt?: string
   reservaPaga: boolean
   valorReserva: number
-  dataReserva: string | null
+  dataReserva?: string | null
+  observacoes?: string | null
   itens: {
     id: number
     preco: number
