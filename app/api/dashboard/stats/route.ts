@@ -32,7 +32,7 @@ export async function GET() {
 
     const carrysAgendados = await prisma.pedido.count({
       where: {
-        status: 'Agendado'
+        status: 'AGENDADO'
       }
     })
 

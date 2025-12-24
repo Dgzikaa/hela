@@ -71,6 +71,12 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
     if (pedido.horario) {
       const horarioFormatado = pedido.horario.substring(0, 5) // "HH:MM"
       setHorario(horarioFormatado)
+    } else if (pedido.dataAgendada) {
+      // Calcular horário padrão baseado no dia da semana
+      const data = new Date(pedido.dataAgendada)
+      const diaSemana = data.getDay() // 0=Domingo, 6=Sábado
+      const horarioPadrao = (diaSemana === 0 || diaSemana === 6) ? '15:00' : '19:00'
+      setHorario(horarioPadrao)
     }
   }, [pedido])
 
@@ -291,13 +297,16 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
             <div className="space-y-4">
               {/* Horário do Carry */}
               <div className="p-4 bg-gray-700 rounded-lg">
-                <label className="block text-gray-300 text-sm mb-2">🕐 Horário do Carry</label>
+                <label className="block text-gray-300 text-sm mb-2">🕐 Horário do Clear (Brasília)</label>
                 <input
                   type="time"
                   value={horario}
                   onChange={(e) => setHorario(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600 text-lg"
                 />
+                <p className="text-gray-400 text-xs mt-2">
+                  ⏰ Padrão: Semana <strong>19:00</strong> | Fim de semana <strong>15:00</strong>
+                </p>
               </div>
 
               {/* Valor Total */}

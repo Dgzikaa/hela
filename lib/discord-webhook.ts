@@ -537,24 +537,27 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
     const numJogadores = isAgrupado ? 10 : 11 // 10 sem Pablo, 11 com Pablo
     const valorPorJogador = Math.floor(valorTotal / numJogadores)
 
+    // Pegar o primeiro horário como referência (geralmente todos são iguais)
+    const horarioPrincipal = carries[0].horario
+
     if (isAgrupado) {
       // MODO AGRUPADO (2+ carrys)
       descricao += `🔥 **${numCarrys} CARRYS AGRUPADOS** 🔥\n`
       descricao += `📅 Data: ${new Date(data + 'T00:00:00').toLocaleDateString('pt-BR')}\n`
+      descricao += `⏰ **HORÁRIO DO CLEAR: ${horarioPrincipal} (Brasília)** ⏰\n`
       descricao += `👥 **${numJogadores} jogadores** (SEM Pablo)\n`
       descricao += `💰 Valor total: **${(valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n\n`
       
+      descricao += `📋 **Clientes:**\n`
       carries.forEach((carry, index) => {
-        descricao += `**Carry #${index + 1}:** ${carry.cliente}\n`
-        descricao += `🕐 **${carry.horario}**\n`
-        descricao += `💵 ${(carry.valorTotal / 1000).toFixed(1)}b\n`
-        descricao += `🎯 ${carry.bosses.join(', ')}\n\n`
+        descricao += `${index + 1}. **${carry.cliente}** - ${(carry.valorTotal / 1000).toFixed(1)}b\n`
       })
+      descricao += `\n🎯 **Bosses:** ${carries[0].bosses.join(', ')}\n\n`
     } else {
       // MODO NORMAL (1 carry)
       const carry = carries[0]
       descricao += `🎮 **Carry:** ${carry.cliente}\n`
-      descricao += `🕐 **${carry.horario}**\n`
+      descricao += `⏰ **HORÁRIO DO CLEAR: ${carry.horario} (Brasília)** ⏰\n`
       descricao += `💰 Valor: **${(carry.valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n`
       descricao += `👥 **11 jogadores** (COM Pablo)\n`
       descricao += `🎯 ${carry.bosses.join(', ')}\n\n`
