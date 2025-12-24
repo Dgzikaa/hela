@@ -71,7 +71,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
     setObservacoes(pedido.observacoes || '')
     
     // Inicializar horário
-    if (pedido.horario) {
+    if (pedido.horario && typeof pedido.horario === 'string' && pedido.horario.trim() !== '') {
       const horarioFormatado = pedido.horario.substring(0, 5) // "HH:MM"
       setHorario(horarioFormatado)
     } else if (pedido.dataAgendada) {
@@ -80,6 +80,9 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
       const diaSemana = data.getDay() // 0=Domingo, 6=Sábado
       const horarioPadrao = (diaSemana === 0 || diaSemana === 6) ? '15:00' : '19:00'
       setHorario(horarioPadrao)
+    } else {
+      // Horário padrão se não tiver nada
+      setHorario('21:00')
     }
   }, [pedido])
 
@@ -182,7 +185,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
         valorReserva: valorPago,
         statusPagamento,
         reservaPaga: statusPagamento !== 'NAO_PAGO',
-        horario: horario + ':00', // Converter HH:MM para HH:MM:SS
+        horario: horario && horario.trim() !== '' ? horario + ':00' : null, // Converter HH:MM para HH:MM:SS ou null
         observacoes: observacoes || null,
         itens: itensPedido
       })

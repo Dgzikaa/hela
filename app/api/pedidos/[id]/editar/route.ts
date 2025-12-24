@@ -21,6 +21,19 @@ export async function PATCH(
       itens
     } = body
 
+    // Validar e formatar horário
+    let horarioParaSalvar = null
+    if (horario && typeof horario === 'string' && horario.trim() !== '') {
+      try {
+        const horarioDate = new Date(`2000-01-01T${horario}`)
+        if (!isNaN(horarioDate.getTime())) {
+          horarioParaSalvar = horarioDate
+        }
+      } catch (e) {
+        console.error('Horário inválido, salvando como null:', horario)
+      }
+    }
+
     // Atualizar pedido
     await prisma.pedido.update({
       where: { id: pedidoId },
@@ -29,7 +42,7 @@ export async function PATCH(
         valorFinal,
         valorReserva,
         reservaPaga,
-        horario: horario ? new Date(`2000-01-01T${horario}`) : null,
+        horario: horarioParaSalvar,
         observacoes: observacoes || null,
         updatedAt: new Date()
       }
