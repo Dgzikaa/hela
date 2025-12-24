@@ -1,57 +1,66 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Plus, Edit, Trash } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
-import { Button } from '@/app/components/Button'
-import { ToastContainer } from '@/app/components/Toast'
-import { useToast } from '@/app/hooks/useToast'
+import {
+  Users,
+  Trophy,
+  TrendingUp,
+  Calendar,
+  Star,
+  Award,
+  Target,
+  DollarSign,
+  BarChart3,
+  Clock,
+  Crown,
+  Medal,
+  Zap,
+  Filter,
+  Search
+} from 'lucide-react'
 
 interface Jogador {
   id: number
   nick: string
-  categorias: string // String separada por vírgula: "HELA,CARRYS"
-  discord: string | null
-  discordId: string | null
-  ativo: boolean
+  categorias: string
   essencial: boolean
-  ordemRodizio: number | null
-  ultimoCarry: string | null
   totalCarrys: number
   totalGanho: number
+  ativo: boolean
 }
 
-// Helper para converter string em array
-const parseCategorias = (categorias: string): string[] => {
-  return categorias ? categorias.split(',') : []
+interface Conquista {
+  id: string
+  nome: string
+  descricao: string
+  icone: string
+  progresso: number
+  meta: number
+  concluida: boolean
 }
 
-// Helper para converter array em string
-const stringifyCategorias = (categorias: string[]): string => {
-  return categorias.join(',')
-}
-
-export default function JogadoresPage() {
-  const toast = useToast()
+export default function MembrosPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [jogadores, setJogadores] = useState<Jogador[]>([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [formData, setFormData] = useState({
-    nick: '',
-    categorias: ['HELA'] as string[], // Array de categorias
-    discord: '',
-    discordId: '',
-    ativo: true,
-    essencial: false
-  })
+  const [jogadorSelecionado, setJogadorSelecionado] = useState<Jogador | null>(null)
+  const [busca, setBusca] = useState('')
+  const [filtroCategoria, setFiltroCategoria] = useState<string>('todos')
 
   useEffect(() => {
-    fetchJogadores()
-  }, [])
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      carregarJogadores()
+    }
+  }, [status, router])
 
-  const fetchJogadores = async () => {
+  const carregarJogadores = async () => {
     try {
       const res = await fetch('/api/jogadores')
       if (res.ok) {
@@ -59,400 +68,391 @@ export default function JogadoresPage() {
         setJogadores(data)
       }
     } catch (error) {
-      console.error('Erro ao buscar jogadores:', error)
+      console.error('Erro ao carregar jogadores:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSubmit = async () => {
-    try {
-      const res = await fetch('/api/jogadores', {
-        method: editingId ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingId ? { 
-          id: editingId, 
-          ...formData,
-          categorias: formData.categorias // Já é array, API converte
-        } : {
-          ...formData,
-          categorias: formData.categorias
-        })
-      })
-
-      if (res.ok) {
-        toast.success(editingId ? '✅ Jogador atualizado!' : '🎉 Jogador criado!')
-        setShowForm(false)
-        setEditingId(null)
-        setFormData({
-          nick: '',
-          categorias: ['HELA'],
-          discord: '',
-          discordId: '',
-          ativo: true,
-          essencial: false
-        })
-        fetchJogadores()
-      } else {
-        toast.error('❌ Erro ao salvar jogador')
+  // Sistema de Conquistas
+  const calcularConquistas = (jogador: Jogador): Conquista[] => {
+    return [
+      {
+        id: 'first-carry',
+        nome: 'Primeiro Carry',
+        descricao: 'Participe do seu primeiro carry',
+        icone: '🎯',
+        progresso: Math.min(jogador.totalCarrys, 1),
+        meta: 1,
+        concluida: jogador.totalCarrys >= 1
+      },
+      {
+        id: 'carry-10',
+        nome: 'Veterano',
+        descricao: 'Participe de 10 carrys',
+        icone: '⭐',
+        progresso: Math.min(jogador.totalCarrys, 10),
+        meta: 10,
+        concluida: jogador.totalCarrys >= 10
+      },
+      {
+        id: 'carry-50',
+        nome: 'Expert',
+        descricao: 'Participe de 50 carrys',
+        icone: '💎',
+        progresso: Math.min(jogador.totalCarrys, 50),
+        meta: 50,
+        concluida: jogador.totalCarrys >= 50
+      },
+      {
+        id: 'carry-100',
+        nome: 'Lenda',
+        descricao: 'Participe de 100 carrys',
+        icone: '👑',
+        progresso: Math.min(jogador.totalCarrys, 100),
+        meta: 100,
+        concluida: jogador.totalCarrys >= 100
+      },
+      {
+        id: 'ganho-100m',
+        nome: 'Milionário',
+        descricao: 'Ganhe 100kk',
+        icone: '💰',
+        progresso: Math.min(jogador.totalGanho, 100),
+        meta: 100,
+        concluida: jogador.totalGanho >= 100
+      },
+      {
+        id: 'ganho-500m',
+        nome: 'Rico',
+        descricao: 'Ganhe 500kk',
+        icone: '💸',
+        progresso: Math.min(jogador.totalGanho, 500),
+        meta: 500,
+        concluida: jogador.totalGanho >= 500
+      },
+      {
+        id: 'ganho-1b',
+        nome: 'Bilionário',
+        descricao: 'Ganhe 1.000kk (1b)',
+        icone: '🏆',
+        progresso: Math.min(jogador.totalGanho, 1000),
+        meta: 1000,
+        concluida: jogador.totalGanho >= 1000
       }
-    } catch (error) {
-      console.error('Erro:', error)
-      toast.error('❌ Erro ao salvar jogador')
-    }
+    ]
   }
 
-  const handleEdit = (jogador: Jogador) => {
-    setEditingId(jogador.id)
-    setFormData({
-      nick: jogador.nick,
-      categorias: parseCategorias(jogador.categorias),
-      discord: jogador.discord || '',
-      discordId: jogador.discordId || '',
-      ativo: jogador.ativo,
-      essencial: jogador.essencial
-    })
-    setShowForm(true)
-  }
+  const jogadoresFiltrados = jogadores.filter(jogador => {
+    const matchBusca = jogador.nick.toLowerCase().includes(busca.toLowerCase())
+    const matchCategoria = filtroCategoria === 'todos' || 
+                          jogador.categorias.includes(filtroCategoria.toUpperCase())
+    return matchBusca && matchCategoria
+  })
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [jogadorParaExcluir, setJogadorParaExcluir] = useState<Jogador | null>(null)
+  // Ranking
+  const ranking = [...jogadores]
+    .sort((a, b) => b.totalGanho - a.totalGanho)
+    .slice(0, 10)
 
-  const handleDelete = async (id: number) => {
-    try {
-      const res = await fetch(`/api/jogadores?id=${id}`, {
-        method: 'DELETE'
-      })
-
-      if (res.ok) {
-        toast.success('🗑️ Jogador excluído!')
-        fetchJogadores()
-        setShowDeleteModal(false)
-        setJogadorParaExcluir(null)
-      } else {
-        toast.error('❌ Erro ao excluir jogador')
-      }
-    } catch (error) {
-      console.error('Erro:', error)
-      toast.error('❌ Erro ao excluir jogador')
-    }
-  }
-
-  const getCategoryBadge = (categoria: string) => {
-    const map: Record<string, any> = {
-      HELA: { variant: 'success', label: '⭐ Time Principal' },
-      CARRYS: { variant: 'info', label: '🎯 Carrys' },
-      SUPLENTE: { variant: 'warning', label: '🔄 Suplente' }
-    }
-    const config = map[categoria] || { variant: 'default', label: categoria }
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
-
-  const renderCategoryBadges = (categoriasStr: string) => {
-    const cats = parseCategorias(categoriasStr)
-    return cats.map((cat, index) => (
-      <span key={index}>{getCategoryBadge(cat)}</span>
-    ))
-  }
-
-  if (loading) {
+  if (status === 'loading' || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-gray-400">Carregando...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Jogadores</h1>
-            <p className="text-gray-600">Gerencie os jogadores do time</p>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                Sistema de Jogadores
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Estatísticas, conquistas e ranking da equipe
+              </p>
+            </div>
           </div>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-5 h-5" />
-            Novo Jogador
-          </Button>
         </div>
 
-        {/* Stats */}
+        {/* Estatísticas Globais */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card hover>
-            <div className="text-green-600 text-sm font-semibold mb-1">Time HELA</div>
-            <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.categorias?.includes('HELA') && j.ativo).length}
+          <Card className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{jogadores.length}</p>
+              </div>
             </div>
           </Card>
-          <Card hover>
-            <div className="text-blue-600 text-sm font-semibold mb-1">Carrys</div>
-            <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.categorias?.includes('CARRYS') && j.ativo).length}
+
+          <Card className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Ativos</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {jogadores.filter(j => j.ativo).length}
+                </p>
+              </div>
             </div>
           </Card>
-          <Card hover>
-            <div className="text-yellow-600 text-sm font-semibold mb-1">Suplentes</div>
-            <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.categorias?.includes('SUPLENTE') && j.ativo).length}
+
+          <Card className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Carrys</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {jogadores.reduce((sum, j) => sum + j.totalCarrys, 0)}
+                </p>
+              </div>
             </div>
           </Card>
-          <Card hover>
-            <div className="text-purple-600 text-sm font-semibold mb-1">Total</div>
-            <div className="text-3xl font-bold text-gray-900">
-              {jogadores.filter(j => j.ativo).length}
+
+          <Card className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Ganhos</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {jogadores.reduce((sum, j) => sum + j.totalGanho, 0)}kk
+                </p>
+              </div>
             </div>
           </Card>
         </div>
 
-        {/* Lista de Jogadores */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jogadores.map(jogador => (
-            <Card key={jogador.id} hover>
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-xl font-bold text-gray-900">{jogador.nick}</h3>
-                    {jogador.essencial && (
-                      <span className="text-xl" title="Jogador Essencial - Nunca sai da PT">⭐</span>
-                    )}
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {renderCategoryBadges(jogador.categorias)}
-                    {jogador.essencial && (
-                      <Badge variant="warning">⭐ ESSENCIAL</Badge>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="secondary" onClick={() => handleEdit(jogador)}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="danger" onClick={() => {
-                    setJogadorParaExcluir(jogador)
-                    setShowDeleteModal(true)
-                  }}>
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="space-y-2 text-sm text-gray-600">
-                {jogador.discord && (
-                  <div>💬 Discord: {jogador.discord}</div>
-                )}
-                {jogador.discordId && (
-                  <div className="text-xs">🆔 ID: {jogador.discordId}</div>
-                )}
-                <div className="flex gap-4 pt-2 border-t border-gray-200">
-                  <div>
-                    <div className="text-xs text-gray-500">Carrys</div>
-                    <div className="font-bold text-gray-900">{jogador.totalCarrys}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500">Ganho</div>
-                    <div className="font-bold text-gray-900">{jogador.totalGanho}KK</div>
-                  </div>
-                </div>
-              </div>
-              
-              {!jogador.ativo && (
-                <Badge variant="danger" className="mt-2">Inativo</Badge>
-              )}
-            </Card>
-          ))}
-        </div>
-
-        {/* Modal Form */}
-        {showForm && (
-          <div 
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-            onClick={() => {
-              setShowForm(false)
-              setEditingId(null)
-            }}
-          >
-            <div 
-              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-2xl font-bold text-white mb-6">
-                {editingId ? 'Editar Jogador' : 'Novo Jogador'}
-              </h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-gray-300 mb-2">Nick</label>
-                  <input
-                    type="text"
-                    className="w-full bg-gray-700 text-white rounded px-4 py-2"
-                    value={formData.nick}
-                    onChange={(e) => setFormData({ ...formData, nick: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-300 mb-3">Categorias (selecione uma ou mais)</label>
-                  <div className="space-y-3">
-                    {['HELA', 'CARRYS', 'SUPLENTE'].map((cat) => (
-                      <label key={cat} className="flex items-center gap-3 cursor-pointer hover:bg-gray-700/50 p-2 rounded">
-                        <input
-                          type="checkbox"
-                          className="w-5 h-5 rounded border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-800"
-                          checked={formData.categorias.includes(cat)}
-                          onChange={(e) => {
-                            const newCategorias = e.target.checked
-                              ? [...formData.categorias, cat]
-                              : formData.categorias.filter(c => c !== cat)
-                            setFormData({ ...formData, categorias: newCategorias })
-                          }}
-                        />
-                        <span className="text-white">
-                          {cat === 'HELA' && '⭐ Time Principal (HELA)'}
-                          {cat === 'CARRYS' && '🎯 Carrys (Boss 4-6)'}
-                          {cat === 'SUPLENTE' && '🔄 Suplente'}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-300 mb-2">Discord (username)</label>
-                  <input
-                    type="text"
-                    className="w-full bg-gray-700 text-white rounded px-4 py-2"
-                    placeholder="exemplo#1234"
-                    value={formData.discord}
-                    onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-300 mb-2">Discord ID (para notificações)</label>
-                  <input
-                    type="text"
-                    className="w-full bg-gray-700 text-white rounded px-4 py-2"
-                    placeholder="123456789012345678"
-                    value={formData.discordId}
-                    onChange={(e) => setFormData({ ...formData, discordId: e.target.value })}
-                  />
-                  <p className="text-xs text-gray-400 mt-1">
-                    Para receber notificações via DM. Clique com botão direito no usuário e "Copiar ID"
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-gray-300">
-                    <input
-                      type="checkbox"
-                      checked={formData.ativo}
-                      onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-                      className="w-5 h-5"
-                    />
-                    <span>Ativo</span>
-                  </label>
-                  
-                  <label className="flex items-center gap-2 text-gray-300">
-                    <input
-                      type="checkbox"
-                      checked={formData.essencial}
-                      onChange={(e) => setFormData({ ...formData, essencial: e.target.checked })}
-                      className="w-5 h-5"
-                    />
-                    <span className="flex items-center gap-1">
-                      <span className="text-xl">⭐</span>
-                      <span>Essencial (Nunca sai da PT)</span>
-                    </span>
-                  </label>
-                  <p className="text-xs text-gray-400 ml-7">
-                    Jogadores essenciais são obrigatórios em todos os carries e não entram no rodízio
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <Button onClick={handleSubmit} className="flex-1">
-                  {editingId ? 'Salvar' : 'Criar'}
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingId(null)
-                  }}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Excluir Jogador */}
-        {showDeleteModal && jogadorParaExcluir && (
-          <div 
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            <div 
-              className="bg-gray-800 rounded-lg max-w-md w-full p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Lista de Jogadores */}
+          <div className="lg:col-span-2">
+            <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Trash className="w-6 h-6 text-red-500" />
-                  Excluir Jogador
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Membros da Equipe
                 </h2>
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-700 rounded"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
               </div>
 
-              <div className="space-y-4 mb-6">
-                <div className="bg-red-900/30 border border-red-500/50 p-4 rounded">
-                  <div className="text-red-300 text-sm mb-1">⚠️ Esta ação não pode ser desfeita!</div>
-                  <div className="text-white font-bold mt-3">{jogadorParaExcluir.nick}</div>
-                  <div className="text-gray-400 text-sm mt-2 flex gap-2">
-                    {renderCategoryBadges(jogadorParaExcluir.categorias)}
+              {/* Filtros */}
+              <div className="flex gap-4 mb-6">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    placeholder="Buscar jogador..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <select
+                  value={filtroCategoria}
+                  onChange={(e) => setFiltroCategoria(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                >
+                  <option value="todos">Todas</option>
+                  <option value="hela">Hela</option>
+                  <option value="carrys">Carrys</option>
+                  <option value="suplente">Suplente</option>
+                </select>
+              </div>
+
+              <div className="space-y-3">
+                {jogadoresFiltrados.map((jogador) => {
+                  const conquistas = calcularConquistas(jogador)
+                  const conquistasConcluidas = conquistas.filter(c => c.concluida).length
+                  
+                  return (
+                    <button
+                      key={jogador.id}
+                      onClick={() => setJogadorSelecionado(jogador)}
+                      className="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            {jogador.nick[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold text-gray-900 dark:text-white">
+                                {jogador.nick}
+                              </h3>
+                              {jogador.essencial && (
+                                <Star className="w-4 h-4 text-yellow-500" fill="currentColor" />
+                              )}
+                              {jogador.categorias.includes('HELA') && (
+                                <Crown className="w-4 h-4 text-purple-500" fill="currentColor" />
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              <span>{jogador.totalCarrys} carrys</span>
+                              <span>•</span>
+                              <span>{jogador.totalGanho}kk ganho</span>
+                              <span>•</span>
+                              <span>{conquistasConcluidas}/7 conquistas</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant={jogador.ativo ? 'success' : 'default'}>
+                            {jogador.ativo ? 'Ativo' : 'Inativo'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </Card>
+          </div>
+
+          {/* Ranking */}
+          <div>
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Trophy className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Top 10
+                </h2>
+              </div>
+
+              <div className="space-y-3">
+                {ranking.map((jogador, index) => (
+                  <div
+                    key={jogador.id}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-lg
+                      ${index < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20' : 'bg-gray-50 dark:bg-gray-800'}
+                    `}
+                  >
+                    <div className={`
+                      w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white
+                      ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-amber-600' : 'bg-gray-500'}
+                    `}>
+                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                        {jogador.nick}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {jogador.totalGanho}kk • {jogador.totalCarrys} carrys
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-gray-400 text-sm mt-1">
-                    {jogadorParaExcluir.totalCarrys} carrys • {jogadorParaExcluir.totalGanho}KK ganho
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        {/* Modal de Detalhes do Jogador */}
+        {jogadorSelecionado && (
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setJogadorSelecionado(null)}
+          >
+            <div
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-2xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-purple-600">
+                      {jogadorSelecionado.nick[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-1">
+                        {jogadorSelecionado.nick}
+                      </h2>
+                      <div className="flex items-center gap-2">
+                        {jogadorSelecionado.essencial && (
+                          <Badge variant="warning">⭐ Essencial</Badge>
+                        )}
+                        {jogadorSelecionado.categorias.includes('HELA') && (
+                          <Badge variant="info">👑 Hela</Badge>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => setJogadorSelecionado(null)}
+                    className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
+                  >
+                    <span className="text-2xl">×</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <Button
-                  variant="danger"
-                  onClick={() => handleDelete(jogadorParaExcluir.id)}
-                  className="flex-1"
-                >
-                  <Trash className="w-5 h-5 mr-2" />
-                  Sim, Excluir
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowDeleteModal(false)}
-                >
-                  Cancelar
-                </Button>
+              {/* Conquistas */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Trophy className="w-5 h-5" />
+                  Conquistas
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {calcularConquistas(jogadorSelecionado).map((conquista) => (
+                    <div
+                      key={conquista.id}
+                      className={`
+                        p-4 rounded-lg border-2 transition-all
+                        ${conquista.concluida
+                          ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-500'
+                          : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60'
+                        }
+                      `}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-3xl">{conquista.icone}</span>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                            {conquista.nome}
+                          </h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            {conquista.descricao}
+                          </p>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${conquista.concluida ? 'bg-green-500' : 'bg-purple-500'}`}
+                              style={{ width: `${(conquista.progresso / conquista.meta) * 100}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {conquista.progresso} / {conquista.meta}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         )}
-
-        {/* Toast Container */}
-        <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       </div>
     </div>
   )
 }
-
