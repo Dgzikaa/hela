@@ -354,6 +354,38 @@ export default function PedidosPage() {
     }
   }
 
+  const handleConcluirTodos = async (carrys: Pedido[]) => {
+    try {
+      // Concluir todos os carrys em paralelo
+      const promises = carrys.map(carry => 
+        fetch('/api/pedidos', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: carry.id,
+            status: 'CONCLUIDO',
+            dataAgendada: null,
+            motivo: null,
+            marcarPago: true
+          })
+        })
+      )
+      
+      const results = await Promise.all(promises)
+      const todosOk = results.every(res => res.ok)
+      
+      if (todosOk) {
+        toast.success(`💰 ${carrys.length} carrys concluídos e jogadores pagos!`)
+        fetchPedidos()
+      } else {
+        toast.error('❌ Erro ao concluir alguns carrys')
+      }
+    } catch (error) {
+      console.error('Erro:', error)
+      toast.error('❌ Erro ao concluir carrys')
+    }
+  }
+
   const handleUpdateStatus = async (pedidoId: number, novoStatus: string, dataAgendada?: string, motivo?: string, marcarPago?: boolean) => {
     try {
       const res = await fetch('/api/pedidos', {
@@ -659,6 +691,7 @@ export default function PedidosPage() {
                 setPedidoParaConcluir(pedido)
                 setShowConcluirModal(true)
               }}
+              onConcluirTodos={handleConcluirTodos}
             />
           ))}
 

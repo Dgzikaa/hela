@@ -42,6 +42,7 @@ interface Props {
   onAgendar: (pedido: Pedido) => void
   onCancelar: (pedido: Pedido) => void
   onConcluir: (pedido: Pedido) => void
+  onConcluirTodos?: (carrys: Pedido[]) => void
 }
 
 export function CarryAgrupado({ 
@@ -52,7 +53,8 @@ export function CarryAgrupado({
   onUpdateStatus,
   onAgendar,
   onCancelar,
-  onConcluir 
+  onConcluir,
+  onConcluirTodos
 }: Props) {
   // Só agrupa se tiver 2+ carrys
   const isAgrupado = carrys.length >= 2
@@ -312,7 +314,14 @@ export function CarryAgrupado({
           {statusComum === 'EM_ANDAMENTO' && (
             <Button
               variant="success"
-              onClick={() => carrys.forEach(c => onConcluir(c))}
+              onClick={() => {
+                if (onConcluirTodos) {
+                  onConcluirTodos(carrys)
+                } else {
+                  // Fallback: concluir um por um (abrindo modal)
+                  carrys.forEach(c => onConcluir(c))
+                }
+              }}
             >
               <CheckCircle className="w-4 h-4 mr-2" />
               Concluir Todos
