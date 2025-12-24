@@ -24,6 +24,7 @@ interface Pedido {
   valorFinal: number
   valorReserva: number
   reservaPaga: boolean
+  observacoes?: string | null
   itens: {
     id: number
     preco: number
@@ -46,6 +47,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
   const [statusPagamento, setStatusPagamento] = useState('NAO_PAGO')
   const [valorPago, setValorPago] = useState(0)
   const [horario, setHorario] = useState('21:00')
+  const [observacoes, setObservacoes] = useState('')
 
   useEffect(() => {
     if (!pedido) return
@@ -66,6 +68,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
     setValorFinal(pedido.valorFinal)
     setStatusPagamento(pedido.statusPagamento || 'NAO_PAGO')
     setValorPago(pedido.valorReserva || 0)
+    setObservacoes(pedido.observacoes || '')
     
     // Inicializar horário
     if (pedido.horario) {
@@ -180,6 +183,7 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
         statusPagamento,
         reservaPaga: statusPagamento !== 'NAO_PAGO',
         horario: horario + ':00', // Converter HH:MM para HH:MM:SS
+        observacoes: observacoes || null,
         itens: itensPedido
       })
 
@@ -306,6 +310,21 @@ export function ModalEditarPedido({ pedido, bosses, onClose, onSave }: Props) {
                 />
                 <p className="text-gray-400 text-xs mt-2">
                   ⏰ Padrão: Semana <strong>19:00</strong> | Fim de semana <strong>15:00</strong>
+                </p>
+              </div>
+
+              {/* Observações */}
+              <div className="p-4 bg-gray-700 rounded-lg">
+                <label className="block text-gray-300 text-sm mb-2">📝 Observações</label>
+                <textarea
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  rows={2}
+                  placeholder="Ex: Sacolinhas de zeny: Adrr (DESILUSIONAL DAMAGE)"
+                  className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-600 text-sm"
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  Info adicional: sacolinhas, contatos, etc.
                 </p>
               </div>
 

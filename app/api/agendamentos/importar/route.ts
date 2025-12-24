@@ -8,9 +8,15 @@ export async function POST(request: Request) {
     const resultados = []
 
     for (const agendamento of agendamentos) {
-      const { data, clientes, sinal } = agendamento
+      const { data, clientes, sinal, observacoes } = agendamento
 
-      // Para cada cliente no mesmo dia
+      // VALIDAÇÃO: Máximo 2 clientes por data
+      if (clientes.length > 2) {
+        console.warn(`⚠️ Data ${data} tem ${clientes.length} clientes. Limite: 2. Considerando apenas os 2 primeiros.`)
+        clientes.splice(2) // Remove do índice 2 em diante
+      }
+
+      // Para cada cliente no mesmo dia (máximo 2)
       for (const clienteNome of clientes) {
         // Criar ou buscar cliente
         let cliente = await prisma.cliente.findFirst({
@@ -78,6 +84,7 @@ export async function POST(request: Request) {
             reservaPaga,
             valorReserva,
             dataReserva: reservaPaga ? new Date() : null,
+            observacoes: observacoes || null, // Campo para sacolinhas, etc.
             itens: {
               create: bosses.map(boss => ({
                 bossId: boss.id,

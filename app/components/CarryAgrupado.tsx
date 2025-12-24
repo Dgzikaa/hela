@@ -25,6 +25,7 @@ interface Pedido {
   valorReserva: number
   reservaPaga: boolean
   pacoteCompleto: boolean
+  observacoes?: string | null
   itens: {
     id: number
     preco: number
@@ -273,6 +274,13 @@ export function CarryAgrupado({
                     </Badge>
                   ))}
                 </div>
+
+                {/* Observações (Sacolinhas, etc) */}
+                {carry.observacoes && (
+                  <div className="text-xs text-gray-500 italic">
+                    📝 {carry.observacoes}
+                  </div>
+                )}
               </div>
 
               {/* Ações individuais */}

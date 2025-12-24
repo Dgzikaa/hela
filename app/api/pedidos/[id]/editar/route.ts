@@ -17,6 +17,7 @@ export async function PATCH(
       statusPagamento,
       reservaPaga,
       horario,
+      observacoes,
       itens
     } = body
 
@@ -29,6 +30,7 @@ export async function PATCH(
         valorReserva,
         reservaPaga,
         horario: horario ? new Date(`2000-01-01T${horario}`) : null,
+        observacoes: observacoes || null,
         updatedAt: new Date()
       }
     })
