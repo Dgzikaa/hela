@@ -549,7 +549,7 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
       descricao += `🔥 **${numCarrys} CARRYS AGRUPADOS** 🔥\n`
       descricao += `📅 Data: ${new Date(data + 'T00:00:00').toLocaleDateString('pt-BR')}\n`
       descricao += `⏰ **HORÁRIO DO CLEAR: ${horarioFormatado} (Brasília)** ⏰\n`
-      descricao += `👥 **${numJogadores} jogadores** (SEM Pablo)\n`
+      descricao += `👥 **${numJogadores} jogadores**\n`
       descricao += `💰 Valor total: **${(valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n\n`
       
       descricao += `📋 **Clientes:**\n`
@@ -563,7 +563,7 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
       descricao += `🎮 **Carry:** ${carry.cliente}\n`
       descricao += `⏰ **HORÁRIO DO CLEAR: ${horarioFormatado} (Brasília)** ⏰\n`
       descricao += `💰 Valor: **${(carry.valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n`
-      descricao += `👥 **11 jogadores** (COM Pablo)\n`
+      descricao += `👥 **${numJogadores} jogadores**\n`
       descricao += `🎯 ${carry.bosses.join(', ')}\n\n`
     }
   })
