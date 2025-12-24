@@ -111,7 +111,7 @@ export async function GET() {
       if (pedido.status === 'CONCLUIDO') {
         tipo = 'concluido'
         titulo = 'Carry concluído'
-        descricao = `Cliente: ${pedido.cliente.nome}`
+        descricao = `Cliente: ${pedido.cliente?.nome || pedido.nomeCliente}`
       }
 
       return {

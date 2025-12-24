@@ -18,7 +18,7 @@ export async function GET() {
         missoesFora: {
           where: {
             status: {
-              in: ['Concluído', 'Agendado']
+              in: ['CONCLUIDO', 'AGENDADO']
             }
           },
           orderBy: {
