@@ -533,3 +533,107 @@ model Missao {
 
   @@map("missoes")
 }
+
+// =======================
+// SISTEMA DE SEGURANÇA
+// =======================
+
+// Logs de Auditoria
+model LogAuditoria {
+  id            Int      @id @default(autoincrement())
+  
+  // Usuário que realizou a ação
+  usuarioId     Int?
+  usuarioNome   String   // Backup caso usuário seja deletado
+  
+  // Ação realizada
+  acao          String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, etc
+  entidade      String   // Cliente, Pedido, Jogador, Usuario, etc
+  entidadeId    Int?     // ID da entidade afetada
+  
+  // Detalhes
+  descricao     String   // Descrição legível da ação
+  dadosAntigos  String?  @db.Text // JSON com dados antes da mudança
+  dadosNovos    String?  @db.Text // JSON com dados após a mudança
+  
+  // Metadados
+  ip            String?
+  userAgent     String?  @db.Text
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([usuarioId])
+  @@index([acao])
+  @@index([entidade])
+  @@index([createdAt])
+  @@map("logs_auditoria")
+}
+
+// Permissões por usuário
+model Permissao {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  
+  // Módulos
+  verDashboard       Boolean @default(true)
+  gerenciarCarrys    Boolean @default(true)
+  gerenciarClientes  Boolean @default(true)
+  gerenciarJogadores Boolean @default(false)
+  gerenciarUsuarios  Boolean @default(false)
+  verRelatorios      Boolean @default(true)
+  exportarDados      Boolean @default(false)
+  configurarSistema  Boolean @default(false)
+  verLogs            Boolean @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([usuarioId])
+  @@map("permissoes")
+}
+
+// Sessões ativas (para controle de 2FA e sessões simultâneas)
+model Sessao {
+  id          String   @id @default(cuid())
+  usuarioId   Int
+  
+  token       String   @unique
+  ip          String?
+  userAgent   String?  @db.Text
+  
+  ativo       Boolean  @default(true)
+  ultimaAtividade DateTime @default(now())
+  
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  
+  @@index([usuarioId])
+  @@index([token])
+  @@map("sessoes")
+}
+
+// Configurações de Backup
+model ConfigBackup {
+  id                Int      @id @default(autoincrement())
+  
+  ativo             Boolean  @default(true)
+  frequencia        String   @default("DIARIO") // DIARIO, SEMANAL, MENSAL
+  hora              String   @default("03:00")  // HH:MM
+  
+  // Retenção
+  manterUltimos     Int      @default(7)        // Manter últimos N backups
+  
+  // Destino
+  destino           String   @default("LOCAL")  // LOCAL, S3, DRIVE
+  caminhoLocal      String?
+  
+  // Último backup
+  ultimoBackup      DateTime?
+  proximoBackup     DateTime?
+  statusUltimo      String?  // SUCCESS, ERROR
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("config_backup")
+}
