@@ -3,6 +3,25 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Densidade de Informação - Padrão: Confortável */
+  --spacing-base: 1rem;
+  --text-base: 1rem;
+  --card-padding: 1.5rem;
+}
+
+/* Densidade Compacta */
+:root[data-density="compacto"] {
+  --spacing-base: 0.75rem;
+  --text-base: 0.875rem;
+  --card-padding: 1rem;
+}
+
+/* Densidade Espaçosa */
+:root[data-density="espaçoso"] {
+  --spacing-base: 1.5rem;
+  --text-base: 1.125rem;
+  --card-padding: 2rem;
 }
 
 @theme inline {
