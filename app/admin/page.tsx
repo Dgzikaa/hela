@@ -7,8 +7,8 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirecionar para a página de pedidos
-    router.push('/admin/pedidos')
+    // Redirecionar para a home
+    router.push('/')
   }, [router])
 
   return null

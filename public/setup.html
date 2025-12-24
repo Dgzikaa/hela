@@ -137,7 +137,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data.usuariosExistentes > 0) {
-                    showMessage('info', data.message + ' Use /admin/login para entrar.');
+                    showMessage('info', data.message + ' Use /login para entrar.');
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'Usuário já existe';
                 }
@@ -168,7 +168,7 @@
                 if (response.ok) {
                     showMessage('success', '✅ ' + data.message);
                     setTimeout(() => {
-                        window.location.href = '/admin/login';
+                        window.location.href = '/login';
                     }, 2000);
                 } else {
                     showMessage('error', '❌ ' + data.error);

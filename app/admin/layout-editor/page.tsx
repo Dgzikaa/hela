@@ -26,7 +26,7 @@ export default function LayoutEditorPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/login')
     }
   }, [status, router])
 

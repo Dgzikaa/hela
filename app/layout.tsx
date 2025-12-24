@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { PreferencesProvider } from './contexts/PreferencesContext';
-import { NotificationsProvider } from './contexts/NotificationsContext';
-import { PriceAlertsProvider } from './contexts/PriceAlertsContext';
-import { AvailabilityProvider } from './contexts/AvailabilityContext';
-import { RemindersProvider } from './contexts/RemindersContext';
-import { SessionProvider } from 'next-auth/react';
+import { Providers } from './providers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,19 +49,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>
-          <PreferencesProvider>
-            <NotificationsProvider>
-              <PriceAlertsProvider>
-                <AvailabilityProvider>
-                  <RemindersProvider>
-                    {children}
-                  </RemindersProvider>
-                </AvailabilityProvider>
-              </PriceAlertsProvider>
-            </NotificationsProvider>
-          </PreferencesProvider>
-        </SessionProvider>
+        <Providers>
+          {children}
+        </Providers>
         <script
           dangerouslySetInnerHTML={{
             __html: `

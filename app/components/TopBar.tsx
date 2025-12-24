@@ -90,7 +90,7 @@ export function TopBar() {
             <UserMenu />
           ) : (
             <button
-              onClick={() => router.push('/admin/login')}
+              onClick={() => router.push('/login')}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-sm"
             >
               Login

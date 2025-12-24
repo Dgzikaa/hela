@@ -30,7 +30,7 @@ export default function LeadsPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/login')
     } else if (status === 'authenticated') {
       carregarLeads()
     }

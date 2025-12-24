@@ -28,7 +28,7 @@ export default function TwoFactorAuthPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/login')
     } else if (status === 'authenticated') {
       // Verificar se 2FA já está ativado (localStorage para demo)
       const enabled = localStorage.getItem('2fa_enabled') === 'true'

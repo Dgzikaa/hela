@@ -11,24 +11,12 @@ function AdminContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  // Rota de login não precisa de autenticação
-  const isLoginPage = pathname === '/admin/login'
-
   useEffect(() => {
-    // Se não está na página de login e não está autenticado, redireciona
-    if (!isLoginPage && status === 'unauthenticated') {
-      router.push('/admin/login')
+    // Se não está autenticado, redireciona para login
+    if (status === 'unauthenticated') {
+      router.push('/login')
     }
-    // Se está na página de login e está autenticado, redireciona para o admin
-    if (isLoginPage && status === 'authenticated') {
-      router.push('/admin/pedidos')
-    }
-  }, [status, router, isLoginPage])
-
-  // Página de login - renderiza direto sem sidebar
-  if (isLoginPage) {
-    return <>{children}</>
-  }
+  }, [status, router])
 
   // Carregando
   if (status === 'loading') {

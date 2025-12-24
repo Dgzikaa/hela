@@ -38,7 +38,7 @@ export default function CalendarioPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/login')
     } else if (status === 'authenticated') {
       carregarPedidos()
     }

@@ -49,7 +49,7 @@ export default function SecurityDashboardPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/login')
     } else if (status === 'authenticated') {
       carregarLogs()
     }

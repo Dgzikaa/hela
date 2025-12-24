@@ -38,7 +38,7 @@ export default function DisponibilidadePage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/login')
     }
   }, [status, router])
 

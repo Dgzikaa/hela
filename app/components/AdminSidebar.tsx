@@ -46,7 +46,7 @@ export function AdminSidebar() {
 
   const handleLogout = async () => {
     await signOut({ redirect: false })
-    router.push('/admin/login')
+    router.push('/login')
   }
 
   const isActive = (href: string) => {
