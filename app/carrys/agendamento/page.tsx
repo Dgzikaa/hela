@@ -767,7 +767,7 @@ export default function PedidosPage() {
                     <>
                       <Button
                         size="sm"
-                        variant="primary"
+                        variant="info"
                         onClick={() => handleUpdateStatus(pedido.id, 'EM_ANDAMENTO')}
                       >
                         <Clock className="w-4 h-4 mr-1" />

@@ -34,7 +34,7 @@ export function TopJogadores({ jogadores, periodo = 'mes' }: TopJogadoresProps) 
           <Trophy className="w-5 h-5 text-yellow-600" />
           Top Jogadores
         </h3>
-        <Badge variant="primary">{periodo === 'semana' ? 'Esta Semana' : 'Este Mês'}</Badge>
+        <Badge variant="info">{periodo === 'semana' ? 'Esta Semana' : 'Este Mês'}</Badge>
       </div>
       
       <div className="space-y-3">

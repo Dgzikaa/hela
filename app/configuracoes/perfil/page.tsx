@@ -54,7 +54,7 @@ export default function PerfilPage() {
                 <p className="text-gray-600">{session?.user?.email}</p>
                 <div className="flex gap-2 mt-2">
                   <Badge variant="success">✅ Ativo</Badge>
-                  <Badge variant="primary">👑 Admin</Badge>
+                  <Badge variant="info">👑 Admin</Badge>
                 </div>
               </div>
             </div>
