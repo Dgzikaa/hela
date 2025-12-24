@@ -564,7 +564,8 @@ export default function PedidosPage() {
   const pedidosAgrupados: Record<string, typeof pedidos> = {}
   pedidos.forEach(pedido => {
     if (pedido.dataAgendada) {
-      const data = new Date(pedido.dataAgendada).toISOString().split('T')[0]
+      // FIX: Extrair data sem conversão UTC
+      const data = pedido.dataAgendada.split('T')[0] // "2025-12-24"
       if (!pedidosAgrupados[data]) {
         pedidosAgrupados[data] = []
       }

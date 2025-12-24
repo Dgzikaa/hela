@@ -63,7 +63,10 @@ export default function CalendarioPage() {
   const events: CalendarEvent[] = pedidos
     .filter(p => p.dataAgendada)
     .map(p => {
-      const dataAgendada = new Date(p.dataAgendada!)
+      // FIX: Forçar data local (não UTC) para evitar deslocamento de timezone
+      const dataStr = p.dataAgendada!.split('T')[0] // "2025-12-24"
+      const [ano, mes, dia] = dataStr.split('-').map(Number)
+      const dataAgendada = new Date(ano, mes - 1, dia, 12, 0, 0) // Meio-dia para evitar DST
       
       // Determinar tipo de carry
       let type: 'HELA' | 'CARRY_PAGO' | 'CARRY_GRATIS' = 'CARRY_PAGO'
