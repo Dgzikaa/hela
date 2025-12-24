@@ -534,7 +534,7 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
 
     // Calcular valor total e divisão
     const valorTotal = carries.reduce((sum, c) => sum + c.valorTotal, 0)
-    const numJogadores = isAgrupado ? 10 : 11
+    const numJogadores = 11 // Sempre 11 jogadores (Pablo ainda está recebendo)
     const valorPorJogador = Math.floor(valorTotal / numJogadores)
 
     // Pegar o primeiro horário como referência (geralmente todos são iguais)

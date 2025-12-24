@@ -64,7 +64,7 @@ export function CarryAgrupado({
     ? carrys.reduce((sum, c) => sum + c.valorFinal, 0)
     : carrys[0]?.valorFinal || 0
   
-  const numJogadores = isAgrupado ? 10 : 11 // 10 quando agrupado, 11 quando único
+  const numJogadores = 11 // Sempre 11 jogadores (Pablo ainda está recebendo)
   const valorPorJogador = Math.floor(valorTotalAgrupado / numJogadores)
 
   // Data formatada
