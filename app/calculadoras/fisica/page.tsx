@@ -473,9 +473,9 @@ function CardModal({
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-800 truncate">{card.name}</div>
                   <div className="text-xs text-gray-500">
-                    {card.effects.slice(0, 1).map((group, idx) => (
+                    {card.effects && Array.isArray(card.effects) && card.effects.slice(0, 1).map((group, idx) => (
                       <span key={idx}>
-                        {group.effects.slice(0, 2).map((eff, i) => (
+                        {group?.effects && Array.isArray(group.effects) && group.effects.slice(0, 2).map((eff, i) => (
                           <span key={i} className="mr-1">
                             {eff.stat && `${eff.stat}: ${(eff.value || 0) > 0 ? '+' : ''}${eff.value || 0}${eff.modifier === 'percent' ? '%' : ''}`}
                           </span>
