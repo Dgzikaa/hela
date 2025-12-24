@@ -30,8 +30,8 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Email ou senha inválidos')
       } else {
-        // Redireciona para o admin após login
-        router.push('/admin')
+        // Redireciona para a home (dashboard) após login
+        router.push('/')
         router.refresh()
       }
     } catch (err) {
