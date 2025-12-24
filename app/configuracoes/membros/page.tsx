@@ -34,6 +34,8 @@ interface Jogador {
   totalCarrys: number
   totalGanho: number
   ativo: boolean
+  discord?: string | null
+  discordId?: string | null
 }
 
 interface Conquista {
