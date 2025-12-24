@@ -17,24 +17,33 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('🔐 Iniciando login...', { email })
     setLoading(true)
     setError('')
 
     try {
+      console.log('📡 Chamando signIn...')
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false
       })
 
+      console.log('📥 Resultado do signIn:', result)
+
       if (result?.error) {
+        console.error('❌ Erro no login:', result.error)
         setError('Email ou senha inválidos')
-      } else {
-        // Redireciona para /home após login
+      } else if (result?.ok) {
+        console.log('✅ Login bem-sucedido! Redirecionando...')
         router.push('/home')
         router.refresh()
+      } else {
+        console.error('⚠️ Resultado inesperado:', result)
+        setError('Erro inesperado ao fazer login')
       }
     } catch (err) {
+      console.error('💥 Erro na requisição:', err)
       setError('Erro ao fazer login')
     } finally {
       setLoading(false)
