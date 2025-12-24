@@ -4,6 +4,7 @@ import "./globals.css";
 import { PreferencesProvider } from './contexts/PreferencesContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
 import { PriceAlertsProvider } from './contexts/PriceAlertsContext';
+import { AvailabilityProvider } from './contexts/AvailabilityContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +55,9 @@ export default function RootLayout({
         <PreferencesProvider>
           <NotificationsProvider>
             <PriceAlertsProvider>
-              {children}
+              <AvailabilityProvider>
+                {children}
+              </AvailabilityProvider>
             </PriceAlertsProvider>
           </NotificationsProvider>
         </PreferencesProvider>
