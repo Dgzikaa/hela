@@ -539,10 +539,15 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
 
     // Pegar o primeiro horário como referência (geralmente todos são iguais)
     const horarioPrincipal = carries[0].horario
+    console.log('[DEBUG DISCORD] horarioPrincipal:', horarioPrincipal, '| tipo:', typeof horarioPrincipal)
+    
     // Formatar horário (vem como string "15:00:00" ou "15:00")
     let horarioFormatado = '21:00' // Padrão
     if (horarioPrincipal && typeof horarioPrincipal === 'string') {
       horarioFormatado = horarioPrincipal.substring(0, 5) // Pegar apenas HH:MM
+      console.log('[DEBUG DISCORD] horarioFormatado:', horarioFormatado)
+    } else {
+      console.log('[DEBUG DISCORD] Horário não é string ou está vazio')
     }
 
     if (isAgrupado) {
