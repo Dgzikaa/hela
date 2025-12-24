@@ -140,10 +140,10 @@ export default function PrecosPage() {
 
   return (
     <ToolsLayout>
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="min-h-screen bg-gray-50 p-2 md:p-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between gap-4 mb-8">
+          <div className="flex items-center justify-between gap-4 mb-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3 text-gray-900">
                 <TrendingUp className="w-8 h-8 text-purple-600" />
@@ -179,7 +179,7 @@ export default function PrecosPage() {
               placeholder="Buscar item..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
           </div>
         </Card>
@@ -188,12 +188,12 @@ export default function PrecosPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card className="p-4 bg-white border-gray-200 shadow-sm">
             <p className="text-xs text-gray-500">Total Itens</p>
-            <p className="text-2xl font-bold text-white">{prices.length}</p>
+            <p className="text-2xl font-bold text-gray-900">{prices.length}</p>
           </Card>
           
           <Card className="p-4 bg-white border-gray-200 shadow-sm">
             <p className="text-xs text-gray-500">Total Runas</p>
-            <p className="text-2xl font-bold text-white">{runas.length}</p>
+            <p className="text-2xl font-bold text-gray-900">{runas.length}</p>
           </Card>
           
           <Card className="p-4 bg-white border-gray-200 shadow-sm">
@@ -222,7 +222,7 @@ export default function PrecosPage() {
                   className="w-full p-4 flex items-center justify-between hover:bg-gray-100/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <h2 className="font-bold text-white">{categoria}</h2>
+                    <h2 className="font-bold text-gray-900">{categoria}</h2>
                     <span className="text-xs px-2 py-0.5 bg-slate-700 rounded text-slate-300">
                       {itensCategoria.length} itens
                     </span>
@@ -247,7 +247,7 @@ export default function PrecosPage() {
                               onError={(e) => { e.currentTarget.style.display = 'none' }}
                             />
                             <div>
-                              <p className="font-medium text-white">{item.item_name}</p>
+                              <p className="font-medium text-gray-900">{item.item_name}</p>
                               <p className="text-xs text-gray-500">{item.sellers} vendedores</p>
                             </div>
                           </div>
@@ -272,7 +272,7 @@ export default function PrecosPage() {
               className="w-full p-4 flex items-center justify-between hover:bg-gray-100/50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <h2 className="font-bold text-white">🧬 Runas Somatológicas</h2>
+                <h2 className="font-bold text-gray-900">🧬 Runas Somatológicas</h2>
                 <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded">
                   {filteredRunas.length} runas
                 </span>
@@ -293,7 +293,7 @@ export default function PrecosPage() {
                   {filteredRunas.map(runa => (
                     <div key={runa.runa_id} className="p-3 flex items-center justify-between hover:bg-gray-100/30">
                       <div>
-                        <p className="font-medium text-white text-sm">{runa.runa_name}</p>
+                        <p className="font-medium text-gray-900 text-sm">{runa.runa_name}</p>
                         <p className="text-xs text-gray-500">{runa.sellers} vendedores</p>
                       </div>
                       

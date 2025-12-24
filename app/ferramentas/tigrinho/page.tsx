@@ -560,10 +560,10 @@ export default function CalculadoraPage() {
 
   return (
     <ToolsLayout>
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="min-h-screen bg-gray-50 p-2 md:p-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Calculator className="w-7 h-7 text-purple-600" />
               Calculadora Tigrinho
