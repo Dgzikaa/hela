@@ -503,6 +503,12 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
   const carrysUnicos = new Map<number, any>()
   jogadores.forEach(jogador => {
     jogador.carrys.forEach(carry => {
+      console.log('[DEBUG DISCORD] Carry recebido:', {
+        id: carry.id,
+        cliente: carry.nomeCliente,
+        horario: carry.horario,
+        horarioTipo: typeof carry.horario
+      })
       if (!carrysUnicos.has(carry.id)) {
         carrysUnicos.set(carry.id, carry)
       }
