@@ -552,13 +552,8 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
     console.log('[DEBUG DISCORD] horarioPrincipal:', horarioPrincipal, '| tipo:', typeof horarioPrincipal, '| carries[0]:', JSON.stringify(carries[0]))
     
     // Formatar horário (vem como string "15:00:00" ou "15:00")
-    let horarioFormatado = '21:00' // Padrão
-    if (horarioPrincipal && typeof horarioPrincipal === 'string') {
-      horarioFormatado = horarioPrincipal.substring(0, 5) // Pegar apenas HH:MM
-      console.log('[DEBUG DISCORD] horarioFormatado:', horarioFormatado)
-    } else {
-      console.log('[DEBUG DISCORD] Horário não é string ou está vazio')
-    }
+    let horarioFormatado = '15:00' // TESTE: FORÇADO
+    console.log('[DEBUG DISCORD] FORÇANDO horarioFormatado para 15:00')
 
     if (isAgrupado) {
       // MODO AGRUPADO (2+ carrys)
