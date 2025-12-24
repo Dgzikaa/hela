@@ -24,7 +24,7 @@ interface Participacao {
     id: number
     nomeCliente: string
     valorTotal: number
-    dataCriacao: string
+    createdAt: string
     dataAgendada: string | null
     itens: Array<{
       boss: {
