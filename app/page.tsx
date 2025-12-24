@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { ToolsLayout } from './components/ToolsLayout'
 import { DashboardMetrics } from './components/Dashboard/DashboardMetrics'
 import { CarrysChart } from './components/Dashboard/CarrysChart'
@@ -13,8 +14,15 @@ import { AcoesRapidas } from './components/Dashboard/AcoesRapidas'
 
 export default function HomePage() {
   const { data: session, status } = useSession()
+  const router = useRouter()
   const isLoggedIn = status === 'authenticated'
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
 
   // Dados mockados (TODO: buscar do backend)
   const dadosGrafico = [
@@ -79,7 +87,7 @@ export default function HomePage() {
     setLoading(false)
   }, [])
 
-  if (loading) {
+  if (status === 'loading' || loading) {
     return (
       <ToolsLayout>
         <div className="flex items-center justify-center min-h-screen">
@@ -90,6 +98,10 @@ export default function HomePage() {
         </div>
       </ToolsLayout>
     )
+  }
+
+  if (!session) {
+    return null
   }
 
   return (
