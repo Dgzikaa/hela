@@ -25,31 +25,40 @@ export async function GET(req: Request) {
     const amanha = new Date(hoje)
     amanha.setDate(amanha.getDate() + 1)
 
-    const pedidosHoje = await prisma.pedido.findMany({
-      where: {
-        status: {
-          in: ['AGENDADO', 'EM_ANDAMENTO']
-        },
-        dataAgendada: {
-          gte: hoje,
-          lt: amanha
-        }
-      },
-      include: {
-        itens: {
-          include: {
-            boss: true
-          }
-        },
-        participacoes: {
-          include: {
-            jogador: true
-          }
-        }
-      }
-    })
+    // Buscar pedidos com horário formatado como string
+    const pedidosHoje = await prisma.$queryRaw<Array<any>>`
+      SELECT 
+        p.*,
+        CAST(p.horario AS TEXT) as horario_texto
+      FROM "Pedido" p
+      WHERE p.status IN ('AGENDADO', 'EM_ANDAMENTO')
+        AND p."dataAgendada" >= ${hoje}
+        AND p."dataAgendada" < ${amanha}
+    `
 
-    if (pedidosHoje.length === 0) {
+    // Buscar itens e participações separadamente
+    const pedidosComRelacoes = await Promise.all(
+      pedidosHoje.map(async (pedido) => {
+        const itens = await prisma.itensPedido.findMany({
+          where: { pedidoId: pedido.id },
+          include: { boss: true }
+        })
+        
+        const participacoes = await prisma.participacaoCarry.findMany({
+          where: { pedidoId: pedido.id },
+          include: { jogador: true }
+        })
+
+        return {
+          ...pedido,
+          horario: pedido.horario_texto, // Usar horário como texto
+          itens,
+          participacoes
+        }
+      })
+    )
+
+    if (pedidosComRelacoes.length === 0) {
       return NextResponse.json({
         success: true,
         message: 'Nenhum carry agendado para hoje',
@@ -70,7 +79,7 @@ export async function GET(req: Request) {
       }>
     }>()
 
-    pedidosHoje.forEach(pedido => {
+    pedidosComRelacoes.forEach(pedido => {
       if (!pedido.participacoes || pedido.participacoes.length === 0) return
 
       pedido.participacoes.forEach((participacao: any) => {
@@ -81,36 +90,12 @@ export async function GET(req: Request) {
           })
         }
 
-        // Usar horario do pedido se existir, senão pegar da dataAgendada
+        // Usar horario do pedido (já vem como string "15:00:00")
         let horario = '21:00' // Padrão
-        const horarioDb = (pedido as any).horario
         
-        if (horarioDb) {
-          try {
-            if (typeof horarioDb === 'string') {
-              // Se for string "15:00:00" ou "15:00"
-              horario = horarioDb.substring(0, 5)
-            } else {
-              // Se for Date
-              const dateObj = new Date(horarioDb)
-              horario = dateObj.toLocaleTimeString('pt-BR', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-              })
-            }
-          } catch (e) {
-            console.error('Erro ao formatar horário:', e)
-            horario = '21:00'
-          }
-        } else if (pedido.dataAgendada) {
-          // Fallback: usar hora da dataAgendada
-          const dataObj = new Date(pedido.dataAgendada)
-          horario = dataObj.toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          })
+        if (pedido.horario && typeof pedido.horario === 'string') {
+          // Extrair apenas HH:MM de "15:00:00"
+          horario = pedido.horario.substring(0, 5)
         }
 
         carrysPorJogador.get(participacao.jogadorId)!.carrys.push({
@@ -138,7 +123,7 @@ export async function GET(req: Request) {
       success: true,
       message: `Lembretes enviados para ${jogadoresParaNotificar.length} jogador(es)`,
       jogadores: jogadoresParaNotificar.length,
-      pedidos: pedidosHoje.length
+      pedidos: pedidosComRelacoes.length
     })
   } catch (error: any) {
     console.error('Erro ao enviar lembrete diário:', error)
