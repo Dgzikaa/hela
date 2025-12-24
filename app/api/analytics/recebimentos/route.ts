@@ -48,20 +48,30 @@ export async function GET() {
 
     // Calcular estatísticas por jogador
     const estatisticas = jogadores.map(jogador => {
-      // Carrys concluídos
-      const carrysConcluidos = pedidosConcluidos.filter(p => 
-        p.participacoes.some(part => part.jogadorId === jogador.id)
-      )
+      // Carrys concluídos - verifica se jogador participou OU se carry não tem participações (carrys antigos)
+      const carrysConcluidos = pedidosConcluidos.filter(p => {
+        // Se não tem participações, considerar que todos os 11 participaram
+        if (!p.participacoes || p.participacoes.length === 0) {
+          return true
+        }
+        // Se tem participações, verificar se o jogador está nelas
+        return p.participacoes.some(part => part.jogadorId === jogador.id)
+      })
       
       const valorRecebido = carrysConcluidos.reduce((sum, pedido) => {
         // Dividir valor pelo número de jogadores (11)
         return sum + Math.floor(pedido.valorFinal / 11)
       }, 0)
 
-      // Carrys futuros
-      const carrysFuturos = pedidosAgendados.filter(p => 
-        p.participacoes.some(part => part.jogadorId === jogador.id)
-      )
+      // Carrys futuros - verifica se jogador participou OU se carry não tem participações
+      const carrysFuturos = pedidosAgendados.filter(p => {
+        // Se não tem participações, considerar que todos os 11 participaram
+        if (!p.participacoes || p.participacoes.length === 0) {
+          return true
+        }
+        // Se tem participações, verificar se o jogador está nelas
+        return p.participacoes.some(part => part.jogadorId === jogador.id)
+      })
       
       const valorAReceber = carrysFuturos.reduce((sum, pedido) => {
         // Dividir valor pelo número de jogadores (11)
