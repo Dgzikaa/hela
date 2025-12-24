@@ -59,7 +59,13 @@ export function UserMenu() {
     }
   }
 
-  const menuItems = [
+  const menuItems: Array<{
+    label: string
+    icon: any
+    onClick: () => void
+    show: boolean
+    badge?: string
+  }> = [
     {
       label: 'Meu Perfil',
       icon: User,
