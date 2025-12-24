@@ -384,6 +384,44 @@ export default function MembrosPage() {
                               <option value="SUPLENTE">Suplente (Pode tudo)</option>
                             </select>
                           </div>
+
+                          {/* Campos de Discord */}
+                          <div className="grid grid-cols-1 gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <div>
+                              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                💬 Discord Username:
+                              </label>
+                              <input
+                                type="text"
+                                value={jogadorEditando.discord || ''}
+                                onChange={(e) => setJogadorEditando({
+                                  ...jogadorEditando,
+                                  discord: e.target.value
+                                })}
+                                placeholder="Ex: supaturk"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                                🆔 Discord ID (para menções):
+                              </label>
+                              <input
+                                type="text"
+                                value={jogadorEditando.discordId || ''}
+                                onChange={(e) => setJogadorEditando({
+                                  ...jogadorEditando,
+                                  discordId: e.target.value
+                                })}
+                                placeholder="Ex: 123456789012345678"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                ℹ️ Para obter: Ative "Modo desenvolvedor" no Discord, clique com botão direito no usuário → "Copiar ID"
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )
@@ -421,6 +459,18 @@ export default function MembrosPage() {
                               <span>•</span>
                               <span>{conquistasConcluidas}/7 conquistas</span>
                             </div>
+                            {(jogador.discord || jogador.discordId) && (
+                              <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                <span>💬</span>
+                                {jogador.discord && <span>{jogador.discord}</span>}
+                                {jogador.discordId && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="font-mono">ID: {jogador.discordId.substring(0, 8)}...</span>
+                                  </>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </button>
                         <div className="flex items-center gap-2">
