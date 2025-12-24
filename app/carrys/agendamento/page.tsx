@@ -753,17 +753,32 @@ export default function PedidosPage() {
                       <Calendar className="w-4 h-4" />
                       <span>
                         {pedido.dataAgendada 
-                          ? new Date(pedido.dataAgendada).toLocaleString('pt-BR', {
+                          ? new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
                               weekday: 'long',
                               day: '2-digit',
                               month: '2-digit',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
+                              year: 'numeric'
                             })
                           : 'Não agendado'}
                       </span>
                     </div>
+                    {pedido.horario && (
+                      <div className="flex items-center gap-2 ml-4">
+                        <Clock className="w-4 h-4" />
+                        <span>
+                          {(() => {
+                            try {
+                              const horarioStr = typeof pedido.horario === 'string' 
+                                ? pedido.horario 
+                                : String(pedido.horario)
+                              return horarioStr.substring(0, 5)
+                            } catch (e) {
+                              return '21:00'
+                            }
+                          })()}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-3">
@@ -1840,7 +1855,24 @@ export default function PedidosPage() {
                   </div>
                   {pedidoParaCancelar.dataAgendada && (
                     <div className="text-gray-400 text-sm mt-2">
-                      📅 Agendado para: {new Date(pedidoParaCancelar.dataAgendada).toLocaleString('pt-BR')}
+                      📅 Agendado para: {new Date(pedidoParaCancelar.dataAgendada).toLocaleDateString('pt-BR', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })}
+                      {pedidoParaCancelar.horario && ` às ${
+                        (() => {
+                          try {
+                            const horarioStr = typeof pedidoParaCancelar.horario === 'string' 
+                              ? pedidoParaCancelar.horario 
+                              : String(pedidoParaCancelar.horario)
+                            return horarioStr.substring(0, 5)
+                          } catch (e) {
+                            return '21:00'
+                          }
+                        })()
+                      }`}
                     </div>
                   )}
                 </div>
