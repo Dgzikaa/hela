@@ -114,7 +114,7 @@ export function CarryAgrupado({
           {/* Informações */}
           <div className="flex-1 space-y-3">
             <div className="flex items-center gap-3 flex-wrap">
-              <h3 className="text-xl font-bold text-white">{carry.nomeCliente}</h3>
+              <h3 className="text-xl font-bold text-gray-900">{carry.nomeCliente}</h3>
               <Badge variant={getStatusColor(carry.status) as any}>
                 {carry.status}
               </Badge>
@@ -126,7 +126,7 @@ export function CarryAgrupado({
 
             {/* Data e Horário */}
             {carry.dataAgendada && (
-              <div className="flex items-center gap-4 text-sm text-gray-400">
+              <div className="flex items-center gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {dataFormatada}
@@ -144,10 +144,10 @@ export function CarryAgrupado({
             )}
 
             {/* Valor */}
-            <div className="flex items-center gap-2 text-lg font-semibold text-green-400">
+            <div className="flex items-center gap-2 text-lg font-semibold text-green-600">
               <DollarSign className="w-5 h-5" />
               {(carry.valorFinal / 1000).toFixed(1)}b
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-600">
                 ({carry.valorFinal}kk) • {valorPorJogador}kk/jogador
               </span>
             </div>
@@ -181,14 +181,14 @@ export function CarryAgrupado({
 
   // Renderizar carrys agrupados
   return (
-    <Card className="border-2 border-purple-500 bg-gradient-to-r from-purple-900/10 to-pink-900/10">
+    <Card className="border-2 border-purple-500 bg-white">
       {/* Header do Agrupamento */}
-      <div className="mb-4 pb-4 border-b border-gray-700">
+      <div className="mb-4 pb-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                <Calendar className="w-6 h-6 text-purple-400" />
+              <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <Calendar className="w-6 h-6 text-purple-600" />
                 {dataFormatada}
               </h3>
               <Badge variant="warning" className="text-lg px-3 py-1">
@@ -198,7 +198,7 @@ export function CarryAgrupado({
 
             <div className="flex items-center gap-6 text-sm">
               {/* Horários */}
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-gray-600">
                 <Clock className="w-4 h-4" />
                 {carrys.map(c => c.horario ? 
                   new Date(`2000-01-01T${c.horario}`).toLocaleTimeString('pt-BR', {
@@ -209,7 +209,7 @@ export function CarryAgrupado({
               </div>
 
               {/* Jogadores */}
-              <div className="flex items-center gap-2 text-purple-400 font-semibold">
+              <div className="flex items-center gap-2 text-purple-600 font-semibold">
                 <Users className="w-4 h-4" />
                 {numJogadores} jogadores {isAgrupado && '(SEM Pablo)'}
               </div>
@@ -218,11 +218,11 @@ export function CarryAgrupado({
 
           {/* Valor Total */}
           <div className="text-right">
-            <div className="text-sm text-gray-400 mb-1">Valor Total</div>
-            <div className="text-3xl font-bold text-green-400">
+            <div className="text-sm text-gray-600 mb-1">Valor Total</div>
+            <div className="text-3xl font-bold text-green-600">
               {(valorTotalAgrupado / 1000).toFixed(1)}b
             </div>
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-gray-600">
               {valorPorJogador}kk por jogador
             </div>
           </div>
@@ -234,13 +234,13 @@ export function CarryAgrupado({
         {carrys.map((carry, index) => (
           <div 
             key={carry.id}
-            className="p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-all border border-gray-700"
+            className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all border border-gray-200"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl font-bold text-purple-400">#{index + 1}</span>
-                  <h4 className="text-lg font-bold text-white">{carry.nomeCliente}</h4>
+                  <span className="text-2xl font-bold text-purple-600">#{index + 1}</span>
+                  <h4 className="text-lg font-bold text-gray-900">{carry.nomeCliente}</h4>
                   <Badge variant={getStatusColor(carry.status) as any}>
                     {carry.status}
                   </Badge>
@@ -249,7 +249,7 @@ export function CarryAgrupado({
 
                 <div className="flex items-center gap-4 text-sm">
                   {carry.horario && (
-                    <div className="flex items-center gap-2 text-gray-400">
+                    <div className="flex items-center gap-2 text-gray-600">
                       <Clock className="w-4 h-4" />
                       {new Date(`2000-01-01T${carry.horario}`).toLocaleTimeString('pt-BR', {
                         hour: '2-digit',
@@ -257,7 +257,7 @@ export function CarryAgrupado({
                       })}
                     </div>
                   )}
-                  <div className="text-green-400 font-semibold">
+                  <div className="text-green-600 font-semibold">
                     {(carry.valorFinal / 1000).toFixed(1)}b ({carry.valorFinal}kk)
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export function CarryAgrupado({
 
       {/* Ações do Grupo */}
       {statusComum !== 'MISTO' && (
-        <div className="mt-4 pt-4 border-t border-gray-700 flex gap-3">
+        <div className="mt-4 pt-4 border-t border-gray-200 flex gap-3">
           {statusComum === 'AGENDADO' && (
             <Button
               variant="primary"
