@@ -11,7 +11,6 @@ import {
   Trash2,
   TrendingUp,
   Dices,
-  Gift,
   BarChart3,
   Flame,
   Home,
@@ -52,13 +51,12 @@ const menuCategories: MenuCategory[] = [
       { name: 'Agendamento', href: '/carrys/agendamento', icon: Calendar, isAdmin: true },
       { name: 'Resumo', href: '/carrys/resumo', icon: Wallet, isAdmin: true },
       { name: 'Calendário', href: '/carrys/calendario', icon: CalendarRange, isAdmin: true },
-      { name: 'Carry Grátis', href: '/carrys/carry-gratis', icon: Gift, isAdmin: true },
     ]
   },
   {
     name: 'Ferramentas',
     items: [
-      { name: 'CRM', href: '/ferramentas/crm', icon: BarChart3, isAdmin: true },
+      // { name: 'CRM', href: '/ferramentas/crm', icon: BarChart3, isAdmin: true }, // Oculto temporariamente
       { name: 'Tigrinho', href: '/ferramentas/tigrinho', icon: Dices },
       { name: 'Preços', href: '/ferramentas/precos', icon: LineChart },
     ]
