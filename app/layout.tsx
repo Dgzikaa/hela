@@ -5,6 +5,7 @@ import { PreferencesProvider } from './contexts/PreferencesContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
 import { PriceAlertsProvider } from './contexts/PriceAlertsContext';
 import { AvailabilityProvider } from './contexts/AvailabilityContext';
+import { RemindersProvider } from './contexts/RemindersContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,7 +57,9 @@ export default function RootLayout({
           <NotificationsProvider>
             <PriceAlertsProvider>
               <AvailabilityProvider>
-                {children}
+                <RemindersProvider>
+                  {children}
+                </RemindersProvider>
               </AvailabilityProvider>
             </PriceAlertsProvider>
           </NotificationsProvider>
