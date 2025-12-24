@@ -70,15 +70,14 @@ export async function POST(request: Request) {
             update: {
               discordUsername: cliente.discordUsername,
               nickIngame: cliente.nickIngame,
-              nome: cliente.nome,
-              contato: cliente.contato
+              nome: cliente.nome
             },
             create: {
               id: cliente.id,
+              discordUserId: cliente.discordUserId || `user_${cliente.id}`,
               discordUsername: cliente.discordUsername,
               nickIngame: cliente.nickIngame,
-              nome: cliente.nome,
-              contato: cliente.contato
+              nome: cliente.nome
             }
           })
           results.clientes++
