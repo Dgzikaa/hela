@@ -34,7 +34,7 @@ export default function CalendarioPage() {
   const [pedidos, setPedidos] = useState<Pedido[]>([])
   const [loading, setLoading] = useState(true)
   const [pedidoSelecionado, setPedidoSelecionado] = useState<Pedido | null>(null)
-  const { showToast } = useToast()
+  const { success, error } = useToast()
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -53,7 +53,7 @@ export default function CalendarioPage() {
       }
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error)
-      showToast('Erro ao carregar carrys', 'error')
+      error('Erro ao carregar carrys')
     } finally {
       setLoading(false)
     }
@@ -113,10 +113,10 @@ export default function CalendarioPage() {
       })
 
       if (res.ok) {
-        showToast('Carry reagendado com sucesso!', 'success')
+        success('Carry reagendado com sucesso!')
         await carregarPedidos()
       } else {
-        showToast('Erro ao reagendar carry', 'error')
+        error('Erro ao reagendar carry')
       }
     } catch (error) {
       console.error('Erro ao reagendar:', error)

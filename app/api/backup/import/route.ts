@@ -95,14 +95,18 @@ export async function POST(request: Request) {
             where: { id: boss.id },
             update: {
               nome: boss.nome,
-              valorHela: boss.valorHela,
-              valorPago: boss.valorPago
+              mobId: boss.mobId,
+              ordem: boss.ordem,
+              preco: boss.preco,
+              imagemUrl: boss.imagemUrl
             },
             create: {
               id: boss.id,
               nome: boss.nome,
-              valorHela: boss.valorHela,
-              valorPago: boss.valorPago
+              mobId: boss.mobId,
+              ordem: boss.ordem,
+              preco: boss.preco,
+              imagemUrl: boss.imagemUrl
             }
           })
           results.bosses++
