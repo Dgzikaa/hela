@@ -140,8 +140,8 @@ export default function PrecosPage() {
 
   return (
     <ToolsLayout>
-      <div className="min-h-screen bg-gray-50 p-2 md:p-4">
-        <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-gray-50 p-3 md:p-4">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>

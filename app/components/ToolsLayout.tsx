@@ -14,7 +14,7 @@ export function ToolsLayout({ children }: ToolsLayoutProps) {
       <div className="flex min-h-screen bg-gray-50">
         <AppSidebar defaultCollapsed={true} />
         <TopBar />
-        <main className="flex-1 min-h-screen pt-16">
+        <main className="flex-1 min-h-screen pt-14">
           {children}
         </main>
       </div>

@@ -28,7 +28,7 @@ export function TopBar() {
   }, [])
 
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-16 h-16 bg-white border-b border-gray-200 z-40 px-4 md:px-8">
+    <header className="fixed top-0 right-0 left-0 lg:left-16 h-14 bg-white border-b border-gray-200 z-40 px-3 md:px-6">
       <div className="h-full flex items-center justify-between">
         {/* Logo Mobile (aparece só em mobile) */}
         <div className="lg:hidden flex items-center gap-3">

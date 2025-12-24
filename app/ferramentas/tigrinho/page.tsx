@@ -560,10 +560,10 @@ export default function CalculadoraPage() {
 
   return (
     <ToolsLayout>
-      <div className="min-h-screen bg-gray-50 p-2 md:p-4">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-gray-50 p-3 md:p-4">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-4">
+          <div className="mb-3">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Calculator className="w-7 h-7 text-purple-600" />
               Calculadora Tigrinho
@@ -572,7 +572,7 @@ export default function CalculadoraPage() {
           </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-4">
           <button
             onClick={() => setActiveTab('expedicao')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
@@ -595,7 +595,7 @@ export default function CalculadoraPage() {
 
         {/* EXPEDIÇÃO */}
         {activeTab === 'expedicao' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Tesouros de Expedição</h2>
@@ -681,12 +681,12 @@ export default function CalculadoraPage() {
                   const vale = lucroGarantido >= 0
                   
                   return (
-                    <div key={count} className={`bg-slate-900/50 rounded-lg p-4 border ${
+                    <div key={count} className={`bg-slate-900/50 rounded-lg p-3 border ${
                       vale ? 'border-emerald-500/30' : 'border-red-500/30'
                     }`}>
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-xl font-bold text-gray-900">{count}x Tiros</span>
-                        <span className={`text-xs px-2 py-1 rounded font-medium ${
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-lg font-bold text-gray-900">{count}x Tiros</span>
+                        <span className={`text-xs px-2 py-0.5 rounded font-medium ${
                           vale ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                         }`}>
                           {vale ? '✓ Vale a pena' : '✗ Prejuízo'}
@@ -694,7 +694,7 @@ export default function CalculadoraPage() {
                       </div>
                       
                       {/* Investimento */}
-                      <div className="bg-white border border-gray-200/50 rounded p-2 mb-3">
+                      <div className="bg-white border border-gray-200/50 rounded p-2 mb-2">
                         <div className="text-xs text-gray-500">💰 Investimento</div>
                         <div className="text-lg font-bold text-gray-900">{formatZeny(sim.totalCost)}</div>
                       </div>
