@@ -6,7 +6,7 @@ import { calcularDivisaoPagamento } from '@/lib/payment-calculator'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const pedidoId = parseInt(params.id)
+    const resolvedParams = await params
+    const pedidoId = parseInt(resolvedParams.id)
     const body = await request.json()
     
     const { 
