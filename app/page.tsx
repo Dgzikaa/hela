@@ -1,23 +1,16 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
-  const { status } = useSession()
   const router = useRouter()
 
   useEffect(() => {
-    if (status === 'loading') return
-    
-    if (status === 'unauthenticated') {
-      router.replace('/login')
-    } else if (status === 'authenticated') {
-      router.replace('/admin')
-    }
-  }, [status, router])
-
+    // Redireciona SEMPRE para /login
+    // O /login já verifica se o usuário está logado e redireciona para /admin
+    router.replace('/login')
+  }, [router])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
