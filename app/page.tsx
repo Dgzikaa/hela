@@ -1,262 +1,140 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { 
-  Calculator, 
-  TrendingUp, 
-  Flame, 
-  Sword, 
-  Gift, 
-  Dices,
-  Calendar,
-  Clock,
-  ArrowRight,
-  BarChart3,
-  Wallet
-} from 'lucide-react'
-import { Card } from './components/Card'
+import { useSession } from 'next-auth/react'
 import { ToolsLayout } from './components/ToolsLayout'
+import { DashboardMetrics } from './components/Dashboard/DashboardMetrics'
+import { CarrysChart } from './components/Dashboard/CarrysChart'
+import { AtividadesRecentes } from './components/Dashboard/AtividadesRecentes'
+import { TopJogadores } from './components/Dashboard/TopJogadores'
+import { MetasProgress } from './components/Dashboard/MetasProgress'
+import { AcoesRapidas } from './components/Dashboard/AcoesRapidas'
 
-// Supabase config
-const SUPABASE_URL = 'https://mqovddsgksbyuptnketl.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xb3ZkZHNna3NieXVwdG5rZXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzU5NTksImV4cCI6MjA3ODk1MTk1OX0.wkx2__g4rFmEoiBiF-S85txtaQXK1RTDztgC3vSexp4'
-
-const formatZeny = (value: number): string => {
-  if (value >= 1000000000) return (value / 1000000000).toFixed(2) + 'B'
-  if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
-  if (value >= 1000) return Math.round(value / 1000) + 'K'
-  return value.toLocaleString('pt-BR')
-}
-
-interface MarketPrice {
-  item_key: string
-  item_name: string
-  price: number
-  updated_at: string
-}
-
-// Ferramentas disponíveis
-const FERRAMENTAS = [
-  {
-    id: 'calculadora',
-    nome: 'Calculadora Tigrinho',
-    descricao: 'Simule tiradas de Expedição e Somatologia',
-    icone: Dices,
-    href: '/calculadora',
-    cor: 'purple'
-  },
-  {
-    id: 'farm',
-    nome: 'Calculadora de Farm',
-    descricao: 'Compare lucro/hora dos conteúdos',
-    icone: Flame,
-    href: '/farm',
-    cor: 'emerald'
-  },
-  {
-    id: 'agenda',
-    nome: 'Agenda de Farm',
-    descricao: 'Registre e acompanhe seu farm diário',
-    icone: Calendar,
-    href: '/agenda',
-    cor: 'blue'
-  },
-  {
-    id: 'precos',
-    nome: 'Preços do Mercado',
-    descricao: 'Preços atualizados do RagnaTales',
-    icone: TrendingUp,
-    href: '/precos',
-    cor: 'cyan'
-  },
-  {
-    id: 'dano',
-    nome: 'Calculadora de Dano',
-    descricao: 'Estime seu dano físico e mágico',
-    icone: Sword,
-    href: '/dano',
-    cor: 'red'
-  },
-  {
-    id: 'carry',
-    nome: 'Carry Grátis',
-    descricao: 'Participe do sorteio semanal',
-    icone: Gift,
-    href: '/carry-gratis',
-    cor: 'amber'
-  },
-]
-
-const getCorClasse = (cor: string) => {
-  const cores: Record<string, string> = {
-    purple: 'bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white',
-    emerald: 'bg-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white',
-    blue: 'bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white',
-    cyan: 'bg-cyan-100 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white',
-    red: 'bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white',
-    amber: 'bg-amber-100 text-amber-600 group-hover:bg-amber-600 group-hover:text-white',
-  }
-  return cores[cor] || cores.purple
-}
 
 export default function HomePage() {
-  const [prices, setPrices] = useState<MarketPrice[]>([])
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const { data: session, status } = useSession()
+  const isLoggedIn = status === 'authenticated'
   const [loading, setLoading] = useState(true)
 
+  // Dados mockados (TODO: buscar do backend)
+  const dadosGrafico = [
+    { mes: 'Jul', carrys: 15, receita: 1.2 },
+    { mes: 'Ago', carrys: 22, receita: 1.8 },
+    { mes: 'Set', carrys: 28, receita: 2.3 },
+    { mes: 'Out', carrys: 32, receita: 2.7 },
+    { mes: 'Nov', carrys: 38, receita: 3.2 },
+    { mes: 'Dez', carrys: 42, receita: 3.6 },
+  ]
+
+  const atividades = [
+    {
+      id: 1,
+      tipo: 'concluido' as const,
+      titulo: 'Carry Hela concluído',
+      descricao: 'Cliente: João Silva',
+      tempo: '2h atrás',
+      valor: 850
+    },
+    {
+      id: 2,
+      tipo: 'carry' as const,
+      titulo: 'Novo carry agendado',
+      descricao: 'Bosses 1-6 para amanhã às 20h',
+      tempo: '5h atrás'
+    },
+    {
+      id: 3,
+      tipo: 'pagamento' as const,
+      titulo: 'Pagamento processado',
+      descricao: '12 jogadores receberam',
+      tempo: '1 dia atrás',
+      valor: 1020
+    },
+    {
+      id: 4,
+      tipo: 'jogador' as const,
+      titulo: 'Novo membro adicionado',
+      descricao: 'PlayerX entrou no time CARRYS',
+      tempo: '2 dias atrás'
+    },
+  ]
+
+  const topJogadores = [
+    { id: 1, nome: 'Supaturk', carrys: 12, ganhos: 1020, posicao: 1 },
+    { id: 2, nome: 'Isami', carrys: 12, ganhos: 1020, posicao: 2 },
+    { id: 3, nome: 'PlayerX', carrys: 10, ganhos: 850, posicao: 3 },
+    { id: 4, nome: 'PlayerY', carrys: 8, ganhos: 680, posicao: 4 },
+    { id: 5, nome: 'PlayerZ', carrys: 7, ganhos: 595, posicao: 5 },
+  ]
+
+  const metas = [
+    { id: 1, titulo: 'Carrys do Mês', atual: 42, objetivo: 50, unidade: 'carrys', cor: 'purple' as const },
+    { id: 2, titulo: 'Receita Mensal', atual: 3.6, objetivo: 4.0, unidade: 'b', cor: 'green' as const },
+    { id: 3, titulo: 'Novos Clientes', atual: 18, objetivo: 20, unidade: 'clientes', cor: 'blue' as const },
+    { id: 4, titulo: 'Taxa de Conclusão', atual: 95, objetivo: 100, unidade: '%', cor: 'orange' as const },
+  ]
+
   useEffect(() => {
-    fetchPrices()
+    // TODO: Buscar dados reais do backend
+    setLoading(false)
   }, [])
 
-  const fetchPrices = async () => {
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/market_prices?select=item_key,item_name,price,updated_at&order=updated_at.desc&limit=6`, {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setPrices(data)
-        if (data.length > 0) {
-          setLastUpdate(new Date(data[0].updated_at))
-        }
-      }
-    } catch (err) {
-      console.error('Erro ao buscar preços:', err)
-    } finally {
-      setLoading(false)
-    }
+  if (loading) {
+    return (
+      <ToolsLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando dashboard...</p>
+          </div>
+        </div>
+      </ToolsLayout>
+    )
   }
 
   return (
     <ToolsLayout>
       <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-6">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Hela Tools
+              {isLoggedIn ? '👋 Bem-vindo de volta!' : '🎮 Hela Carrys'}
             </h1>
-            <p className="text-gray-500 mt-1">Ferramentas para RagnaTales</p>
+            <p className="text-gray-600 mt-1">
+              {isLoggedIn ? 'Confira o resumo de hoje' : 'Sistema de Gestão de Carrys RagnaTales'}
+            </p>
           </div>
 
-          {/* Resumo rápido */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
-            <Card className="p-4 bg-white border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Clock className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Última atualização</p>
-                  <p className="font-medium text-gray-900">
-                    {lastUpdate ? lastUpdate.toLocaleString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : 'Carregando...'}
-                  </p>
-                </div>
-              </div>
-            </Card>
+          {/* Métricas Principais */}
+          <DashboardMetrics
+            totalCarrys={42}
+            totalReceita={3600}
+            jogadoresAtivos={14}
+            proximosCarrys={8}
+            changes={{
+              carrys: 12,
+              receita: 8,
+              jogadores: 0
+            }}
+          />
 
-            <Card className="p-4 bg-white border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-100 rounded-lg">
-                  <BarChart3 className="w-5 h-5 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Itens monitorados</p>
-                  <p className="font-medium text-gray-900">
-                    {loading ? '...' : `${prices.length}+ itens`}
-                  </p>
-                </div>
-              </div>
-            </Card>
+          {/* Ações Rápidas */}
+          {isLoggedIn && <AcoesRapidas />}
 
-            <Card className="p-4 bg-white border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Wallet className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Agenda de Farm</p>
-                  <p className="font-medium text-gray-900">
-                    Em breve
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Ferramentas */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Ferramentas</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {FERRAMENTAS.map((ferramenta) => {
-              const Icon = ferramenta.icone
-              return (
-                <Link key={ferramenta.id} href={ferramenta.href}>
-                  <Card className="p-4 bg-white border-gray-200 shadow-sm hover:shadow-md transition-all group cursor-pointer h-full">
-                    <div className="flex items-start gap-4">
-                      <div className={`p-3 rounded-xl transition-colors ${getCorClasse(ferramenta.cor)}`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-                          {ferramenta.nome}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {ferramenta.descricao}
-                        </p>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </Card>
-                </Link>
-              )
-            })}
-          </div>
-
-          {/* Preços recentes */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Preços Recentes</h2>
-          <Card className="p-4 bg-white border-gray-200 shadow-sm">
-            {loading ? (
-              <div className="text-center py-8 text-gray-500">Carregando preços...</div>
-            ) : prices.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                Nenhum preço disponível. Clique em "Atualizar" na Calculadora Tigrinho.
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {prices.slice(0, 6).map((item) => (
-                  <div key={item.item_key} className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500 truncate" title={item.item_name}>
-                      {item.item_name.replace('Pó de Meteorita ', '').replace('Pó ', '')}
-                    </p>
-                    <p className="font-semibold text-gray-900 mt-1">
-                      {formatZeny(item.price)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="mt-4 text-center">
-              <Link 
-                href="/precos" 
-                className="text-sm text-purple-600 hover:text-purple-700 font-medium inline-flex items-center gap-1"
-              >
-                Ver todos os preços <ArrowRight className="w-4 h-4" />
-              </Link>
+          {/* Grid Principal */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Coluna Esquerda - 2/3 */}
+            <div className="lg:col-span-2 space-y-6">
+              <CarrysChart data={dadosGrafico} />
+              <AtividadesRecentes atividades={atividades} />
             </div>
-          </Card>
 
-          {/* Footer */}
-          <div className="mt-8 text-center text-sm text-gray-400">
-            <p>Hela Tools • RagnaTales</p>
+            {/* Coluna Direita - 1/3 */}
+            <div className="space-y-6">
+              <TopJogadores jogadores={topJogadores} periodo="mes" />
+              <MetasProgress metas={metas} />
+            </div>
           </div>
         </div>
       </div>
