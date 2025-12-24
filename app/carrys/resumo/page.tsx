@@ -1,485 +1,279 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { TrendingUp, DollarSign, Calendar, Users, Wallet, Target } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Calendar,
+  Target,
+  Users,
+  DollarSign,
+  AlertCircle,
+  Lightbulb,
+  Activity
+} from 'lucide-react'
 
-interface Jogador {
-  id: number
-  nick: string
-  categorias: string
-  totalCarrys: number
-  totalGanho: number
-  ativo: boolean
-  essencial: boolean
+interface AnaliseD emanda {
+  demandaPorBoss: Record<string, {
+    total: number
+    tendencia: 'crescente' | 'estavel' | 'decrescente'
+    mediaUltimos7Dias: number
+    mediaUltimos30Dias: number
+  }>
+  horariosPico: number[]
+  diaComMaisDemanda: {
+    dia: string
+    quantidade: number
+  }
+  previsaoProximos7Dias: number
+  totalPedidosUltimos90Dias: number
+  mediaDiaria: string
 }
 
-interface Pedido {
-  id: number
-  nomeCliente: string
-  status: string
-  dataAgendada: string | null
-  valorTotal: number
-  participacoes: {
-    jogadorId: number
-    jogador: {
-      id: number
-      nick: string
-    }
-    valorRecebido: number
-    pago: boolean
-  }[]
-}
-
-interface ProjecaoJogador {
-  jogador: Jogador
-  ganhosConcluidos: number // Já recebeu (pedidos concluídos)
-  projecaoTotal: number // Vai receber (pedidos agendados)
-  projecaoSemana: number // Projeção próximos 7 dias
-  projecaoMes: number // Projeção próximos 30 dias
-  carrysAgendados: number
-  carrysConcluidos: number
-}
-
-export default function ProjecaoPage() {
-  const [jogadores, setJogadores] = useState<Jogador[]>([])
-  const [pedidos, setPedidos] = useState<Pedido[]>([])
-  const [projecoes, setProjecoes] = useState<ProjecaoJogador[]>([])
+export default function ResumoPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [analise, setAnalise] = useState<AnaliseDemanda | null>(null)
   const [loading, setLoading] = useState(true)
-  const [filtroCategoria, setFiltroCategoria] = useState<string>('TODOS')
-  const [taxaConversao, setTaxaConversao] = useState<number>(0.35) // 1kk = 0.35 reais
-  const [mostrarEmReais, setMostrarEmReais] = useState<boolean>(false)
 
   useEffect(() => {
-    fetchData()
-    // Carregar taxa salva do localStorage
-    const taxaSalva = localStorage.getItem('taxaConversaoKK')
-    if (taxaSalva) {
-      setTaxaConversao(parseFloat(taxaSalva))
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    } else if (status === 'authenticated') {
+      carregarAnalise()
     }
-  }, [])
+  }, [status, router])
 
-  useEffect(() => {
-    if (jogadores.length > 0 && pedidos.length > 0) {
-      calcularProjecoes()
-    }
-  }, [jogadores, pedidos])
-
-  const fetchData = async () => {
+  const carregarAnalise = async () => {
     try {
-      const [jogadoresRes, pedidosRes] = await Promise.all([
-        fetch('/api/jogadores'),
-        fetch('/api/pedidos')
-      ])
-
-      if (jogadoresRes.ok && pedidosRes.ok) {
-        const jogadoresData = await jogadoresRes.json()
-        const pedidosData = await pedidosRes.json()
-        
-        setJogadores(jogadoresData.filter((j: Jogador) => j.ativo))
-        setPedidos(pedidosData)
+      const res = await fetch('/api/analytics/demanda')
+      if (res.ok) {
+        const data = await res.json()
+        setAnalise(data)
       }
     } catch (error) {
-      console.error('Erro ao buscar dados:', error)
+      console.error('Erro ao carregar análise:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const calcularProjecoes = () => {
-    const hoje = new Date()
-    const umaSemana = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000)
-    const umMes = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000)
-
-    const projecoesCalculadas: ProjecaoJogador[] = jogadores.map(jogador => {
-      // Pedidos concluídos (já recebeu)
-      const pedidosConcluidos = pedidos.filter(p => 
-        p.status === 'CONCLUIDO' && 
-        p.participacoes && 
-        p.participacoes.some(part => part.jogadorId === jogador.id)
-      )
-
-      const ganhosConcluidos = pedidosConcluidos.reduce((total, pedido) => {
-        const participacao = pedido.participacoes?.find(p => p.jogadorId === jogador.id)
-        return total + (participacao?.valorRecebido || 0)
-      }, 0)
-
-      // Pedidos agendados (vai receber)
-      const pedidosAgendados = pedidos.filter(p => 
-        ['PENDENTE', 'APROVADO', 'AGENDADO', 'EM_ANDAMENTO'].includes(p.status) &&
-        p.participacoes && 
-        p.participacoes.some(part => part.jogadorId === jogador.id)
-      )
-
-      const projecaoTotal = pedidosAgendados.reduce((total, pedido) => {
-        const numParticipantes = pedido.participacoes?.length || 0
-        const valorPorJogador = numParticipantes > 0 ? Math.floor(pedido.valorTotal / numParticipantes) : 0
-        return total + valorPorJogador
-      }, 0)
-
-      // Projeção próxima semana
-      const pedidosSemana = pedidosAgendados.filter(p => {
-        if (!p.dataAgendada) return false
-        const data = new Date(p.dataAgendada)
-        return data >= hoje && data <= umaSemana
-      })
-
-      const projecaoSemana = pedidosSemana.reduce((total, pedido) => {
-        const numParticipantes = pedido.participacoes?.length || 0
-        const valorPorJogador = numParticipantes > 0 ? Math.floor(pedido.valorTotal / numParticipantes) : 0
-        return total + valorPorJogador
-      }, 0)
-
-      // Projeção próximo mês
-      const pedidosMes = pedidosAgendados.filter(p => {
-        if (!p.dataAgendada) return false
-        const data = new Date(p.dataAgendada)
-        return data >= hoje && data <= umMes
-      })
-
-      const projecaoMes = pedidosMes.reduce((total, pedido) => {
-        const numParticipantes = pedido.participacoes?.length || 0
-        const valorPorJogador = numParticipantes > 0 ? Math.floor(pedido.valorTotal / numParticipantes) : 0
-        return total + valorPorJogador
-      }, 0)
-
-      return {
-        jogador,
-        ganhosConcluidos,
-        projecaoTotal,
-        projecaoSemana,
-        projecaoMes,
-        carrysAgendados: pedidosAgendados.length,
-        carrysConcluidos: pedidosConcluidos.length
-      }
-    })
-
-    // Ordenar por projeção total (maior primeiro)
-    projecoesCalculadas.sort((a, b) => b.projecaoTotal - a.projecaoTotal)
-    setProjecoes(projecoesCalculadas)
-  }
-
-  const formatarValor = (valor: number): string => {
-    if (valor === 0) return '0'
-    if (valor >= 1000) {
-      const bilhoes = (valor / 1000).toFixed(1)
-      return `${bilhoes}b`
+  const getTendenciaIcon = (tendencia: string) => {
+    switch (tendencia) {
+      case 'crescente':
+        return <TrendingUp className="w-4 h-4 text-green-600" />
+      case 'decrescente':
+        return <TrendingDown className="w-4 h-4 text-red-600" />
+      default:
+        return <Activity className="w-4 h-4 text-gray-600" />
     }
-    return `${valor}kk`
   }
 
-  const formatarValorReais = (valorKK: number): string => {
-    const valorReais = valorKK * taxaConversao
-    return valorReais.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    })
+  const getTendenciaColor = (tendencia: string) => {
+    switch (tendencia) {
+      case 'crescente':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+      case 'decrescente':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    }
   }
 
-  const salvarTaxaConversao = (novaTaxa: number) => {
-    setTaxaConversao(novaTaxa)
-    localStorage.setItem('taxaConversaoKK', novaTaxa.toString())
-  }
-
-  const getCategoriaColor = (categorias: string) => {
-    if (categorias.includes('HELA')) return 'bg-purple-600'
-    if (categorias.includes('CARRYS')) return 'bg-blue-600'
-    if (categorias.includes('SUPLENTE')) return 'bg-yellow-600'
-    return 'bg-gray-600'
-  }
-
-  const getCategoriaLabel = (categorias: string) => {
-    const cats = categorias.split(',')
-    if (cats.includes('HELA') && cats.includes('CARRYS')) return 'HELA + CARRYS'
-    if (cats.includes('HELA')) return 'HELA'
-    if (cats.includes('CARRYS')) return 'CARRYS'
-    if (cats.includes('SUPLENTE')) return 'SUPLENTE'
-    return categorias
-  }
-
-  // Filtrar por categoria
-  const projecoesFiltradas = filtroCategoria === 'TODOS' 
-    ? projecoes 
-    : projecoes.filter(p => p.jogador.categorias.includes(filtroCategoria))
-
-  // Estatísticas gerais
-  const totalGanhosConcluidos = projecoes.reduce((acc, p) => acc + p.ganhosConcluidos, 0)
-  const totalProjecao = projecoes.reduce((acc, p) => acc + p.projecaoTotal, 0)
-  const totalProjecaoSemana = projecoes.reduce((acc, p) => acc + p.projecaoSemana, 0)
-  const totalProjecaoMes = projecoes.reduce((acc, p) => acc + p.projecaoMes, 0)
-
-  if (loading) {
+  if (status === 'loading' || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-gray-400">Carregando...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Analisando demanda...</p>
+        </div>
       </div>
     )
   }
 
+  if (!analise) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Erro ao carregar análise</p>
+        </div>
+      </div>
+    )
+  }
+
+  const topBosses = Object.entries(analise.demandaPorBoss)
+    .sort(([,a], [,b]) => b.total - a.total)
+    .slice(0, 10)
+
   return (
-    <div className="p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">📊 Projeção de Ganhos</h1>
-              <p className="text-gray-600">Acompanhe os ganhos realizados e projetados de cada jogador</p>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-white" />
             </div>
-            
-            {/* Configuração de Taxa de Conversão */}
-            <div className="bg-white p-4 rounded-lg border-2 border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div>
-                  <label className="text-xs text-gray-600 font-semibold mb-1 block">
-                    💱 Taxa de Conversão
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">1kk =</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={taxaConversao}
-                      onChange={(e) => salvarTaxaConversao(parseFloat(e.target.value) || 0)}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm font-semibold"
-                    />
-                    <span className="text-sm text-gray-600">reais</span>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    1b = R$ {(taxaConversao * 1000).toFixed(2)}
-                  </div>
-                </div>
-                
-                <div className="border-l border-gray-300 pl-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={mostrarEmReais}
-                      onChange={(e) => setMostrarEmReais(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm font-semibold text-gray-700">Mostrar em R$</span>
-                  </label>
-                </div>
-              </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                Análise Preditiva de Demanda
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Insights inteligentes sobre tendências de carrys
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Estatísticas Gerais */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Wallet className="w-6 h-6 text-green-600" />
+        {/* Cards de Métricas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Ganhos Concluídos</div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {mostrarEmReais ? formatarValorReais(totalGanhosConcluidos) : formatarValor(totalGanhosConcluidos)}
-                </div>
-                {mostrarEmReais && (
-                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalGanhosConcluidos)}</div>
-                )}
-              </div>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Previsão 7 Dias
+              </h3>
             </div>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {analise.previsaoProximos7Dias}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              carrys estimados
+            </p>
           </Card>
 
-          <Card hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Target className="w-6 h-6 text-blue-600" />
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Projeção Total</div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {mostrarEmReais ? formatarValorReais(totalProjecao) : formatarValor(totalProjecao)}
-                </div>
-                {mostrarEmReais && (
-                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalProjecao)}</div>
-                )}
-              </div>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Média Diária
+              </h3>
             </div>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {analise.mediaDiaria}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              carrys/dia (90d)
+            </p>
           </Card>
 
-          <Card hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Calendar className="w-6 h-6 text-purple-600" />
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Próximos 7 dias</div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {mostrarEmReais ? formatarValorReais(totalProjecaoSemana) : formatarValor(totalProjecaoSemana)}
-                </div>
-                {mostrarEmReais && (
-                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalProjecaoSemana)}</div>
-                )}
-              </div>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Melhor Dia
+              </h3>
             </div>
+            <p className="text-lg font-bold text-gray-900 dark:text-white capitalize">
+              {analise.diaComMaisDemanda.dia}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {analise.diaComMaisDemanda.quantidade} carrys
+            </p>
           </Card>
 
-          <Card hover>
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Próximos 30 dias</div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {mostrarEmReais ? formatarValorReais(totalProjecaoMes) : formatarValor(totalProjecaoMes)}
-                </div>
-                {mostrarEmReais && (
-                  <div className="text-xs text-gray-500 mt-1">{formatarValor(totalProjecaoMes)}</div>
-                )}
-              </div>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Horários de Pico
+              </h3>
             </div>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">
+              {analise.horariosPico.map(h => `${h}h`).join(', ')}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              maior demanda
+            </p>
           </Card>
         </div>
 
-        {/* Filtros */}
-        <div className="flex gap-3 mb-6">
-          <button
-            onClick={() => setFiltroCategoria('TODOS')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-              filtroCategoria === 'TODOS'
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Todos ({projecoes.length})
-          </button>
-          <button
-            onClick={() => setFiltroCategoria('HELA')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-              filtroCategoria === 'HELA'
-                ? 'bg-purple-600 text-white'
-                : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-            }`}
-          >
-            HELA ({projecoes.filter(p => p.jogador.categorias.includes('HELA')).length})
-          </button>
-          <button
-            onClick={() => setFiltroCategoria('CARRYS')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-              filtroCategoria === 'CARRYS'
-                ? 'bg-blue-600 text-white'
-                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-            }`}
-          >
-            CARRYS ({projecoes.filter(p => p.jogador.categorias.includes('CARRYS')).length})
-          </button>
-          <button
-            onClick={() => setFiltroCategoria('SUPLENTE')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-              filtroCategoria === 'SUPLENTE'
-                ? 'bg-yellow-600 text-white'
-                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-            }`}
-          >
-            SUPLENTES ({projecoes.filter(p => p.jogador.categorias.includes('SUPLENTE')).length})
-          </button>
-        </div>
+        {/* Insights Inteligentes */}
+        <Card className="p-6 mb-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-200 dark:border-purple-800">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Lightbulb className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                💡 Insights Inteligentes
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <li>
+                  • <strong>Melhor momento:</strong> A demanda é maior às{' '}
+                  {analise.horariosPico[0]}h, considere ter mais jogadores disponíveis neste horário.
+                </li>
+                <li>
+                  • <strong>Planejamento semanal:</strong> {analise.diaComMaisDemanda.dia} é o dia com maior demanda.
+                  Organize o time para estar disponível.
+                </li>
+                <li>
+                  • <strong>Tendência geral:</strong> Esperamos cerca de{' '}
+                  {analise.previsaoProximos7Dias} carrys nos próximos 7 dias.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </Card>
 
-        {/* Lista de Projeções por Jogador */}
-        <div className="space-y-4">
-          {projecoesFiltradas.map(projecao => (
-            <Card key={projecao.jogador.id} hover>
-              <div className="flex items-start justify-between">
-                {/* Info do Jogador */}
+        {/* Demanda por Boss */}
+        <Card className="p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            📊 Demanda por Boss (Top 10)
+          </h2>
+          
+          <div className="space-y-4">
+            {topBosses.map(([bossNome, dados], index) => (
+              <div
+                key={bossNome}
+                className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <div className={`
+                  w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm
+                  ${index < 3 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' : 'bg-gray-500'}
+                `}>
+                  {index + 1}
+                </div>
+                
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-xl font-bold text-gray-900">{projecao.jogador.nick}</h3>
-                    <Badge variant="default" className={getCategoriaColor(projecao.jogador.categorias)}>
-                      {getCategoriaLabel(projecao.jogador.categorias)}
-                    </Badge>
-                    {projecao.jogador.essencial && (
-                      <Badge variant="warning">⭐ Essencial</Badge>
-                    )}
-                  </div>
-
-                  {/* Estatísticas em Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {/* Ganhos Concluídos */}
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <div className="text-xs text-green-600 font-semibold mb-1">✅ Já Recebeu</div>
-                      <div className="text-2xl font-bold text-green-700">
-                        {mostrarEmReais ? formatarValorReais(projecao.ganhosConcluidos) : formatarValor(projecao.ganhosConcluidos)}
-                      </div>
-                      {mostrarEmReais && (
-                        <div className="text-xs text-green-600">{formatarValor(projecao.ganhosConcluidos)}</div>
-                      )}
-                      <div className="text-xs text-green-600 mt-1">{projecao.carrysConcluidos} carrys</div>
-                    </div>
-
-                    {/* Projeção Total */}
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <div className="text-xs text-blue-600 font-semibold mb-1">🎯 Vai Receber</div>
-                      <div className="text-2xl font-bold text-blue-700">
-                        {mostrarEmReais ? formatarValorReais(projecao.projecaoTotal) : formatarValor(projecao.projecaoTotal)}
-                      </div>
-                      {mostrarEmReais && (
-                        <div className="text-xs text-blue-600">{formatarValor(projecao.projecaoTotal)}</div>
-                      )}
-                      <div className="text-xs text-blue-600 mt-1">{projecao.carrysAgendados} agendados</div>
-                    </div>
-
-                    {/* Projeção Semana */}
-                    <div className="bg-purple-50 p-3 rounded-lg">
-                      <div className="text-xs text-purple-600 font-semibold mb-1">📅 Próximos 7 dias</div>
-                      <div className="text-xl font-bold text-purple-700">
-                        {mostrarEmReais ? formatarValorReais(projecao.projecaoSemana) : formatarValor(projecao.projecaoSemana)}
-                      </div>
-                      {mostrarEmReais && (
-                        <div className="text-xs text-purple-600">{formatarValor(projecao.projecaoSemana)}</div>
-                      )}
-                    </div>
-
-                    {/* Projeção Mês */}
-                    <div className="bg-orange-50 p-3 rounded-lg">
-                      <div className="text-xs text-orange-600 font-semibold mb-1">📆 Próximos 30 dias</div>
-                      <div className="text-xl font-bold text-orange-700">
-                        {mostrarEmReais ? formatarValorReais(projecao.projecaoMes) : formatarValor(projecao.projecaoMes)}
-                      </div>
-                      {mostrarEmReais && (
-                        <div className="text-xs text-orange-600">{formatarValor(projecao.projecaoMes)}</div>
-                      )}
-                    </div>
-
-                    {/* Total Geral */}
-                    <div className="bg-gray-900 p-3 rounded-lg">
-                      <div className="text-xs text-gray-300 font-semibold mb-1">💰 Total Geral</div>
-                      <div className="text-xl font-bold text-white">
-                        {mostrarEmReais 
-                          ? formatarValorReais(projecao.ganhosConcluidos + projecao.projecaoTotal)
-                          : formatarValor(projecao.ganhosConcluidos + projecao.projecaoTotal)
-                        }
-                      </div>
-                      {mostrarEmReais && (
-                        <div className="text-xs text-gray-300">{formatarValor(projecao.ganhosConcluidos + projecao.projecaoTotal)}</div>
-                      )}
-                      <div className="text-xs text-gray-300 mt-1">
-                        {projecao.carrysConcluidos + projecao.carrysAgendados} carrys
-                      </div>
-                    </div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                    {bossNome}
+                  </h3>
+                  <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                    <span>{dados.total} carrys (90d)</span>
+                    <span>•</span>
+                    <span>{dados.mediaUltimos7Dias.toFixed(1)}/dia (7d)</span>
+                    <span>•</span>
+                    <span>{dados.mediaUltimos30Dias.toFixed(1)}/dia (30d)</span>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
 
-          {projecoesFiltradas.length === 0 && (
-            <Card>
-              <div className="text-center py-8 text-gray-500">
-                <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p>Nenhum jogador encontrado nesta categoria</p>
+                <div className="flex items-center gap-2">
+                  {getTendenciaIcon(dados.tendencia)}
+                  <Badge className={getTendenciaColor(dados.tendencia)}>
+                    {dados.tendencia}
+                  </Badge>
+                </div>
               </div>
-            </Card>
-          )}
-        </div>
+            ))}
+          </div>
+        </Card>
       </div>
     </div>
   )
 }
-
