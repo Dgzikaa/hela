@@ -503,12 +503,6 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
   const carrysUnicos = new Map<number, any>()
   jogadores.forEach(jogador => {
     jogador.carrys.forEach(carry => {
-      console.log('[DEBUG DISCORD] Carry recebido:', {
-        id: carry.id,
-        cliente: carry.nomeCliente,
-        horario: carry.horario,
-        horarioTipo: typeof carry.horario
-      })
       if (!carrysUnicos.has(carry.id)) {
         carrysUnicos.set(carry.id, carry)
       }
@@ -530,15 +524,11 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
     })
   })
 
-  console.log('[DEBUG DISCORD] carrysPorData completo:', JSON.stringify(Array.from(carrysPorData.entries()), null, 2))
-
   // Montar mensagem
   let descricao = '☀️ **Bom dia, equipe!** Temos carries agendados para hoje!\n\n'
   
   // Para cada data (no caso de hoje, só uma data)
   carrysPorData.forEach((carries, data) => {
-    console.log(`[DEBUG DISCORD] Processando data ${data}, carries:`, JSON.stringify(carries, null, 2))
-    
     const numCarrys = carries.length
     const isAgrupado = numCarrys >= 2
 
@@ -548,12 +538,12 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
     const valorPorJogador = Math.floor(valorTotal / numJogadores)
 
     // Pegar o primeiro horário como referência (geralmente todos são iguais)
-    const horarioPrincipal = carries[0]?.horario
-    console.log('[DEBUG DISCORD] horarioPrincipal:', horarioPrincipal, '| tipo:', typeof horarioPrincipal, '| carries[0]:', JSON.stringify(carries[0]))
-    
-    // Formatar horário (vem como string "15:00:00" ou "15:00")
-    let horarioFormatado = '15:00' // TESTE: FORÇADO
-    console.log('[DEBUG DISCORD] FORÇANDO horarioFormatado para 15:00')
+    // Garantir que pegamos o horário corretamente
+    let horarioFormatado = '21:00' // Padrão
+    if (carries.length > 0 && carries[0] && carries[0].horario) {
+      const horarioRaw = String(carries[0].horario) // Forçar como string
+      horarioFormatado = horarioRaw.substring(0, 5) // Pegar apenas HH:MM
+    }
 
     if (isAgrupado) {
       // MODO AGRUPADO (2+ carrys)

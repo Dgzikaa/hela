@@ -97,8 +97,6 @@ export async function GET(req: Request) {
           // Extrair apenas HH:MM de "15:00:00"
           horario = pedido.horario.substring(0, 5)
         }
-        
-        console.log(`[DEBUG] Pedido ${pedido.id} - horario do banco:`, pedido.horario, '| formatado:', horario)
 
         carrysPorJogador.get(participacao.jogadorId)!.carrys.push({
           id: pedido.id,
@@ -125,11 +123,7 @@ export async function GET(req: Request) {
       success: true,
       message: `Lembretes enviados para ${jogadoresParaNotificar.length} jogador(es)`,
       jogadores: jogadoresParaNotificar.length,
-      pedidos: pedidosComRelacoes.length,
-      debug: {
-        primeiroCarry: jogadoresParaNotificar[0]?.carrys[0],
-        horarioTipo: typeof jogadoresParaNotificar[0]?.carrys[0]?.horario
-      }
+      pedidos: pedidosComRelacoes.length
     })
   } catch (error: any) {
     console.error('Erro ao enviar lembrete diário:', error)
