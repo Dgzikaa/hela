@@ -82,17 +82,36 @@ export async function GET(req: Request) {
         }
 
         // Usar horario do pedido se existir, senão pegar da dataAgendada
-        const horario = (pedido as any).horario
-          ? new Date(`2000-01-01T${(pedido as any).horario}`).toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          : pedido.dataAgendada
-          ? new Date(pedido.dataAgendada).toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          : '21:00'
+        let horario = '21:00' // Padrão
+        const horarioDb = (pedido as any).horario
+        
+        if (horarioDb) {
+          try {
+            if (typeof horarioDb === 'string') {
+              // Se for string "15:00:00" ou "15:00"
+              horario = horarioDb.substring(0, 5)
+            } else {
+              // Se for Date
+              const dateObj = new Date(horarioDb)
+              horario = dateObj.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+              })
+            }
+          } catch (e) {
+            console.error('Erro ao formatar horário:', e)
+            horario = '21:00'
+          }
+        } else if (pedido.dataAgendada) {
+          // Fallback: usar hora da dataAgendada
+          const dataObj = new Date(pedido.dataAgendada)
+          horario = dataObj.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          })
+        }
 
         carrysPorJogador.get(participacao.jogadorId)!.carrys.push({
           id: pedido.id,
