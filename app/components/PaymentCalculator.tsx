@@ -85,9 +85,9 @@ export function PaymentCalculator({
       } else {
         error('Erro ao calcular divisão')
       }
-    } catch (error) {
-      console.error('Erro:', error)
-      showToast('Erro ao calcular divisão', 'error')
+    } catch (err) {
+      console.error('Erro:', err)
+      error('Erro ao calcular divisão')
     } finally {
       setLoading(false)
     }
