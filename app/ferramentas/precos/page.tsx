@@ -139,7 +139,7 @@ export default function PrecosPage() {
   }, [runas])
 
   return (
-    <ToolsLayout>
+    <ToolsLayout title="💰 Preços do Mercado">
       <div className="min-h-screen bg-gray-50 p-3 md:p-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}

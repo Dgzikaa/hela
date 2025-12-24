@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { TrendingUp, DollarSign, Calendar, Users, Wallet, Target } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 interface Jogador {
   id: number
@@ -218,34 +219,27 @@ export default function ProjecaoPage() {
   }
 
   return (
-    <div className="p-4 md:p-8">
+    <ToolsLayout title="📊 Projeção de Ganhos">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">📊 Projeção de Ganhos</h1>
-              <p className="text-gray-600">Acompanhe os ganhos realizados e projetados de cada jogador</p>
-            </div>
-            
-            {/* Configuração de Taxa de Conversão */}
-            <div className="bg-white p-4 rounded-lg border-2 border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div>
-                  <label className="text-xs text-gray-600 font-semibold mb-1 block">
-                    💱 Taxa de Conversão
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">1kk =</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={taxaConversao}
-                      onChange={(e) => salvarTaxaConversao(parseFloat(e.target.value) || 0)}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm font-semibold"
-                    />
-                    <span className="text-sm text-gray-600">reais</span>
-                  </div>
+        {/* Header Actions */}
+        <div className="flex justify-end items-center mb-6">
+          {/* Configuração de Taxa de Conversão */}
+          <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-600 font-semibold">
+                💱 Taxa de Conversão:
+              </label>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm text-gray-600">1kk =</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={taxaConversao}
+                  onChange={(e) => salvarTaxaConversao(parseFloat(e.target.value) || 0)}
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm font-semibold"
+                />
+                <span className="text-sm text-gray-600">reais</span>
+              </div>
                   <div className="text-xs text-gray-500 mt-1">
                     1b = R$ {(taxaConversao * 1000).toFixed(2)}
                   </div>
@@ -479,7 +473,7 @@ export default function ProjecaoPage() {
           )}
         </div>
       </div>
-    </div>
+    </ToolsLayout>
   )
 }
 

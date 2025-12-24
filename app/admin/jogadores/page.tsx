@@ -7,6 +7,7 @@ import { Badge } from '@/app/components/Badge'
 import { Button } from '@/app/components/Button'
 import { ToastContainer } from '@/app/components/Toast'
 import { useToast } from '@/app/hooks/useToast'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 interface Jogador {
   id: number
@@ -164,14 +165,10 @@ export default function JogadoresPage() {
   }
 
   return (
-    <div className="p-4 md:p-8">
+    <ToolsLayout title="⚔️ Jogadores">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Jogadores</h1>
-            <p className="text-gray-600">Gerencie os jogadores do time</p>
-          </div>
+        {/* Header Actions */}
+        <div className="flex justify-end items-center mb-6">
           <Button onClick={() => setShowForm(true)}>
             <Plus className="w-5 h-5" />
             Novo Jogador
@@ -452,7 +449,7 @@ export default function JogadoresPage() {
         {/* Toast Container */}
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       </div>
-    </div>
+    </ToolsLayout>
   )
 }
 

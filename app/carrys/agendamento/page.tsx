@@ -10,6 +10,7 @@ import { ToastContainer } from '@/app/components/Toast'
 import { useToast } from '@/app/hooks/useToast'
 import { ModalEditarPedido } from '@/app/components/ModalEditarPedido'
 import { CarryAgrupado } from '@/app/components/CarryAgrupado'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 interface Boss {
   id: number
@@ -614,14 +615,10 @@ export default function PedidosPage() {
   )
 
   return (
-    <div className="p-4 md:p-8">
+    <ToolsLayout title="📦 Pedidos de Carry">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Pedidos de Carry</h1>
-            <p className="text-gray-600">Gerencie todos os pedidos de carry</p>
-          </div>
+        {/* Header Actions */}
+        <div className="flex justify-end items-center mb-6">
           <Button onClick={() => setShowCreateForm(true)}>
             <Plus className="w-5 h-5" />
             Novo Pedido
@@ -2177,7 +2174,7 @@ export default function PedidosPage() {
         {/* Toast Container */}
         <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       </div>
-    </div>
+    </ToolsLayout>
   )
 }
 

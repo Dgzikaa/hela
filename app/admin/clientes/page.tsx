@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Crown, TrendingUp, DollarSign, ShoppingBag } from 'lucide-react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 
 interface Cliente {
   id: number
@@ -81,32 +82,17 @@ export default function ClientesPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-slate-600">Carregando...</p>
-      </div>
+      <ToolsLayout title="👑 Clientes VIP">
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <p className="text-slate-600">Carregando...</p>
+        </div>
+      </ToolsLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <ToolsLayout title="👑 Clientes VIP">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
-              👑 Clientes VIP
-            </h1>
-            <p className="text-slate-600">
-              Sistema de fidelidade e histórico de compras
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/admin')}
-            className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800"
-          >
-            ← Voltar
-          </button>
-        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -264,7 +250,7 @@ export default function ClientesPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </ToolsLayout>
   )
 }
 

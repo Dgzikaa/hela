@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 import {
   BarChart3,
   TrendingUp,
@@ -103,24 +104,8 @@ export default function ResumoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <ToolsLayout title="📊 Resumo e Análise">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                Resumo e Análise de Carrys
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Recebimentos, estatísticas e previsões do time
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Cards de Totais Gerais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -269,6 +254,6 @@ export default function ResumoPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </ToolsLayout>
   )
 }

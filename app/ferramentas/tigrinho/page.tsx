@@ -562,7 +562,7 @@ export default function CalculadoraPage() {
   const expSimulation = calculateExpeditionSimulation(selectedTreasure, expSimCount)
 
   return (
-    <ToolsLayout>
+    <ToolsLayout title="🎰 Calculadora de Tigrinho">
       <div className="min-h-screen bg-gray-50 p-3 md:p-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}

@@ -8,7 +8,11 @@ import { UserMenu } from './UserMenu'
 import { GlobalSearch } from './GlobalSearch'
 import { NotificationCenter } from './NotificationCenter'
 
-export function TopBar() {
+interface TopBarProps {
+  title?: string
+}
+
+export function TopBar({ title }: TopBarProps) {
   const router = useRouter()
   const { data: session, status } = useSession()
   const isLoggedIn = status === 'authenticated'
@@ -29,42 +33,47 @@ export function TopBar() {
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-16 h-14 bg-white border-b border-gray-200 z-40 px-3 md:px-6">
-      <div className="h-full flex items-center justify-between">
-        {/* Logo Mobile (aparece só em mobile) */}
-        <div className="lg:hidden flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-white text-xl font-bold">H</span>
+      <div className="h-full flex items-center justify-between gap-4">
+        {/* Logo Mobile / Título Desktop */}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Logo Mobile */}
+          <div className="lg:hidden flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-base font-bold">H</span>
+            </div>
+            <span className="text-gray-900 font-bold text-sm truncate">{title || 'Hela Carrys'}</span>
           </div>
-          <div>
-            <h1 className="text-gray-900 font-bold text-lg">Hela Carrys</h1>
-            <p className="text-gray-500 text-xs">RagnaTales</p>
+          
+          {/* Título Desktop */}
+          <div className="hidden lg:block">
+            <h1 className="text-gray-900 font-bold text-base truncate">{title || 'Hela Carrys'}</h1>
           </div>
         </div>
 
-        {/* Busca Global (Desktop) */}
-        <div className="hidden md:flex items-center flex-1 max-w-2xl">
+        {/* Busca Global (Centralizada Desktop) */}
+        <div className="hidden md:flex items-center flex-1 max-w-xl justify-center">
           <button
             onClick={() => setIsSearchOpen(true)}
             className="relative w-full group"
           >
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-gray-500 transition-colors" />
-            <div className="w-full pl-10 pr-16 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-left text-gray-500 dark:text-gray-400 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors text-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
+            <div className="w-full pl-10 pr-14 py-2 bg-gray-50 border border-gray-200 rounded-lg text-left text-gray-500 hover:border-purple-300 hover:bg-gray-100 transition-colors text-sm">
               Buscar clientes, pedidos, jogadores...
             </div>
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 text-xs text-gray-500 dark:text-gray-400 font-mono">
+            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-white rounded border border-gray-300 text-xs text-gray-500 font-mono">
               ⌘K
             </kbd>
           </button>
         </div>
 
         {/* Ações da Direita */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* Busca Mobile */}
           <button 
             onClick={() => setIsSearchOpen(true)}
-            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <Search className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <Search className="w-5 h-5 text-gray-600" />
           </button>
 
           {/* Global Search Modal */}
@@ -75,15 +84,6 @@ export function TopBar() {
 
           {/* Notificações */}
           {isLoggedIn && <NotificationCenter />}
-          {/* {isLoggedIn && (
-            <button 
-              onClick={() => router.push('/notificacoes')}
-              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-          )} */}
 
           {/* Menu do Usuário */}
           {isLoggedIn ? (

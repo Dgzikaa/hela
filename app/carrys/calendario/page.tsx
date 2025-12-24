@@ -7,6 +7,7 @@ import { CalendarView, CalendarEvent } from '@/app/components/Calendar/CalendarV
 import { Card } from '@/app/components/Card'
 import { Badge } from '@/app/components/Badge'
 import { useToast } from '@/app/hooks/useToast'
+import { ToolsLayout } from '@/app/components/ToolsLayout'
 import { Clock, Users, DollarSign, X } from 'lucide-react'
 
 interface Pedido {
@@ -139,28 +140,20 @@ export default function CalendarioPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando calendário...</p>
+      <ToolsLayout title="📅 Calendário de Carrys">
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Carregando calendário...</p>
+          </div>
         </div>
-      </div>
+      </ToolsLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <ToolsLayout title="📅 Calendário de Carrys">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            📅 Calendário de Carrys
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Visualize, gerencie e reagende todos os carrys
-          </p>
-        </div>
-
         {/* Calendário */}
         <CalendarView
           events={events}
@@ -325,7 +318,7 @@ export default function CalendarioPage() {
           </div>
         )}
       </div>
-    </div>
+    </ToolsLayout>
   )
 }
 
