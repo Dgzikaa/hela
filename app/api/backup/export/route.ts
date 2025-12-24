@@ -16,8 +16,7 @@ export async function GET() {
       jogadores,
       clientes,
       bosses,
-      pedidos,
-      precos
+      pedidos
     ] = await Promise.all([
       prisma.jogador.findMany({
         include: {
@@ -31,8 +30,7 @@ export async function GET() {
           itens: true,
           participacoes: true
         }
-      }),
-      prisma.preco.findMany()
+      })
     ])
 
     const backup = {
@@ -42,15 +40,13 @@ export async function GET() {
         jogadores,
         clientes,
         bosses,
-        pedidos,
-        precos
+        pedidos
       },
       metadata: {
         totalJogadores: jogadores.length,
         totalClientes: clientes.length,
         totalBosses: bosses.length,
-        totalPedidos: pedidos.length,
-        totalPrecos: precos.length
+        totalPedidos: pedidos.length
       }
     }
 
