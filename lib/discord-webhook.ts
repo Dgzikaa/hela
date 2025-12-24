@@ -539,12 +539,16 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
 
     // Pegar o primeiro horário como referência (geralmente todos são iguais)
     const horarioPrincipal = carries[0].horario
+    // Formatar horário (pode vir como "15:00:00" ou "15:00")
+    const horarioFormatado = horarioPrincipal 
+      ? horarioPrincipal.substring(0, 5) // Pegar apenas HH:MM
+      : '21:00'
 
     if (isAgrupado) {
       // MODO AGRUPADO (2+ carrys)
       descricao += `🔥 **${numCarrys} CARRYS AGRUPADOS** 🔥\n`
       descricao += `📅 Data: ${new Date(data + 'T00:00:00').toLocaleDateString('pt-BR')}\n`
-      descricao += `⏰ **HORÁRIO DO CLEAR: ${horarioPrincipal} (Brasília)** ⏰\n`
+      descricao += `⏰ **HORÁRIO DO CLEAR: ${horarioFormatado} (Brasília)** ⏰\n`
       descricao += `👥 **${numJogadores} jogadores** (SEM Pablo)\n`
       descricao += `💰 Valor total: **${(valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n\n`
       
@@ -557,7 +561,7 @@ export async function enviarLembreteDiarioCarrys(jogadores: Array<{
       // MODO NORMAL (1 carry)
       const carry = carries[0]
       descricao += `🎮 **Carry:** ${carry.cliente}\n`
-      descricao += `⏰ **HORÁRIO DO CLEAR: ${carry.horario} (Brasília)** ⏰\n`
+      descricao += `⏰ **HORÁRIO DO CLEAR: ${horarioFormatado} (Brasília)** ⏰\n`
       descricao += `💰 Valor: **${(carry.valorTotal / 1000).toFixed(1)}b** | **${valorPorJogador}kk/jogador**\n`
       descricao += `👥 **11 jogadores** (COM Pablo)\n`
       descricao += `🎯 ${carry.bosses.join(', ')}\n\n`
