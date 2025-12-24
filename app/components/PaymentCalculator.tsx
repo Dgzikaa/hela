@@ -48,7 +48,7 @@ export function PaymentCalculator({
   const [bonusHela, setBonusHela] = useState(15)
   const [resultado, setResultado] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const { showToast } = useToast()
+  const { success, error } = useToast()
 
   const toggleJogador = (jogadorId: number) => {
     if (jogadoresSelecionados.includes(jogadorId)) {
@@ -61,7 +61,7 @@ export function PaymentCalculator({
 
   const calcular = async () => {
     if (jogadoresSelecionados.length === 0) {
-      showToast('Selecione pelo menos 1 jogador', 'error')
+      error('Selecione pelo menos 1 jogador')
       return
     }
 
@@ -83,7 +83,7 @@ export function PaymentCalculator({
         const data = await res.json()
         setResultado(data.resultado)
       } else {
-        showToast('Erro ao calcular divisão', 'error')
+        error('Erro ao calcular divisão')
       }
     } catch (error) {
       console.error('Erro:', error)
@@ -112,10 +112,10 @@ export function PaymentCalculator({
 
       if (res.ok) {
         const data = await res.json()
-        showToast('Divisão aplicada com sucesso!', 'success')
+        success('Divisão aplicada com sucesso!')
         onAplicar?.(data.resultado.divisoes)
       } else {
-        showToast('Erro ao aplicar divisão', 'error')
+        error('Erro ao aplicar divisão')
       }
     } catch (error) {
       console.error('Erro:', error)

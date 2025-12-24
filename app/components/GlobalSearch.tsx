@@ -52,7 +52,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
-  const { showToast } = useToast()
+  const { error } = useToast()
 
   // Carregar histórico de buscas
   useEffect(() => {

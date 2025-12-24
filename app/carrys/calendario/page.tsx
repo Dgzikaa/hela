@@ -51,8 +51,8 @@ export default function CalendarioPage() {
         const data = await res.json()
         setPedidos(data.filter((p: Pedido) => p.status !== 'CANCELADO'))
       }
-    } catch (error) {
-      console.error('Erro ao carregar pedidos:', error)
+    } catch (err) {
+      console.error('Erro ao carregar pedidos:', err)
       error('Erro ao carregar carrys')
     } finally {
       setLoading(false)
@@ -118,9 +118,9 @@ export default function CalendarioPage() {
       } else {
         error('Erro ao reagendar carry')
       }
-    } catch (error) {
-      console.error('Erro ao reagendar:', error)
-      showToast('Erro ao reagendar carry', 'error')
+    } catch (err) {
+      console.error('Erro ao reagendar:', err)
+      error('Erro ao reagendar carry')
     }
   }
 
