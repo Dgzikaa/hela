@@ -576,7 +576,7 @@ export default function CalculadoraPage() {
           <button
             onClick={() => setActiveTab('expedicao')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
-              activeTab === 'expedicao' ? 'bg-purple-600 text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              activeTab === 'expedicao' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <Gem className="w-4 h-4" />
@@ -585,7 +585,7 @@ export default function CalculadoraPage() {
           <button
             onClick={() => setActiveTab('somatologia')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
-              activeTab === 'somatologia' ? 'bg-purple-600 text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              activeTab === 'somatologia' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <FlaskConical className="w-4 h-4" />
@@ -604,7 +604,7 @@ export default function CalculadoraPage() {
               <button
                 onClick={syncPrices}
                 disabled={syncing}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-gray-900 rounded-lg disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled:opacity-50 transition-colors"
               >
                 {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 {syncing ? 'Atualizando...' : 'Atualizar'}
@@ -644,7 +644,7 @@ export default function CalculadoraPage() {
                     onClick={() => setSelectedTreasure(key)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                       selectedTreasure === key
-                        ? 'bg-purple-600 text-gray-900'
+                        ? 'bg-purple-600 text-white'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
