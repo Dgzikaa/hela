@@ -604,23 +604,28 @@ export default function PedidosPage() {
   hoje.setHours(0, 0, 0, 0)
   
   const pedidosFiltrados = pedidos.filter(pedido => {
+    // Criar data do pedido sem conversão de timezone
+    const dataPedido = pedido.dataAgendada ? new Date(pedido.dataAgendada.split('T')[0] + 'T00:00:00') : null
+    
     switch (tabAtiva) {
       case 'proximos':
         // Próximos: AGENDADO ou EM_ANDAMENTO, com data >= hoje
+        // NUNCA mostrar CONCLUIDO ou CANCELADO aqui
+        if (['CONCLUIDO', 'CANCELADO'].includes(pedido.status)) return false
         return ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status) && 
-               pedido.dataAgendada && 
-               new Date(pedido.dataAgendada) >= hoje
+               dataPedido && 
+               dataPedido >= hoje
       
       case 'pendentes':
         // Pendentes: status PENDENTE (aguardando aprovação/pagamento)
         return pedido.status === 'PENDENTE'
       
       case 'concluidos':
-        // Concluídos
+        // Concluídos apenas
         return pedido.status === 'CONCLUIDO'
       
       case 'cancelados':
-        // Cancelados
+        // Cancelados apenas
         return pedido.status === 'CANCELADO'
       
       default:
