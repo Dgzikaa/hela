@@ -66,6 +66,9 @@ export default function PedidosPage() {
   const [showModal, setShowModal] = useState(false)
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null)
   
+  // Tab ativa (padrão: próximos)
+  const [tabAtiva, setTabAtiva] = useState<'proximos' | 'pendentes' | 'concluidos' | 'cancelados'>('proximos')
+  
   // Modal de agendamento
   const [showAgendarModal, setShowAgendarModal] = useState(false)
   const [pedidoParaAgendar, setPedidoParaAgendar] = useState<Pedido | null>(null)
@@ -596,9 +599,38 @@ export default function PedidosPage() {
     )
   }
 
-  // Agrupar pedidos por data
+  // Filtrar pedidos baseado na tab ativa
+  const hoje = new Date()
+  hoje.setHours(0, 0, 0, 0)
+  
+  const pedidosFiltrados = pedidos.filter(pedido => {
+    switch (tabAtiva) {
+      case 'proximos':
+        // Próximos: AGENDADO ou EM_ANDAMENTO, com data >= hoje
+        return ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status) && 
+               pedido.dataAgendada && 
+               new Date(pedido.dataAgendada) >= hoje
+      
+      case 'pendentes':
+        // Pendentes: status PENDENTE (aguardando aprovação/pagamento)
+        return pedido.status === 'PENDENTE'
+      
+      case 'concluidos':
+        // Concluídos
+        return pedido.status === 'CONCLUIDO'
+      
+      case 'cancelados':
+        // Cancelados
+        return pedido.status === 'CANCELADO'
+      
+      default:
+        return true
+    }
+  })
+
+  // Agrupar pedidos filtrados por data
   const pedidosAgrupados: Record<string, typeof pedidos> = {}
-  pedidos.forEach(pedido => {
+  pedidosFiltrados.forEach(pedido => {
     if (pedido.dataAgendada) {
       // FIX: Extrair data sem conversão UTC
       const data = pedido.dataAgendada.split('T')[0] // "2025-12-24"
@@ -613,6 +645,18 @@ export default function PedidosPage() {
   const datasOrdenadas = Object.keys(pedidosAgrupados).sort((a, b) => 
     new Date(a).getTime() - new Date(b).getTime()
   )
+  
+  // Contar pedidos por categoria
+  const contadores = {
+    proximos: pedidos.filter(p => 
+      ['AGENDADO', 'EM_ANDAMENTO'].includes(p.status) && 
+      p.dataAgendada && 
+      new Date(p.dataAgendada) >= hoje
+    ).length,
+    pendentes: pedidos.filter(p => p.status === 'PENDENTE').length,
+    concluidos: pedidos.filter(p => p.status === 'CONCLUIDO').length,
+    cancelados: pedidos.filter(p => p.status === 'CANCELADO').length
+  }
 
   return (
     <ToolsLayout title="📦 Pedidos de Carry">
@@ -625,75 +669,138 @@ export default function PedidosPage() {
           </Button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Tabs de Filtro */}
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          <button
+            onClick={() => setTabAtiva('proximos')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
+              tabAtiva === 'proximos'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            🔜 Próximos ({contadores.proximos})
+          </button>
+          <button
+            onClick={() => setTabAtiva('pendentes')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
+              tabAtiva === 'pendentes'
+                ? 'bg-yellow-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            ⏳ Pendentes ({contadores.pendentes})
+          </button>
+          <button
+            onClick={() => setTabAtiva('concluidos')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
+              tabAtiva === 'concluidos'
+                ? 'bg-green-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            ✅ Concluídos ({contadores.concluidos})
+          </button>
+          <button
+            onClick={() => setTabAtiva('cancelados')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
+              tabAtiva === 'cancelados'
+                ? 'bg-red-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            ❌ Cancelados ({contadores.cancelados})
+          </button>
+        </div>
+
+        {/* Stats da Tab Atual */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card hover>
-            <div className="text-yellow-600 text-sm font-semibold mb-1">Pendentes</div>
+            <div className="text-blue-600 text-sm font-semibold mb-1">Total de Pedidos</div>
             <div className="text-3xl font-bold text-gray-900">
-              {pedidos.filter(p => p.status === 'PENDENTE').length}
-            </div>
-          </Card>
-          <Card hover>
-            <div className="text-blue-600 text-sm font-semibold mb-1">Agendados</div>
-            <div className="text-3xl font-bold text-gray-900">
-              {pedidos.filter(p => p.status === 'AGENDADO').length}
-            </div>
-          </Card>
-          <Card hover>
-            <div className="text-green-600 text-sm font-semibold mb-1">Concluídos</div>
-            <div className="text-3xl font-bold text-gray-900">
-              {pedidos.filter(p => p.status === 'CONCLUIDO').length}
+              {pedidosFiltrados.length}
             </div>
           </Card>
           <Card hover>
             <div className="text-purple-600 text-sm font-semibold mb-1">Valor Total</div>
             <div className="text-3xl font-bold text-gray-900">
               {(() => {
-                const total = pedidos.reduce((acc, p) => acc + p.valorTotal, 0)
+                const total = pedidosFiltrados.reduce((acc, p) => acc + p.valorTotal, 0)
                 return total >= 1000 ? `${(total / 1000).toFixed(1)}b` : `${total}kk`
               })()}
+            </div>
+          </Card>
+          <Card hover>
+            <div className="text-green-600 text-sm font-semibold mb-1">Datas Agendadas</div>
+            <div className="text-3xl font-bold text-gray-900">
+              {datasOrdenadas.length}
             </div>
           </Card>
         </div>
 
         {/* Lista de Pedidos Agrupados */}
         <div className="space-y-6">
-          {datasOrdenadas.map(data => (
-            <CarryAgrupado
-              key={data}
-              data={data}
-              carrys={pedidosAgrupados[data]}
-              onEdit={(pedido) => {
-                setPedidoParaEditarNovo(pedido)
-                setShowNovoEditModal(true)
-              }}
-              onDelete={(pedido) => {
-                setPedidoParaExcluir(pedido)
-                setShowExcluirModal(true)
-              }}
-              onUpdateStatus={handleUpdateStatus}
-              onAgendar={(pedido) => {
-                setPedidoParaAgendar(pedido)
-                const amanha = new Date()
-                amanha.setDate(amanha.getDate() + 1)
-                setDataAgendamento(amanha.toISOString().split('T')[0])
-                setHoraAgendamento('20:00')
-                setShowAgendarModal(true)
-              }}
-              onCancelar={(pedido) => {
-                setPedidoParaCancelar(pedido)
-                setShowCancelarModal(true)
-              }}
-              onConcluir={(pedido) => {
-                setPedidoParaConcluir(pedido)
-                setShowConcluirModal(true)
-              }}
-              onConcluirTodos={handleConcluirTodos}
-            />
-          ))}
+          {datasOrdenadas.length > 0 ? (
+            datasOrdenadas.map(data => (
+              <CarryAgrupado
+                key={data}
+                data={data}
+                carrys={pedidosAgrupados[data]}
+                onEdit={(pedido) => {
+                  setPedidoParaEditarNovo(pedido)
+                  setShowNovoEditModal(true)
+                }}
+                onDelete={(pedido) => {
+                  setPedidoParaExcluir(pedido)
+                  setShowExcluirModal(true)
+                }}
+                onUpdateStatus={handleUpdateStatus}
+                onAgendar={(pedido) => {
+                  setPedidoParaAgendar(pedido)
+                  const amanha = new Date()
+                  amanha.setDate(amanha.getDate() + 1)
+                  setDataAgendamento(amanha.toISOString().split('T')[0])
+                  setHoraAgendamento('20:00')
+                  setShowAgendarModal(true)
+                }}
+                onCancelar={(pedido) => {
+                  setPedidoParaCancelar(pedido)
+                  setShowCancelarModal(true)
+                }}
+                onConcluir={(pedido) => {
+                  setPedidoParaConcluir(pedido)
+                  setShowConcluirModal(true)
+                }}
+                onConcluirTodos={handleConcluirTodos}
+              />
+            ))
+          ) : (
+            <Card>
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">
+                  {tabAtiva === 'proximos' && '📅'}
+                  {tabAtiva === 'pendentes' && '⏳'}
+                  {tabAtiva === 'concluidos' && '✅'}
+                  {tabAtiva === 'cancelados' && '❌'}
+                </div>
+                <h3 className="text-xl font-bold text-gray-700 mb-2">
+                  {tabAtiva === 'proximos' && 'Nenhum carry agendado'}
+                  {tabAtiva === 'pendentes' && 'Nenhum pedido pendente'}
+                  {tabAtiva === 'concluidos' && 'Nenhum carry concluído'}
+                  {tabAtiva === 'cancelados' && 'Nenhum carry cancelado'}
+                </h3>
+                <p className="text-gray-500">
+                  {tabAtiva === 'proximos' && 'Os próximos carrys aparecerão aqui'}
+                  {tabAtiva === 'pendentes' && 'Aguardando novos pedidos'}
+                  {tabAtiva === 'concluidos' && 'Complete alguns carrys para vê-los aqui'}
+                  {tabAtiva === 'cancelados' && 'Nenhum carry foi cancelado'}
+                </p>
+              </div>
+            </Card>
+          )}
 
           {/* Renderização antiga (caso não tenha data agendada) */}
-          {pedidos.filter(p => !p.dataAgendada).map(pedido => {
+          {pedidosFiltrados.filter(p => !p.dataAgendada).map(pedido => {
             // Verificar se o pedido está concluído ou cancelado
             const isFinalizado = ['CONCLUIDO', 'CANCELADO'].includes(pedido.status)
             const dataAgendada = pedido.dataAgendada ? new Date(pedido.dataAgendada) : null
