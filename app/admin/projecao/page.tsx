@@ -225,37 +225,37 @@ export default function ProjecaoPage() {
         <div className="flex justify-end items-center mb-6">
           {/* Configuração de Taxa de Conversão */}
           <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-gray-600 font-semibold">
-                💱 Taxa de Conversão:
-              </label>
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm text-gray-600">1kk =</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={taxaConversao}
-                  onChange={(e) => salvarTaxaConversao(parseFloat(e.target.value) || 0)}
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm font-semibold"
-                />
-                <span className="text-sm text-gray-600">reais</span>
+            <div className="flex items-center gap-4">
+              <div>
+                <label className="text-xs text-gray-600 font-semibold">
+                  💱 Taxa de Conversão:
+                </label>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-sm text-gray-600">1kk =</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={taxaConversao}
+                    onChange={(e) => salvarTaxaConversao(parseFloat(e.target.value) || 0)}
+                    className="w-16 px-2 py-1 border border-gray-300 rounded text-sm font-semibold"
+                  />
+                  <span className="text-sm text-gray-600">reais</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  1b = R$ {(taxaConversao * 1000).toFixed(2)}
+                </div>
               </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    1b = R$ {(taxaConversao * 1000).toFixed(2)}
-                  </div>
-                </div>
-                
-                <div className="border-l border-gray-300 pl-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={mostrarEmReais}
-                      onChange={(e) => setMostrarEmReais(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm font-semibold text-gray-700">Mostrar em R$</span>
-                  </label>
-                </div>
+              
+              <div className="border-l border-gray-300 pl-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={mostrarEmReais}
+                    onChange={(e) => setMostrarEmReais(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-semibold text-gray-700">Mostrar em R$</span>
+                </label>
               </div>
             </div>
           </div>
