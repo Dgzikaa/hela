@@ -5,8 +5,8 @@ import { prisma } from './prisma'
  * 
  * Regras:
  * - Sempre escala os 10 jogadores principais (essencial: true)
- * - SEMPRE adiciona Pablo (11 jogadores no total)
- * - Pablo ainda está ativo e recebendo em todos os carrys
+ * - Se tiver 2+ carrys no mesmo dia: NÃO escala Pablo (10 jogadores)
+ * - Se tiver apenas 1 carry no dia: ESCALA Pablo (11 jogadores)
  */
 export async function escalarJogadoresAutomaticamente(
   pedidoId: number,
@@ -33,7 +33,28 @@ export async function escalarJogadoresAutomaticamente(
       }
     }
 
-    // 2. Buscar Pablo (jogador rotativo)
+    // 2. Verificar quantos carrys estão agendados para o mesmo dia
+    const inicioDia = new Date(dataAgendada)
+    inicioDia.setHours(0, 0, 0, 0)
+    
+    const fimDia = new Date(dataAgendada)
+    fimDia.setHours(23, 59, 59, 999)
+
+    const carrysNoDia = await prisma.pedido.count({
+      where: {
+        dataAgendada: {
+          gte: inicioDia,
+          lte: fimDia
+        },
+        status: {
+          in: ['AGENDADO', 'EM_ANDAMENTO']
+        }
+      }
+    })
+
+    console.log(`📊 Total de carrys agendados para ${dataAgendada.toLocaleDateString('pt-BR')}: ${carrysNoDia}`)
+
+    // 3. Buscar Pablo (jogador rotativo)
     const pablo = await prisma.jogador.findFirst({
       where: {
         nick: 'Pablo',
@@ -44,15 +65,19 @@ export async function escalarJogadoresAutomaticamente(
       }
     })
 
-    // 3. Determinar quem escalar
+    // 4. Determinar quem escalar
     const jogadoresParaEscalar = [...jogadoresPrincipais]
     
-    // SEMPRE adiciona Pablo (ele ainda está recebendo)
-    if (pablo) {
+    // Se tiver apenas 1 carry no dia, adiciona Pablo
+    // Se tiver 2+ carrys, NÃO adiciona Pablo (time de 10)
+    if (carrysNoDia === 1 && pablo) {
       jogadoresParaEscalar.push({ id: pablo.id, nick: 'Pablo' })
+      console.log(`✅ Pablo escalado (1 carry no dia)`)
+    } else if (carrysNoDia >= 2) {
+      console.log(`⚠️ Pablo NÃO escalado (${carrysNoDia} carrys no dia - time de 10)`)
     }
 
-    // 4. Buscar pedido para calcular valorRecebido
+    // 5. Buscar pedido para calcular valorRecebido
     const pedido = await prisma.pedido.findUnique({
       where: { id: pedidoId },
       select: { valorFinal: true }
@@ -68,7 +93,9 @@ export async function escalarJogadoresAutomaticamente(
 
     const valorPorJogador = Math.floor(pedido.valorFinal / jogadoresParaEscalar.length)
 
-    // 5. Verificar se já existem participações (evitar duplicatas)
+    console.log(`💰 Valor por jogador: ${valorPorJogador}kk (${pedido.valorFinal}kk / ${jogadoresParaEscalar.length} jogadores)`)
+
+    // 6. Verificar se já existem participações (evitar duplicatas)
     const participacoesExistentes = await prisma.participacaoCarry.count({
       where: { pedidoId }
     })
@@ -81,7 +108,7 @@ export async function escalarJogadoresAutomaticamente(
       }
     }
 
-    // 6. Criar participações
+    // 7. Criar participações
     await prisma.participacaoCarry.createMany({
       data: jogadoresParaEscalar.map(jogador => ({
         pedidoId,
