@@ -25,7 +25,7 @@ const {
 } = require('discord.js');
 
 // Configuração
-const API_BASE = process.env.API_BASE || 'https://hela-blond.vercel.app/api';
+const API_BASE = process.env.API_BASE || 'https://helaturk.vercel.app/api';
 const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID; // ID do cargo de admin
 const TICKET_CATEGORY_ID = process.env.TICKET_CATEGORY_ID; // ID da categoria de tickets
 
@@ -58,7 +58,7 @@ Somos especialistas em carrys dos bosses lendários do RagnaTales.
 
 **📌 Clique no botão abaixo para começar:**
     `)
-    .setThumbnail('https://hela-blond.vercel.app/images/bosses/hela.gif')
+    .setThumbnail('https://helaturk.vercel.app/images/bosses/hela.gif')
     .setFooter({ text: 'Hela Carrys • O melhor carry do RagnaTales' });
 };
 
@@ -76,7 +76,7 @@ const createWelcomeButtons = () => {
       new ButtonBuilder()
         .setLabel('📅 Próximas Datas')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://hela-blond.vercel.app/admin/calendario'),
+        .setURL('https://helaturk.vercel.app/admin/calendario'),
       new ButtonBuilder()
         .setCustomId('faq')
         .setLabel('❓ FAQ')
@@ -321,7 +321,7 @@ Todo sábado sorteamos **4 jogadores** para fazer os bosses 1-6 **GRATUITAMENTE*
       new ButtonBuilder()
         .setLabel('📊 Ver no Site')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://hela-blond.vercel.app/carry-gratis')
+        .setURL('https://helaturk.vercel.app/carry-gratis')
     );
   
   await interaction.reply({
@@ -385,7 +385,7 @@ client.on('interactionCreate', async (interaction) => {
         
         case 'ver_precos':
           await interaction.reply({
-            content: '💰 Confira nossa tabela de preços: https://hela-blond.vercel.app',
+            content: '💰 Confira nossa tabela de preços: https://helaturk.vercel.app',
             ephemeral: true
           });
           break;
@@ -537,7 +537,7 @@ Todo sábado sorteamos **4 jogadores** para fazer os bosses 1-6 **GRATUITAMENTE*
 • Deve confirmar presença
 • Se não comparecer, perde a próxima
       `)
-      .setImage('https://hela-blond.vercel.app/images/bosses/hela.gif')
+      .setImage('https://helaturk.vercel.app/images/bosses/hela.gif')
       .setFooter({ text: 'Hela Carrys • Apoiando novos jogadores' });
     
     const buttons = new ActionRowBuilder()

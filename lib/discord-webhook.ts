@@ -94,7 +94,7 @@ export async function notificarNovoCarry(pedido: {
   jogadores?: string[]
   compradores?: Array<{ nome: string; bossesIds?: number[] }>
 }) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://helaturk.vercel.app'
   
   // Mapear cada boss com seu comprador (se houver)
   const bossesTexto = pedido.bossesCompletos.map(boss => {
@@ -158,7 +158,7 @@ export async function notificarCarryAgendado(pedido: {
   valorTotal: number
   jogadores?: string[]
 }) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://helaturk.vercel.app'
   
   const dataFormatada = new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -202,7 +202,7 @@ export async function notificarCarryConcluido(pedido: {
   jogadores?: string[]
   pacoteCompleto?: boolean
 }) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://helaturk.vercel.app'
   
   // Formatar valor em "b" se >= 1000kk
   const valorFormatado = pedido.valorTotal >= 1000 
@@ -252,7 +252,7 @@ export async function notificarJogadoresPagos(jogadores: Array<{
   id: number
   bosses: string[]
 }) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://helaturk.vercel.app'
   
   const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join('\n')
 
@@ -287,7 +287,7 @@ export async function notificarCarryCancelado(pedido: {
   valorTotal: number
   motivo?: string
 }) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://helaturk.vercel.app'
   
   const bossesTexto = pedido.bosses.map(boss => adicionarEmojiBoss(boss)).join(', ')
 
@@ -453,7 +453,7 @@ export async function notificarJogadoresNovoCarry(jogadores: Array<{
   bosses: string[]
   valorTotal: number
 }) {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://hela-blond.vercel.app'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://helaturk.vercel.app'
   
   const dataFormatada = pedido.dataAgendada 
     ? new Date(pedido.dataAgendada).toLocaleDateString('pt-BR', {

@@ -15,7 +15,7 @@ const client = new Client({
   ]
 });
 
-const API_URL = process.env.API_URL || 'https://hela-blond.vercel.app/api';
+const API_URL = process.env.API_URL || 'https://helaturk.vercel.app/api';
 
 client.on('ready', () => {
   console.log(`🤖 Seu Raimundo conectado como ${client.user.tag}`);
