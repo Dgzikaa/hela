@@ -324,33 +324,22 @@ export function CarryAgrupado({
       </div>
 
       {/* Ações do Grupo */}
-      {statusComum !== 'MISTO' && (
+      {statusComum !== 'MISTO' && ['AGENDADO', 'EM_ANDAMENTO'].includes(statusComum) && (
         <div className="mt-4 pt-4 border-t border-gray-200 flex gap-3">
-          {statusComum === 'AGENDADO' && (
-            <Button
-              variant="primary"
-              onClick={() => carrys.forEach(c => onUpdateStatus(c.id, 'EM_ANDAMENTO'))}
-            >
-              <Clock className="w-4 h-4 mr-2" />
-              Iniciar Todos
-            </Button>
-          )}
-          {statusComum === 'EM_ANDAMENTO' && (
-            <Button
-              variant="success"
-              onClick={() => {
-                if (onConcluirTodos) {
-                  onConcluirTodos(carrys)
-                } else {
-                  // Fallback: concluir um por um (abrindo modal)
-                  carrys.forEach(c => onConcluir(c))
-                }
-              }}
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Concluir Todos
-            </Button>
-          )}
+          <Button
+            variant="success"
+            onClick={() => {
+              if (onConcluirTodos) {
+                onConcluirTodos(carrys)
+              } else {
+                // Fallback: concluir um por um (abrindo modal)
+                carrys.forEach(c => onConcluir(c))
+              }
+            }}
+          >
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Concluir Todos
+          </Button>
         </div>
       )}
     </Card>

@@ -763,15 +763,18 @@ export default function PedidosPage() {
                       </Button>
                     </>
                   )}
-                  {pedido.status === 'AGENDADO' && (
+                  {['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status) && (
                     <>
                       <Button
                         size="sm"
-                        variant="primary"
-                        onClick={() => handleUpdateStatus(pedido.id, 'EM_ANDAMENTO')}
+                        variant="success"
+                        onClick={() => {
+                          setPedidoParaConcluir(pedido)
+                          setShowConcluirModal(true)
+                        }}
                       >
-                        <Clock className="w-4 h-4 mr-1" />
-                        Iniciar
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Concluir
                       </Button>
                       <Button
                         size="sm"
@@ -785,19 +788,6 @@ export default function PedidosPage() {
                         Cancelar
                       </Button>
                     </>
-                  )}
-                  {pedido.status === 'EM_ANDAMENTO' && (
-                    <Button
-                      size="sm"
-                      variant="success"
-                      onClick={() => {
-                        setPedidoParaConcluir(pedido)
-                        setShowConcluirModal(true)
-                      }}
-                    >
-                      <CheckCircle className="w-4 h-4 mr-1" />
-                      Concluir
-                    </Button>
                   )}
                 </div>
               </div>
