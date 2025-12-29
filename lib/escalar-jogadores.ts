@@ -3,10 +3,11 @@ import { prisma } from './prisma'
 /**
  * Escala automaticamente jogadores em um carry
  * 
- * Regras:
- * - Sempre escala os 10 jogadores principais (essencial: true)
- * - Se tiver 2+ carrys no mesmo dia: NÃO escala Pablo (10 jogadores)
- * - Se tiver apenas 1 carry no dia: ESCALA Pablo (11 jogadores)
+ * Novo sistema (Dez/2025):
+ * - SEMPRE escala 11 jogadores (10 essenciais + Pablo)
+ * - TODOS recebem, independente da quantidade de carrys
+ * - 9 jogadores fazem o carry (sem Pablo e Lazo)
+ * - Valor sempre dividido por 11
  */
 export async function escalarJogadoresAutomaticamente(
   pedidoId: number,
@@ -33,28 +34,7 @@ export async function escalarJogadoresAutomaticamente(
       }
     }
 
-    // 2. Verificar quantos carrys estão agendados para o mesmo dia
-    const inicioDia = new Date(dataAgendada)
-    inicioDia.setHours(0, 0, 0, 0)
-    
-    const fimDia = new Date(dataAgendada)
-    fimDia.setHours(23, 59, 59, 999)
-
-    const carrysNoDia = await prisma.pedido.count({
-      where: {
-        dataAgendada: {
-          gte: inicioDia,
-          lte: fimDia
-        },
-        status: {
-          in: ['AGENDADO', 'EM_ANDAMENTO']
-        }
-      }
-    })
-
-    console.log(`📊 Total de carrys agendados para ${dataAgendada.toLocaleDateString('pt-BR')}: ${carrysNoDia}`)
-
-    // 3. Buscar Pablo (jogador rotativo)
+    // 2. Buscar Pablo
     const pablo = await prisma.jogador.findFirst({
       where: {
         nick: 'Pablo',
@@ -65,17 +45,18 @@ export async function escalarJogadoresAutomaticamente(
       }
     })
 
-    // 4. Determinar quem escalar
-    const jogadoresParaEscalar = [...jogadoresPrincipais]
-    
-    // Se tiver apenas 1 carry no dia, adiciona Pablo
-    // Se tiver 2+ carrys, NÃO adiciona Pablo (time de 10)
-    if (carrysNoDia === 1 && pablo) {
-      jogadoresParaEscalar.push({ id: pablo.id, nick: 'Pablo' })
-      console.log(`✅ Pablo escalado (1 carry no dia)`)
-    } else if (carrysNoDia >= 2) {
-      console.log(`⚠️ Pablo NÃO escalado (${carrysNoDia} carrys no dia - time de 10)`)
+    if (!pablo) {
+      return {
+        success: false,
+        jogadoresEscalados: 0,
+        erro: 'Pablo não encontrado no banco'
+      }
     }
+
+    // 3. SEMPRE escalar 11 jogadores (todos)
+    const jogadoresParaEscalar = [...jogadoresPrincipais, { id: pablo.id, nick: 'Pablo' }]
+    
+    console.log(`✅ Escalando 11 jogadores (TODOS recebem, 9 fazem o carry)`)
 
     // 5. Buscar pedido para calcular valorRecebido
     const pedido = await prisma.pedido.findUnique({
