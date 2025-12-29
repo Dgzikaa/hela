@@ -647,10 +647,19 @@ export default function PedidosPage() {
     }
   })
 
-  // Ordenar datas
-  const datasOrdenadas = Object.keys(pedidosAgrupados).sort((a, b) => 
-    new Date(a).getTime() - new Date(b).getTime()
-  )
+  // Ordenar datas baseado na tab ativa
+  const datasOrdenadas = Object.keys(pedidosAgrupados).sort((a, b) => {
+    const dataA = new Date(a).getTime()
+    const dataB = new Date(b).getTime()
+    
+    // Concluídos e Cancelados: ordem DECRESCENTE (mais recente primeiro)
+    if (tabAtiva === 'concluidos' || tabAtiva === 'cancelados') {
+      return dataB - dataA
+    }
+    
+    // Próximos e Pendentes: ordem CRESCENTE (mais próximo/antigo primeiro)
+    return dataA - dataB
+  })
   
   // Contar pedidos por categoria
   const contadores = {
