@@ -610,12 +610,10 @@ export default function PedidosPage() {
     
     switch (tabAtiva) {
       case 'proximos':
-        // Próximos: AGENDADO ou EM_ANDAMENTO, com data >= hoje
+        // Próximos: AGENDADO ou EM_ANDAMENTO (incluindo datas passadas não concluídas)
         // NUNCA mostrar CONCLUIDO ou CANCELADO aqui
         if (['CONCLUIDO', 'CANCELADO'].includes(pedido.status)) return false
-        return ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status) && 
-               dataPedidoStr && 
-               dataPedidoStr >= hojeStr
+        return ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status)
       
       case 'pendentes':
         // Pendentes: status PENDENTE (aguardando aprovação/pagamento)
@@ -663,12 +661,9 @@ export default function PedidosPage() {
   
   // Contar pedidos por categoria
   const contadores = {
-    proximos: pedidos.filter(p => {
-      const dataStr = p.dataAgendada ? p.dataAgendada.split('T')[0] : null
-      return ['AGENDADO', 'EM_ANDAMENTO'].includes(p.status) && 
-             dataStr && 
-             dataStr >= hojeStr
-    }).length,
+    proximos: pedidos.filter(p => 
+      ['AGENDADO', 'EM_ANDAMENTO'].includes(p.status)
+    ).length,
     pendentes: pedidos.filter(p => p.status === 'PENDENTE').length,
     concluidos: pedidos.filter(p => p.status === 'CONCLUIDO').length,
     cancelados: pedidos.filter(p => p.status === 'CANCELADO').length
