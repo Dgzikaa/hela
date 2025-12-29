@@ -600,12 +600,13 @@ export default function PedidosPage() {
   }
 
   // Filtrar pedidos baseado na tab ativa
+  // Pegar data de hoje no formato YYYY-MM-DD (sem timezone)
   const hoje = new Date()
-  hoje.setHours(0, 0, 0, 0)
+  const hojeStr = hoje.toISOString().split('T')[0] // "2025-12-26"
   
   const pedidosFiltrados = pedidos.filter(pedido => {
-    // Criar data do pedido sem conversão de timezone
-    const dataPedido = pedido.dataAgendada ? new Date(pedido.dataAgendada.split('T')[0] + 'T00:00:00') : null
+    // Extrair apenas a data do pedido (YYYY-MM-DD)
+    const dataPedidoStr = pedido.dataAgendada ? pedido.dataAgendada.split('T')[0] : null
     
     switch (tabAtiva) {
       case 'proximos':
@@ -613,8 +614,8 @@ export default function PedidosPage() {
         // NUNCA mostrar CONCLUIDO ou CANCELADO aqui
         if (['CONCLUIDO', 'CANCELADO'].includes(pedido.status)) return false
         return ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status) && 
-               dataPedido && 
-               dataPedido >= hoje
+               dataPedidoStr && 
+               dataPedidoStr >= hojeStr
       
       case 'pendentes':
         // Pendentes: status PENDENTE (aguardando aprovação/pagamento)
@@ -653,11 +654,12 @@ export default function PedidosPage() {
   
   // Contar pedidos por categoria
   const contadores = {
-    proximos: pedidos.filter(p => 
-      ['AGENDADO', 'EM_ANDAMENTO'].includes(p.status) && 
-      p.dataAgendada && 
-      new Date(p.dataAgendada) >= hoje
-    ).length,
+    proximos: pedidos.filter(p => {
+      const dataStr = p.dataAgendada ? p.dataAgendada.split('T')[0] : null
+      return ['AGENDADO', 'EM_ANDAMENTO'].includes(p.status) && 
+             dataStr && 
+             dataStr >= hojeStr
+    }).length,
     pendentes: pedidos.filter(p => p.status === 'PENDENTE').length,
     concluidos: pedidos.filter(p => p.status === 'CONCLUIDO').length,
     cancelados: pedidos.filter(p => p.status === 'CANCELADO').length
