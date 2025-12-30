@@ -92,19 +92,27 @@ export function CarryAgrupado({
     }
   }
 
-  const getPaymentBadge = (statusPagamento: string, valorReserva: number, valorTotal: number) => {
+  // Função para formatar valores: >= 1000kk vira b
+  const formatarValor = (valor: number) => {
+    const resultado = valor >= 1000 
+      ? `${(valor / 1000).toFixed(2)}b` 
+      : `${Math.floor(valor)}kk`
+    return resultado
+  }
+
+  const getPaymentBadge = (statusPagamento: string, valorTotal: number) => {
     if (statusPagamento === 'PAGO') {
-      return <Badge variant="success">✅ Pago Completo</Badge>
+      return <Badge variant="success" className="font-semibold">✅ PAGO ({formatarValor(valorTotal)})</Badge>
     } else if (statusPagamento === 'SINAL') {
-      const restante = valorTotal - valorReserva
-      const formatVal = (v: number) => v >= 100000 ? `${(v / 100000).toFixed(2)}b` : `${v}kk`
+      const sinal = 2000 // 2b em kk
+      const falta = valorTotal - sinal
       return (
-        <Badge variant="warning">
-          💰 Sinal {formatVal(valorReserva)} | Falta {formatVal(restante)}
+        <Badge variant="warning" className="font-semibold">
+          🟡 Sinal {formatarValor(sinal)} | Falta {formatarValor(falta)}
         </Badge>
       )
     }
-    return <Badge variant="danger">❌ Não Pago</Badge>
+    return <Badge variant="danger" className="font-semibold">🔴 NÃO PAGO</Badge>
   }
 
   if (!isAgrupado) {
@@ -122,7 +130,7 @@ export function CarryAgrupado({
               <Badge variant={getStatusColor(carry.status) as any}>
                 {carry.status}
               </Badge>
-              {carry.statusPagamento && getPaymentBadge(carry.statusPagamento, carry.valorReserva, carry.valorFinal)}
+              {carry.statusPagamento && getPaymentBadge(carry.statusPagamento, carry.valorFinal)}
               {carry.pacoteCompleto && (
                 <Badge variant="success">Pacote Completo</Badge>
               )}
@@ -156,9 +164,9 @@ export function CarryAgrupado({
             {/* Valor */}
             <div className="flex items-center gap-2 text-lg font-semibold text-green-600">
               <DollarSign className="w-5 h-5" />
-              {carry.valorFinal >= 100000 ? `${(carry.valorFinal / 100000).toFixed(2)}b` : `${carry.valorFinal}kk`}
+              {formatarValor(carry.valorFinal)}
               <span className="text-sm text-gray-600">
-                • {valorPorJogador}kk/jogador
+                • {formatarValor(valorPorJogador)}/jogador
               </span>
             </div>
 
@@ -201,9 +209,17 @@ export function CarryAgrupado({
                 <Calendar className="w-6 h-6 text-purple-600" />
                 {dataFormatada}
               </h3>
-              <Badge variant="warning" className="text-lg px-3 py-1">
-                🔥 {carrys.length} CARRYS
+              <Badge 
+                variant={carrys.length > 3 ? "danger" : "warning"} 
+                className="text-lg px-3 py-1"
+              >
+                {carrys.length > 3 ? '⚠️' : '🔥'} {carrys.length} CARRYS
               </Badge>
+              {carrys.length > 3 && (
+                <span className="text-red-600 text-sm font-semibold animate-pulse">
+                  LIMITE EXCEDIDO! Máximo: 3 carrys
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-6 text-sm">
@@ -241,10 +257,10 @@ export function CarryAgrupado({
           <div className="text-right">
             <div className="text-sm text-gray-600 mb-1">Valor Total</div>
             <div className="text-3xl font-bold text-green-600">
-              {valorTotalAgrupado >= 100000 ? `${(valorTotalAgrupado / 100000).toFixed(2)}b` : `${valorTotalAgrupado}kk`}
+              {formatarValor(valorTotalAgrupado)}
             </div>
             <div className="text-sm text-gray-600">
-              {valorPorJogador}kk por jogador
+              {formatarValor(valorPorJogador)} por jogador
             </div>
           </div>
         </div>
@@ -265,7 +281,7 @@ export function CarryAgrupado({
                   <Badge variant={getStatusColor(carry.status) as any}>
                     {carry.status}
                   </Badge>
-                  {carry.statusPagamento && getPaymentBadge(carry.statusPagamento, carry.valorReserva, carry.valorFinal)}
+                  {carry.statusPagamento && getPaymentBadge(carry.statusPagamento, carry.valorFinal)}
                 </div>
 
                 <div className="flex items-center gap-4 text-sm">
@@ -285,7 +301,7 @@ export function CarryAgrupado({
                     </div>
                   )}
                   <div className="text-green-600 font-semibold">
-                    {carry.valorFinal >= 100000 ? `${(carry.valorFinal / 100000).toFixed(2)}b` : `${carry.valorFinal}kk`}
+                    {formatarValor(carry.valorFinal)}
                   </div>
                 </div>
 

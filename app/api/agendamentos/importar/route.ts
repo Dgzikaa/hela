@@ -10,13 +10,41 @@ export async function POST(request: Request) {
     for (const agendamento of agendamentos) {
       const { data, clientes, sinal, observacoes } = agendamento
 
-      // VALIDAÇÃO: Máximo 2 clientes por data
-      if (clientes.length > 2) {
-        console.warn(`⚠️ Data ${data} tem ${clientes.length} clientes. Limite: 2. Considerando apenas os 2 primeiros.`)
-        clientes.splice(2) // Remove do índice 2 em diante
+      // VALIDAÇÃO: Máximo 3 clientes por data
+      if (clientes.length > 3) {
+        console.warn(`⚠️ Data ${data} tem ${clientes.length} clientes. Limite: 3. Considerando apenas os 3 primeiros.`)
+        clientes.splice(3) // Remove do índice 3 em diante
       }
 
-      // Para cada cliente no mesmo dia (máximo 2)
+      // VALIDAÇÃO ADICIONAL: Verificar quantos carrys já existem nesta data
+      const dataAlvo = new Date(data)
+      const inicioDia = new Date(dataAlvo.setHours(0, 0, 0, 0))
+      const fimDia = new Date(dataAlvo.setHours(23, 59, 59, 999))
+      
+      const carrysExistentes = await prisma.pedido.count({
+        where: {
+          dataAgendada: {
+            gte: inicioDia,
+            lte: fimDia
+          },
+          status: { notIn: ['CANCELADO'] }
+        }
+      })
+
+      // Calcular quantos novos carrys podemos adicionar
+      const vagasDisponiveis = Math.max(0, 3 - carrysExistentes)
+      
+      if (vagasDisponiveis === 0) {
+        console.warn(`⚠️ Data ${data} já tem 3 carrys. Pulando...`)
+        continue // Pula esta data
+      }
+      
+      if (clientes.length > vagasDisponiveis) {
+        console.warn(`⚠️ Data ${data}: Só há ${vagasDisponiveis} vaga(s) disponível(is). Importando apenas os primeiros.`)
+        clientes.splice(vagasDisponiveis) // Manter apenas os que cabem
+      }
+
+      // Para cada cliente no mesmo dia (máximo 3)
       for (const clienteNome of clientes) {
         // Criar ou buscar cliente
         let cliente = await prisma.cliente.findFirst({

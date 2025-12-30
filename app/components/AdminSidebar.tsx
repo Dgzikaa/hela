@@ -16,7 +16,9 @@ import {
   Dices,
   Gift,
   BarChart3,
-  Flame
+  Flame,
+  DollarSign,
+  FileText
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -30,6 +32,8 @@ const menuItems: MenuItem[] = [
   { name: 'Agendamento', href: '/admin/pedidos', icon: ShoppingCart },
   { name: 'Resumo', href: '/admin/projecao', icon: TrendingUp },
   { name: 'Calendário', href: '/admin/calendario', icon: Calendar },
+  { name: '💰 Pagamentos', href: '/admin/relatorio-pagamentos', icon: DollarSign },
+  { name: '📝 Observações', href: '/admin/observacoes-carrys', icon: FileText },
   { name: 'Membros', href: '/admin/jogadores', icon: Gamepad2 },
   { name: 'CRM', href: '/admin/crm', icon: BarChart3 },
   { name: 'Carry Grátis', href: '/admin/carry-gratis', icon: Gift },

@@ -269,6 +269,36 @@ export async function PATCH(req: Request) {
     const body = await req.json()
     const { id, status, dataAgendada, aprovadoPor, marcarPago } = body
 
+    // VALIDAÇÃO: Máximo 3 carrys por data
+    if (dataAgendada && status === 'AGENDADO') {
+      const dataAlvo = new Date(dataAgendada)
+      const inicioDia = new Date(dataAlvo.setHours(0, 0, 0, 0))
+      const fimDia = new Date(dataAlvo.setHours(23, 59, 59, 999))
+      
+      const carrysNaData = await prisma.pedido.count({
+        where: {
+          id: { not: id }, // Excluir o próprio pedido (para permitir reedição)
+          dataAgendada: {
+            gte: inicioDia,
+            lte: fimDia
+          },
+          status: {
+            notIn: ['CANCELADO'] // Não contar cancelados
+          }
+        }
+      })
+      
+      if (carrysNaData >= 3) {
+        return NextResponse.json(
+          { 
+            error: '⚠️ Limite excedido! Esta data já possui 3 carrys agendados.',
+            details: `Já existem ${carrysNaData} carrys nesta data. Máximo permitido: 3.`
+          },
+          { status: 400 }
+        )
+      }
+    }
+
     const pedido = await prisma.pedido.update({
       where: { id },
       data: {
@@ -290,7 +320,17 @@ export async function PATCH(req: Request) {
       }
     })
 
-    // Se concluir e marcar como pago, processar pagamentos
+    // Se concluir e marcar como pago, atualizar status de pagamento
+    if (status === 'CONCLUIDO' && marcarPago) {
+      await prisma.pedido.update({
+        where: { id },
+        data: {
+          statusPagamento: 'PAGO'
+        }
+      })
+    }
+
+    // Se concluir e marcar como pago, processar pagamentos dos jogadores
     if (status === 'CONCLUIDO' && marcarPago && pedido.participacoes.length > 0) {
       // Calcular valor por jogador (dividir igualmente entre participantes)
       const valorPorJogador = Math.floor(pedido.valorTotal / pedido.participacoes.length)

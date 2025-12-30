@@ -69,6 +69,9 @@ export default function PedidosPage() {
   // Tab ativa (padrão: próximos)
   const [tabAtiva, setTabAtiva] = useState<'proximos' | 'pendentes' | 'concluidos' | 'cancelados'>('proximos')
   
+  // Filtro de status de pagamento
+  const [filtroPagamento, setFiltroPagamento] = useState<'TODOS' | 'NAO_PAGO' | 'SINAL' | 'PAGO'>('TODOS')
+  
   // Modal de agendamento
   const [showAgendarModal, setShowAgendarModal] = useState(false)
   const [pedidoParaAgendar, setPedidoParaAgendar] = useState<Pedido | null>(null)
@@ -144,8 +147,20 @@ export default function PedidosPage() {
       if (res.ok) {
         const data = await res.json()
         
+        // Verificar duplicados
+        const ids = data.map((p: Pedido) => p.id)
+        const idsUnicos = new Set(ids)
+        if (ids.length !== idsUnicos.size) {
+          console.warn('⚠️ API retornou pedidos duplicados!')
+        }
+        
+        // Remover duplicados caso existam
+        const pedidosSemDuplicados = data.filter((p: Pedido, index: number, self: Pedido[]) => 
+          self.findIndex(t => t.id === p.id) === index
+        )
+        
         // Ordenar pedidos: futuros primeiro (mais próximo), depois concluídos/passados
-        const pedidosOrdenados = data.sort((a: Pedido, b: Pedido) => {
+        const pedidosOrdenados = pedidosSemDuplicados.sort((a: Pedido, b: Pedido) => {
           const hoje = new Date()
           const dataA = a.dataAgendada ? new Date(a.dataAgendada) : null
           const dataB = b.dataAgendada ? new Date(b.dataAgendada) : null
@@ -608,28 +623,44 @@ export default function PedidosPage() {
     // Extrair apenas a data do pedido (YYYY-MM-DD)
     const dataPedidoStr = pedido.dataAgendada ? pedido.dataAgendada.split('T')[0] : null
     
+    // Filtrar por status de pedido
+    let passaFiltroStatus = false
     switch (tabAtiva) {
       case 'proximos':
         // Próximos: AGENDADO ou EM_ANDAMENTO (incluindo datas passadas não concluídas)
         // NUNCA mostrar CONCLUIDO ou CANCELADO aqui
-        if (['CONCLUIDO', 'CANCELADO'].includes(pedido.status)) return false
-        return ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status)
+        if (['CONCLUIDO', 'CANCELADO'].includes(pedido.status)) passaFiltroStatus = false
+        else passaFiltroStatus = ['AGENDADO', 'EM_ANDAMENTO'].includes(pedido.status)
+        break
       
       case 'pendentes':
         // Pendentes: status PENDENTE (aguardando aprovação/pagamento)
-        return pedido.status === 'PENDENTE'
+        passaFiltroStatus = pedido.status === 'PENDENTE'
+        break
       
       case 'concluidos':
         // Concluídos apenas
-        return pedido.status === 'CONCLUIDO'
+        passaFiltroStatus = pedido.status === 'CONCLUIDO'
+        break
       
       case 'cancelados':
         // Cancelados apenas
-        return pedido.status === 'CANCELADO'
+        passaFiltroStatus = pedido.status === 'CANCELADO'
+        break
       
       default:
-        return true
+        passaFiltroStatus = true
     }
+    
+    // Se não passou no filtro de status, já retorna false
+    if (!passaFiltroStatus) return false
+    
+    // Filtrar por status de pagamento
+    if (filtroPagamento !== 'TODOS') {
+      return pedido.statusPagamento === filtroPagamento
+    }
+    
+    return true
   })
 
   // Agrupar pedidos filtrados por data
@@ -641,7 +672,12 @@ export default function PedidosPage() {
       if (!pedidosAgrupados[data]) {
         pedidosAgrupados[data] = []
       }
-      pedidosAgrupados[data].push(pedido)
+      
+      // Verificar se já existe (evitar duplicação)
+      const jaExiste = pedidosAgrupados[data].some(p => p.id === pedido.id)
+      if (!jaExiste) {
+        pedidosAgrupados[data].push(pedido)
+      }
     }
   })
 
@@ -667,6 +703,14 @@ export default function PedidosPage() {
     pendentes: pedidos.filter(p => p.status === 'PENDENTE').length,
     concluidos: pedidos.filter(p => p.status === 'CONCLUIDO').length,
     cancelados: pedidos.filter(p => p.status === 'CANCELADO').length
+  }
+  
+  // Contar pedidos por status de pagamento (apenas dos filtrados pela tab atual)
+  const contadoresPagamento = {
+    total: pedidosFiltrados.length,
+    naoPago: pedidosFiltrados.filter(p => p.statusPagamento === 'NAO_PAGO').length,
+    sinal: pedidosFiltrados.filter(p => p.statusPagamento === 'SINAL').length,
+    pago: pedidosFiltrados.filter(p => p.statusPagamento === 'PAGO').length,
   }
 
   return (
@@ -722,6 +766,56 @@ export default function PedidosPage() {
           >
             ❌ Cancelados ({contadores.cancelados})
           </button>
+        </div>
+
+        {/* Filtros de Status de Pagamento */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <DollarSign className="w-5 h-5 text-gray-600" />
+            <h3 className="text-sm font-semibold text-gray-700">Filtrar por Pagamento:</h3>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <button
+              onClick={() => setFiltroPagamento('TODOS')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                filtroPagamento === 'TODOS'
+                  ? 'bg-gray-700 text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              }`}
+            >
+              Todos ({contadoresPagamento.total})
+            </button>
+            <button
+              onClick={() => setFiltroPagamento('NAO_PAGO')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                filtroPagamento === 'NAO_PAGO'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              }`}
+            >
+              🔴 Não Pago ({contadoresPagamento.naoPago})
+            </button>
+            <button
+              onClick={() => setFiltroPagamento('SINAL')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                filtroPagamento === 'SINAL'
+                  ? 'bg-yellow-600 text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              }`}
+            >
+              🟡 Sinal (2b) ({contadoresPagamento.sinal})
+            </button>
+            <button
+              onClick={() => setFiltroPagamento('PAGO')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                filtroPagamento === 'PAGO'
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              }`}
+            >
+              🟢 Pago (3.5b) ({contadoresPagamento.pago})
+            </button>
+          </div>
         </div>
 
         {/* Stats da Tab Atual */}
@@ -1740,7 +1834,10 @@ export default function PedidosPage() {
               <div className="border-t border-gray-700 p-6 pt-4 bg-gray-800">
                 <div className="bg-gray-700 p-4 rounded mb-4">
                   <div className="text-lg font-bold text-white">
-                    Valor Total: {calcularValorTotal()}KK
+                    Valor Total: {(() => {
+                      const valor = calcularValorTotal()
+                      return valor >= 1000 ? `${(valor / 1000).toFixed(2)}b` : `${valor}kk`
+                    })()}
                   </div>
                 </div>
 
@@ -2228,7 +2325,10 @@ export default function PedidosPage() {
                 <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/50 p-4 rounded">
                   <div className="text-green-300 text-sm mb-1">💵 Valor Total Calculado</div>
                   <div className="text-3xl font-bold text-white">
-                    {calcularValorTotalEdit()}KK
+                    {(() => {
+                      const valor = calcularValorTotalEdit()
+                      return valor >= 1000 ? `${(valor / 1000).toFixed(2)}b` : `${valor}kk`
+                    })()}
                   </div>
                 </div>
 
