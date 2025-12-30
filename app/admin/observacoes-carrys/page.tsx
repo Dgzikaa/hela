@@ -181,7 +181,7 @@ export default function ObservacoesCarrysPage() {
 
   return (
     <ToolsLayout title="📝 Gerenciar Observações dos Carrys">
-      <ToastContainer toasts={toast.toasts} onClose={toast.dismiss} />
+      <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="mb-6">
