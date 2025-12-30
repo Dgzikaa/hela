@@ -246,7 +246,7 @@ export default function ObservacoesCarrysPage() {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-6 h-6 text-purple-600" />
                     <h3 className="text-xl font-bold text-gray-900">{dataFormatada}</h3>
-                    <Badge variant="primary">{carrys.length} carry{carrys.length > 1 ? 's' : ''}</Badge>
+                    <Badge variant="info">{carrys.length} carry{carrys.length > 1 ? 's' : ''}</Badge>
                   </div>
                 </div>
 

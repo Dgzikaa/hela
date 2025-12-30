@@ -157,8 +157,8 @@ export async function POST(request: Request) {
       console.log(`📅 Processando: ${dataAgendada.toLocaleString('pt-BR')}`);
 
       for (const carry of agendamento.carrys) {
-        const statusPagamento = carry.statusPagamento || 'SINAL';
-        const valorTotal = carry.valorTotal || valorPacoteCompleto;
+        const statusPagamento = (carry as any).statusPagamento || 'SINAL';
+        const valorTotal = (carry as any).valorTotal || valorPacoteCompleto;
         const valorFinal = statusPagamento === 'PAGO' ? valorTotal : valorTotal;
 
         // Verificar se já existe um pedido para este cliente nesta data
