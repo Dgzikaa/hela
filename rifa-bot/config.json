@@ -1,0 +1,49 @@
+{
+  "api_url": "http://localhost:3000",
+  "check_interval_seconds": 3,
+  "auto_play": false,
+  "max_plays_per_rifa": 50,
+  "min_profit_to_play": 0,
+  "notifications": true,
+  "debug_mode": true,
+  "screen_regions": {
+    "rifa_text": {
+      "x": 160,
+      "y": 90,
+      "width": 300,
+      "height": 80,
+      "description": "Área do texto do NPC Rafa da Rifa (ajustar conforme sua resolução)"
+    },
+    "npc_click": {
+      "x": 800,
+      "y": 450,
+      "description": "Posição para clicar no NPC"
+    },
+    "buy_button": {
+      "x": 200,
+      "y": 350,
+      "description": "Botão 'Sim, eu quero comprar um número'"
+    },
+    "close_button": {
+      "x": 250,
+      "y": 200,
+      "description": "Botão 'fechar' após resultado"
+    }
+  },
+  "rifas_keywords": {
+    "1": ["Consumíveis da Rifa A", "Consumíveis da Rifa B"],
+    "2": ["Consumíveis da Rifa C", "Consumíveis da Rifa D"],
+    "3": ["Consumíveis da Rifa E", "Consumíveis da Rifa F"],
+    "4": ["Medicina Milagrosa", "Pergaminho do Éden"],
+    "5": ["Espelho Convexo", "Amuleto de Ziegfried"],
+    "6": ["Auxiliares Dourados A", "Conversores Etéreos"],
+    "7": ["Consumíveis Dourados", "Doce de Elvira"],
+    "8": ["Poção de Guyak", "Poção do Vento"],
+    "9": ["Salada de Frutas", "Trouxinha de Comidas"],
+    "10": ["Munições Douradas", "Conversores Elementais"],
+    "11": ["Auxiliares Dourados B", "Suprimentos de Classe"],
+    "12": ["Ingredientes Dourados", "Xaropes"],
+    "13": ["Poção Mental", "Incenso Queimado"],
+    "14": ["Pedra de Selamento", "Consumíveis da Rifa G"]
+  }
+}

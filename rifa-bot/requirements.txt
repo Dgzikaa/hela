@@ -1,0 +1,22 @@
+# Bot de Rifa - Dependências Python
+# Instalar com: pip install -r requirements.txt
+
+# OCR
+easyocr>=1.7.0
+# Alternativa: pytesseract (precisa instalar Tesseract OCR separadamente)
+
+# Automação de mouse/teclado
+pyautogui>=0.9.54
+
+# Captura de tela
+pillow>=10.0.0
+mss>=9.0.0
+
+# Requests para API
+requests>=2.31.0
+
+# Interface gráfica simples (opcional)
+keyboard>=0.13.5
+
+# Notificações Windows
+win10toast>=0.9

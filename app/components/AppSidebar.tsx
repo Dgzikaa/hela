@@ -22,7 +22,8 @@ import {
   Target,
   Wallet,
   CalendarRange,
-  Users
+  Users,
+  Ticket
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -56,8 +57,8 @@ const menuCategories: MenuCategory[] = [
   {
     name: 'Ferramentas',
     items: [
-      // { name: 'CRM', href: '/ferramentas/crm', icon: BarChart3, isAdmin: true }, // Oculto temporariamente
       { name: 'Tigrinho', href: '/ferramentas/tigrinho', icon: Dices },
+      { name: 'Rifas', href: '/rifas', icon: Ticket },
       { name: 'Preços', href: '/ferramentas/precos', icon: LineChart },
     ]
   },
